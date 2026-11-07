@@ -15,7 +15,7 @@ export const HALL = { width: 12, depth: 16, height: 6 } as const;
 export const STAGE = { height: CHAIR_HEIGHT, front: 0.5 } as const;
 
 /** Distance from the stage front to the front row of chairs, in metres. */
-const FRONT_ROW_GAP = 2.8;
+const FRONT_ROW_GAP = 0.8;
 
 const WALL = 0xe6dcc3;
 const FLOOR = 0x9a6b3f;

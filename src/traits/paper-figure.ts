@@ -1,9 +1,11 @@
 import {
+  BufferGeometry,
   CanvasTexture,
+  DoubleSide,
+  Float32BufferAttribute,
   type Intersection,
   Mesh,
   MeshStandardMaterial,
-  PlaneGeometry,
   type Raycaster,
   SRGBColorSpace,
 } from "three";
@@ -14,9 +16,55 @@ import { type RigParams, type RigSelection, renderRig } from "../paper/rig.ts";
 /** Texture pixels per rig unit. */
 const RESOLUTION = 1.5;
 
+/** A profile point: rig row `v` (rig units from the top) placed at local [y, z] metres. */
+export type ProfilePoint = [v: number, y: number, z: number];
+
 /**
- * Shows a paper rig as a flat panel. `anchor` (in rig units) is placed at the
+ * Build the figure's surface. With no profile it's a flat upright panel with
+ * the anchor at the origin. A profile bends it: each listed rig row is placed
+ * at its [y, z], and the drawing runs straight between consecutive rows (e.g.
+ * a seated figure folds forward at the hips and down at the knees).
+ */
+export function figureGeometry(
+  width: number,
+  height: number,
+  scale: number,
+  anchor: readonly [number, number],
+  profile: readonly ProfilePoint[] = [],
+): BufferGeometry {
+  const points: readonly ProfilePoint[] =
+    profile.length >= 2
+      ? profile
+      : [
+          [0, anchor[1] * scale, 0],
+          [height, (anchor[1] - height) * scale, 0],
+        ];
+  const [x0, x1] = [-anchor[0] * scale, (width - anchor[0]) * scale];
+  const positions: number[] = [];
+  const uvs: number[] = [];
+  // One separate quad per segment, so each fold has a crisp edge.
+  for (let i = 0; i + 1 < points.length; i++) {
+    const [va, ya, za] = points[i]!;
+    const [vb, yb, zb] = points[i + 1]!;
+    const [ta, tb] = [1 - va / height, 1 - vb / height];
+    // prettier-ignore
+    positions.push(
+      x0, ya, za,  x1, ya, za,  x0, yb, zb,
+      x1, ya, za,  x1, yb, zb,  x0, yb, zb,
+    );
+    uvs.push(0, ta, 1, ta, 0, tb, 1, ta, 1, tb, 0, tb);
+  }
+  const geometry = new BufferGeometry();
+  geometry.setAttribute("position", new Float32BufferAttribute(positions, 3));
+  geometry.setAttribute("uv", new Float32BufferAttribute(uvs, 2));
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
+/**
+ * Shows a paper rig as a panel. `anchor` (in rig units) is placed at the
  * object's origin, e.g. a seated figure's hips or a standing figure's feet.
+ * An optional `profile` bends the panel (see {@link figureGeometry}).
  * Change `slots` or `params` at any time and the figure redraws.
  * Transparent parts of the drawing don't block the pointer.
  */
@@ -29,14 +77,14 @@ export const PaperFigure = defineTrait({
     /** Metres per rig unit. */
     scale: 0.004,
     anchor: [0, 0] as [number, number],
+    /** Optional bend; see figureGeometry. Empty = flat. */
+    profile: [] as ProfilePoint[],
   },
   setup({ object, settings: s }) {
     const rig = rigs.get(s.rig);
-    const [w, h] = [rig.width * s.scale, rig.height * s.scale];
-    const geometry = new PlaneGeometry(w, h);
-    // Shift so the anchor point sits at the origin.
-    geometry.translate(w / 2 - s.anchor[0] * s.scale, -h / 2 + s.anchor[1] * s.scale, 0);
-    const material = new MeshStandardMaterial({ alphaTest: 0.5, roughness: 1 });
+    const geometry = figureGeometry(rig.width, rig.height, s.scale, s.anchor, s.profile);
+    // Double-sided: a bent figure shows faces at several angles.
+    const material = new MeshStandardMaterial({ alphaTest: 0.5, roughness: 1, side: DoubleSide });
     const mesh = new Mesh(geometry, material);
     mesh.visible = false;
     object.node.add(mesh);

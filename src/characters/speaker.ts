@@ -231,15 +231,15 @@ const BACK_TORSO = `
 
 const BACK_HEAD = `
 <ellipse cx="200" cy="190" rx="112" ry="105" fill="${P.skin}" ${LINE}/>
+<circle cx="90" cy="200" r="18" fill="${P.skin}" ${LINE}/>
+<circle cx="310" cy="200" r="18" fill="${P.skin}" ${LINE}/>
 <path d="M 88 195 C 80 110 140 66 200 66 C 260 66 320 110 312 195 C 308 240 290 268 260 278 Q 200 292 140 278 C 110 268 92 240 88 195 Z" fill="${P.hair}" ${LINE}/>
 <g stroke="${P.hairShine}" stroke-linecap="round" fill="none" opacity="0.6">
 <path d="M 150 86 C 138 150 148 220 168 262" stroke-width="4.5"/>
 <path d="M 200 78 C 196 150 198 220 200 270" stroke-width="4"/>
 <path d="M 250 86 C 262 150 252 220 232 262" stroke-width="4.5"/>
 </g>
-<circle cx="90" cy="200" r="18" fill="${P.skin}" ${LINE}/>
-<circle cx="310" cy="200" r="18" fill="${P.skin}" ${LINE}/>
-<path d="M 100 184 Q 84 182 80 198 M 300 184 Q 316 182 320 198" stroke="${P.lens}" stroke-width="5" fill="none" stroke-linecap="round"/>`;
+`;
 
 const SILENT = variants(MOUTHS, () => "");
 

@@ -18,14 +18,14 @@ describe("Noclip", () => {
     expect(camera.position.toArray()).toEqual([0, 2, 0]);
   });
 
-  it("moves along the view direction, and vertically with Q/E", () => {
+  it("moves along the view direction, and vertically with R/F", () => {
     const { camera, noclip } = setup();
     noclip.toggle();
     noclip.press("KeyW");
     noclip.update(1);
     expect(camera.position.z).toBeCloseTo(-3);
     noclip.release("KeyW");
-    noclip.press("KeyE");
+    noclip.press("KeyR");
     noclip.update(1);
     expect(camera.position.y).toBeCloseTo(5);
   });

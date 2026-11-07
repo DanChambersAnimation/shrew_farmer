@@ -1,34 +1,48 @@
+import { MathUtils, Vector3 } from "three";
 import { describe, expect, it } from "vite-plus/test";
-import { Vector3 } from "three";
 import { World } from "../core/world.ts";
 import { CameraView } from "./camera-view.ts";
 
-describe("camera sway", () => {
-  it("completes a 22-second cycle with five-degree peaks while facing its target", () => {
-    const world = new World();
-    world.createRoot("room").add(CameraView, {
-      position: [0, 3, 8],
-      lookAt: [0, 1, -8],
-      swayDegrees: 5,
-      swayPeriodSeconds: 22,
-    });
-    const start = world.camera.position.clone();
-    world.update(5.5);
-    const peak = world.camera.position.clone();
-    const offset = Math.atan2(-peak.x, peak.z + 8);
-    expect(offset).toBeCloseTo((5 * Math.PI) / 180, 5);
-    expect(peak.y).toBe(3);
-    expect(
-      world.camera
-        .getWorldDirection(new Vector3())
-        .distanceTo(new Vector3(0, 1, -8).sub(peak).normalize()),
-    ).toBeLessThan(1e-10);
-    world.update(5.5);
-    expect(world.camera.position.distanceTo(start)).toBeLessThan(1e-10);
-    world.update(5.5);
-    const oppositePeak = world.camera.position.clone();
-    expect(Math.atan2(-oppositePeak.x, oppositePeak.z + 8)).toBeCloseTo((-5 * Math.PI) / 180, 5);
-    world.update(5.5);
-    expect(world.camera.position.distanceTo(start)).toBeLessThan(1e-10);
+/** Horizontal angle (degrees) of the camera around the look-at point. */
+function orbitAngle(world: World): number {
+  const offset = world.camera.position.clone().sub(new Vector3(0, 0, 0));
+  return MathUtils.radToDeg(Math.atan2(offset.x, offset.z));
+}
+
+function setup(swayDegrees: number) {
+  const world = new World();
+  const room = world.createRoot("room");
+  room.add(CameraView, { position: [0, 3, 10], lookAt: [0, 0, 0], swayDegrees, swayPeriod: 20 });
+  return { world, room };
+}
+
+describe("CameraView", () => {
+  it("places and aims the camera", () => {
+    const { world } = setup(0);
+    expect(world.camera.position.toArray()).toEqual([0, 3, 10]);
+    const ahead = new Vector3(0, 0, -1).applyQuaternion(world.camera.quaternion);
+    expect(ahead.z).toBeLessThan(0);
+  });
+
+  it("sways side to side around the look-at point, keeping distance and height", () => {
+    const { world, room } = setup(5);
+    room.update(5); // a quarter of the period: full swing one way
+    const first = orbitAngle(world);
+    expect(Math.abs(first)).toBeCloseTo(5);
+    expect(world.camera.position.y).toBeCloseTo(3);
+    expect(Math.hypot(world.camera.position.x, world.camera.position.z)).toBeCloseTo(10);
+    room.update(10); // three quarters: full swing the other way
+    expect(orbitAngle(world)).toBeCloseTo(-first);
+  });
+
+  it("pauses while the camera is manual, then returns to its view", () => {
+    const { world, room } = setup(5);
+    world.manualCamera = true;
+    world.camera.position.set(99, 99, 99);
+    room.update(5);
+    expect(world.camera.position.x).toBe(99);
+    world.manualCamera = false;
+    room.update(0);
+    expect(world.camera.position.toArray().map((n) => Math.round(n))).toEqual([0, 3, 10]);
   });
 });

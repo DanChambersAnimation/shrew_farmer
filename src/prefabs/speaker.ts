@@ -10,9 +10,15 @@ import type { Vec3 } from "../traits/types.ts";
 
 /**
  * The player character, standing with his feet at `position`. `view` picks the
- * front or back rig; both share the same slots, so poses carry over.
+ * front or back rig; both share the same slots, so poses carry over. `yaw`
+ * turns him from squarely facing the camera.
  */
-export function speaker(position: Vec3, view: "front" | "back" = "back"): ObjectSpec {
+export function speaker(
+  position: Vec3,
+  view: "front" | "back" = "back",
+  /** Turn from facing the camera, degrees (positive = anticlockwise from above). */
+  yaw = 0,
+): ObjectSpec {
   return {
     kind: "speaker",
     traits: [
@@ -23,12 +29,12 @@ export function speaker(position: Vec3, view: "front" | "back" = "back"): Object
       }),
       // Face the camera fully so a steep view doesn't squash him; the panel
       // pivots at his feet, so they stay planted on the stage.
-      trait(Billboard),
+      trait(Billboard, { yaw }),
       trait(Inspectable, {
         title: "You · The Speaker",
         description: "Slick hair, dark glasses, shiny suit. Ready to inspire.",
       }),
-      trait(Highlight, { intensity: 0.15 }),
+      trait(Highlight, { intensity: 0.08 }),
     ],
   };
 }

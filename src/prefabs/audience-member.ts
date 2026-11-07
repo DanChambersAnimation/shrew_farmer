@@ -1,4 +1,4 @@
-import { SEAT_POINT, randomAppearance } from "../characters/audience.ts";
+import { SEAT_POINT, randomAppearance, seatedProfile } from "../characters/audience.ts";
 import {
   audienceVisual,
   randomAudienceState,
@@ -17,6 +17,8 @@ import { Transform } from "../traits/transform.ts";
 import { AudienceModel } from "../traits/audience-model.ts";
 import type { Vec3 } from "../traits/types.ts";
 
+const SCALE = 0.004;
+
 /** Create one seated audience member. A supplied seed makes generation repeatable. */
 export function createAudienceMember(
   position: Vec3 = [0, 0, 0],
@@ -34,14 +36,17 @@ export function createAudienceMember(
         rig: "audience",
         slots: { ...appearance.slots, face: visual.face, arms: visual.arms },
         params: appearance.params,
+        scale: SCALE,
         anchor: [...SEAT_POINT],
+        profile: seatedProfile(SCALE, position[1]),
       }),
-      trait(Billboard),
+      // Turn (not tilt) toward the camera, so the bent figure stays in its chair.
+      trait(Billboard, { mode: "upright" }),
       trait(Inspectable, {
         title: "Audience member",
         description: visual.description,
       }),
-      trait(Highlight, { intensity: 0.25 }),
+      trait(Highlight, { intensity: 0.08 }),
       trait(AudienceModel, { appearance, personality, state: { ...state } }),
     ],
   };
