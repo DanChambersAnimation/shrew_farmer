@@ -9,8 +9,10 @@ import {
   SpotLight,
   SRGBColorSpace,
   type Texture,
+  Vector3,
 } from "three";
 import { defineTrait } from "../core/trait.ts";
+import { Beam } from "../render/beam.ts";
 import type { Vec3 } from "./types.ts";
 
 export type LightKind = "ambient" | "hemisphere" | "directional" | "point" | "spot";
@@ -50,6 +52,9 @@ function patternTexture(pattern: LightPattern): Texture | null {
  * `color`, `target` and `scale` (a brightness multiplier) are applied live, so
  * other traits can animate them (see Pulse, Sweep, ColorCycle). A spot light
  * can project a `pattern` (e.g. "dots" for a mirror ball).
+ *
+ * A spot light with `beam` > 0 also shows its shaft of light in the air, when
+ * the room has haze (see Haze), down to the floor.
  */
 export const Light = defineTrait({
   name: "light",
@@ -71,6 +76,8 @@ export const Light = defineTrait({
     scale: 1,
     /** Spot lights only: a projected pattern. Projection needs shadows, so it turns them on. */
     pattern: "" as LightPattern,
+    /** Spot lights only: how visible the beam is in hazy air (0 = never). */
+    beam: 0,
   },
   setup({ object, world, settings: s }) {
     let light: ThreeLight;
@@ -120,11 +127,23 @@ export const Light = defineTrait({
     object.node.add(light);
     const levelNow = () => (s.group ? (world.lightLevels.get(s.group) ?? 1) : 1);
     let level = levelNow();
+    const beam = light instanceof SpotLight && s.beam > 0 ? new Beam("cone") : null;
+    if (beam) object.node.add(beam.mesh);
+    const origin = new Vector3();
     const apply = () => {
       light.intensity = s.intensity * level * s.scale;
       light.color.setHex(s.color);
       if (light instanceof SpotLight || light instanceof DirectionalLight) {
         light.target.position.set(...s.target);
+      }
+      if (beam) {
+        // Run the beam down to the floor (or to the target if aimed upward).
+        const direction = new Vector3(...s.target).normalize();
+        object.node.getWorldPosition(origin);
+        const toFloor = direction.y < -0.05 ? origin.y / -direction.y : Infinity;
+        const length = Math.min(toFloor, new Vector3(...s.target).length() * 1.5, 30);
+        const opacity = 0.1 * s.beam * world.haze * level * s.scale;
+        beam.set(direction, length, MathUtils.degToRad(s.angle) * 0.9, s.color, opacity);
       }
     };
     apply();
@@ -139,6 +158,7 @@ export const Light = defineTrait({
       },
       dispose() {
         map?.dispose();
+        beam?.dispose();
         if (light instanceof SpotLight || light instanceof DirectionalLight) {
           light.target.removeFromParent();
         }

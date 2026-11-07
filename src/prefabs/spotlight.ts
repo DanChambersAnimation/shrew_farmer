@@ -6,12 +6,13 @@ import type { Vec3 } from "../traits/types.ts";
 
 /**
  * A shadow-casting spotlight hung at `from`, aimed at `to` (both world space).
- * It belongs to light `group` (default "spot") so lighting cues can fade it.
+ * It belongs to light `group` (default "spot") so lighting cues can fade it;
+ * `beam` makes its shaft visible in a hazy room.
  */
 export function spotlight(
   from: Vec3,
   to: Vec3,
-  options: { intensity?: number; angle?: number; group?: string } = {},
+  options: { intensity?: number; angle?: number; group?: string; beam?: number } = {},
 ): ObjectSpec {
   return {
     kind: "spotlight",
@@ -26,6 +27,7 @@ export function spotlight(
         target: [to[0] - from[0], to[1] - from[1], to[2] - from[2]],
         castShadow: true,
         group: options.group ?? "spot",
+        beam: options.beam ?? 0,
       }),
     ],
   };

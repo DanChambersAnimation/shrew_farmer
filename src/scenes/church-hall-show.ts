@@ -3,6 +3,7 @@ import { spawnSpec } from "../core/spec.ts";
 import { STAGE, churchHall } from "../locations/church-hall.ts";
 import { fillSeats } from "../prefabs/audience-member.ts";
 import { speaker } from "../prefabs/speaker.ts";
+import { Bloom } from "../traits/bloom.ts";
 import { CameraView } from "../traits/camera-view.ts";
 import { LookAround } from "../traits/look-around.ts";
 import type { Vec3 } from "../traits/types.ts";
@@ -22,6 +23,8 @@ export function churchHallShow(room: GameObject): { speakerAt: Vec3; speaker: Ga
     swayDegrees: 5,
     swayPeriod: 22,
   });
+  // Bright things (the windows, stage effects) glow.
+  room.add(Bloom);
   fillSeats(spawnSpec(room, churchHall()));
   // The player, centre stage with his back to us, facing the audience and
   // glancing from side to side every 4 seconds.

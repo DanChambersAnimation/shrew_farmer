@@ -52,7 +52,8 @@ export function windowFrame(
       // Daylight through the glass: a soft self-lit pane.
       slab("glass", [width, height, 0.02], [0, 0, 0], GLASS, {
         emissive: GLASS,
-        emissiveIntensity: 0.45,
+        // Bright enough to glow with bloom.
+        emissiveIntensity: 1.1,
         roughness: 0.1,
         castShadow: false,
       }),
