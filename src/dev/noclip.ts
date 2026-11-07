@@ -6,14 +6,14 @@ const MOVES: Record<string, [number, number, number]> = {
   KeyS: [0, 0, 1],
   KeyA: [-1, 0, 0],
   KeyD: [1, 0, 0],
-  KeyE: [0, 1, 0],
-  KeyQ: [0, -1, 0],
+  KeyR: [0, 1, 0],
+  KeyF: [0, -1, 0],
 };
 
 const round = (n: number) => Math.round(n * 100) / 100;
 
 /**
- * Free-fly camera for positioning shots: WASD to move, Q/E down/up, Shift to go
+ * Free-fly camera for positioning shots: WASD to move, R/F up/down, Shift to go
  * faster, mouse to look (pointer-locked), wheel to zoom. `settings()` gives the
  * current view in the shape CameraView takes.
  */
@@ -71,7 +71,7 @@ export class Noclip {
     if (move.lengthSq() === 0) return;
     const fast = this.held.has("ShiftLeft") || this.held.has("ShiftRight");
     move.normalize().multiplyScalar(this.speed * (fast ? 3 : 1) * dt);
-    // Horizontal moves follow the view direction; Q/E stay vertical.
+    // Horizontal moves follow the view direction; R/F stay vertical.
     const up = move.y;
     move.y = 0;
     move.applyQuaternion(this.camera.quaternion);

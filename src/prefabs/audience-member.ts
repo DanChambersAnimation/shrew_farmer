@@ -1,4 +1,4 @@
-import { MOODS, SEAT_POINT, randomLook } from "../characters/audience.ts";
+import { MOODS, SEAT_POINT, randomLook, seatedProfile } from "../characters/audience.ts";
 import type { GameObject } from "../core/game-object.ts";
 import { type ObjectSpec, spawnSpec } from "../core/spec.ts";
 import { trait } from "../core/trait.ts";
@@ -10,7 +10,12 @@ import { Seat } from "../traits/seat.ts";
 import { Transform } from "../traits/transform.ts";
 import type { Vec3 } from "../traits/types.ts";
 
-/** A seated audience member with a random (but repeatable) look and mood. */
+const SCALE = 0.004;
+
+/**
+ * A seated audience member with a random (but repeatable) look and mood, hips at
+ * `position`; the figure bends to sit, with feet on a floor `position[1]` below.
+ */
 export function audienceMember(seed: number, position: Vec3 = [0, 0, 0]): ObjectSpec {
   const look = randomLook(seed);
   const mood = MOODS[look.mood];
@@ -22,14 +27,17 @@ export function audienceMember(seed: number, position: Vec3 = [0, 0, 0]): Object
         rig: "audience",
         slots: look.slots,
         params: look.params,
+        scale: SCALE,
         anchor: [...SEAT_POINT],
+        profile: seatedProfile(SCALE, position[1]),
       }),
-      trait(Billboard),
+      // Turn (not tilt) toward the camera, so the bent figure stays in its chair.
+      trait(Billboard, { mode: "upright" }),
       trait(Inspectable, {
         title: `Audience member · ${mood.label}`,
         description: mood.description,
       }),
-      trait(Highlight, { intensity: 0.25 }),
+      trait(Highlight, { intensity: 0.08 }),
     ],
   };
 }

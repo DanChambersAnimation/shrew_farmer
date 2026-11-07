@@ -35,11 +35,17 @@ function resize(): void {
 window.addEventListener("resize", resize);
 resize();
 
+function showRoomLabel(): void {
+  if (!def) return;
+  const name = def.title ? `${def.name} · ${def.title}` : def.name;
+  label.textContent = world.projection === "orthographic" ? `${name} · orthographic (Q)` : name;
+}
+
 const roomName = new URLSearchParams(window.location.search).get("room") ?? DEFAULT_ROOM;
 const def = rooms.get(roomName);
 if (def) {
   rooms.load(world, roomName);
-  label.textContent = def.title ? `${def.name} · ${def.title}` : def.name;
+  showRoomLabel();
 } else {
   const known = rooms
     .list()
@@ -81,7 +87,7 @@ function showNoclip(): void {
   noclipHud.querySelector("small")!.textContent =
     copied ||
     (locked
-      ? "WASD move · Q/E down/up · Shift fast · wheel zoom · C copy · Esc free mouse · N exit"
+      ? "WASD move · R/F up/down · Shift fast · wheel zoom · C copy · Esc free mouse · N exit"
       : "Click the view to look around · C copy · N exit");
 }
 window.addEventListener("keydown", (event) => {
@@ -91,6 +97,10 @@ window.addEventListener("keydown", (event) => {
     if (noclip.active) world.pointer.move(null);
     else document.exitPointerLock();
     canvas.style.cursor = "default";
+  } else if (event.code === "KeyQ" && !event.repeat) {
+    // Toggle between perspective and orthographic projection.
+    world.projection = world.projection === "perspective" ? "orthographic" : "perspective";
+    showRoomLabel();
   } else if (event.code === "KeyC" && noclip.active) {
     const text = noclip.snippet();
     navigator.clipboard?.writeText(text).then(
@@ -132,5 +142,5 @@ renderer.setAnimationLoop((time) => {
   noclip.update(dt);
   world.update(dt);
   showNoclip();
-  renderer.render(world.scene, world.camera);
+  renderer.render(world.scene, world.viewCamera);
 });

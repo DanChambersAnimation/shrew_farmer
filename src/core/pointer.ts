@@ -81,7 +81,8 @@ export class PointerSystem {
   }
 
   private pick(ndc: { x: number; y: number }): Hit | null {
-    const { scene, camera } = this.world;
+    const { scene } = this.world;
+    const camera = this.world.viewCamera;
     scene.updateMatrixWorld();
     camera.updateMatrixWorld();
     this.raycaster.setFromCamera(new Vector2(ndc.x, ndc.y), camera);

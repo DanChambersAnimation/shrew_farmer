@@ -12,6 +12,33 @@ import { rigs } from "../paper/rig-registry.ts";
 
 export const SEAT_POINT: Point = [150, 300];
 
+/** Rig rows (units from the top) of the body landmarks used to bend the figure. */
+export const LANDMARKS = { neck: 190, hips: 300, knees: 324, feet: 410 } as const;
+
+/**
+ * How to bend the flat drawing into a seated pose (see PaperFigure's profile):
+ * upright torso, head tipped back by `headTilt` degrees, thighs forward along
+ * the seat for `thigh` metres, shins straight down `seatHeight` metres to the floor.
+ */
+export function seatedProfile(
+  scale: number,
+  seatHeight: number,
+  thigh = 0.34,
+  headTilt = 25,
+): [number, number, number][] {
+  const { neck, hips, knees, feet } = LANDMARKS;
+  const neckY = (hips - neck) * scale;
+  const headLength = neck * scale;
+  const tilt = (headTilt * Math.PI) / 180;
+  return [
+    [0, neckY + headLength * Math.cos(tilt), -headLength * Math.sin(tilt)],
+    [neck, neckY, 0],
+    [hips, 0, 0],
+    [knees, 0, thigh],
+    [feet, -seatHeight, thigh],
+  ];
+}
+
 const OUTLINE = "#2b1d14";
 const LINE = `stroke="${OUTLINE}" stroke-width="4" stroke-linejoin="round"`;
 const thin = (width = 3) =>

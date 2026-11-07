@@ -13,14 +13,14 @@ rooms.register({
     room.add(CameraView, {
       // Behind and above the speaker, looking down at the audience (set with noclip),
       // with a slow side-to-side sway.
-      position: [0.02, 4.61, 5.28],
-      lookAt: [0.02, 0.29, -3.74],
+      position: [0.68, 5.96, 5.25],
+      lookAt: [0.69, -0.07, -2.73],
       fov: 50,
       swayDegrees: 5,
       swayPeriod: 22,
     });
     fillSeats(spawnSpec(room, churchHall()));
-    // The player, on stage with his back to us, facing the audience.
-    spawnSpec(room, speaker([-2.6, STAGE.height, 2.2]));
+    // The player, on stage with his back to us, turned 45° clockwise to face the audience.
+    spawnSpec(room, speaker([-2.6, STAGE.height, 2.2], "back", -45));
   },
 });
