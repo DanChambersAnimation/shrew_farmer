@@ -4,6 +4,7 @@ import { rooms } from "./core/room-registry.ts";
 import { World } from "./core/world.ts";
 import { Noclip } from "./dev/noclip.ts";
 import { FrameRenderer } from "./render/frame.ts";
+import { Bloom } from "./traits/bloom.ts";
 import { INSPECT, type InspectInfo } from "./traits/inspectable.ts";
 import { GameTimer } from "./traits/game-timer.ts";
 import { CUE_CHANGED, NEXT_CUE } from "./traits/lighting-cues.ts";
@@ -113,7 +114,43 @@ function showNoclip(): void {
       ? "WASD move · R/F up/down · Shift fast · wheel zoom · C copy · Esc free mouse · N exit"
       : "Click the view to look around · C copy · N exit");
 }
+// Settings panel: bloom amount and day/night outside. It edits the room's own
+// Bloom trait settings, so the value lives with the room like everything else.
+const panel = Object.assign(document.createElement("div"), { id: "settings" });
+panel.innerHTML = `
+  <label>Bloom <input type="range" min="0" max="1.5" step="0.05" /> <output></output></label>
+  <button type="button"></button>`;
+document.body.appendChild(panel);
+const bloomInput = panel.querySelector("input")!;
+const bloomValue = panel.querySelector("output")!;
+const outsideButton = panel.querySelector("button")!;
+function showSettings(): void {
+  const bloom = world.current?.settingsOf(Bloom);
+  bloomInput.disabled = !bloom;
+  bloomInput.title = bloom ? "" : "This room has no bloom";
+  if (bloom && document.activeElement !== bloomInput) bloomInput.value = String(bloom.strength);
+  bloomValue.textContent = bloom ? bloom.strength.toFixed(2) : "–";
+  outsideButton.textContent = world.outside === "day" ? "☀ Day (T)" : "☾ Night (T)";
+}
+bloomInput.addEventListener("input", () => {
+  const bloom = world.current?.settingsOf(Bloom);
+  if (bloom) bloom.strength = Number(bloomInput.value);
+  showSettings();
+});
+function toggleOutside(): void {
+  world.outside = world.outside === "day" ? "night" : "day";
+  showSettings();
+}
+outsideButton.addEventListener("click", () => {
+  toggleOutside();
+  outsideButton.blur();
+});
+showSettings();
+
 window.addEventListener("keydown", (event) => {
+  // Keys typed into the settings panel's controls aren't game keys.
+  if (event.target instanceof HTMLInputElement || event.target instanceof HTMLButtonElement) return;
+  if (event.code === "KeyT" && !event.repeat) toggleOutside();
   if (event.code === "KeyN" && !event.repeat) {
     noclip.toggle();
     world.manualCamera = noclip.active;
