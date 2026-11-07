@@ -19,6 +19,8 @@ renderer.toneMapping = ACESFilmicToneMapping;
 app.appendChild(renderer.domElement);
 
 const world = new World();
+// Debug handle for the browser console in dev builds.
+if (import.meta.env.DEV) (window as unknown as { world: World }).world = world;
 
 function resize(): void {
   renderer.setSize(window.innerWidth, window.innerHeight);

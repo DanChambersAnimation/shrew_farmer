@@ -83,14 +83,15 @@ const GLASSES = `
 const M = `fill="${P.mouth}" ${LINE}`;
 const TEETH = `fill="${P.teeth}"`;
 const TONGUE = `fill="${P.tongue}"`;
-const LIP = `stroke="${P.outline}" stroke-width="4" fill="none" stroke-linecap="round"`;
+const lip = (width = 4) =>
+  `stroke="${P.outline}" stroke-width="${width}" fill="none" stroke-linecap="round"`;
 
 /** Mouth shapes and the sounds each one covers (used to drive mouths from text). */
 export const MOUTHS = {
-  rest: { sounds: "rest / pause", svg: `<path d="M -20 -2 Q 0 9 20 -2" ${LIP}/>` },
+  rest: { sounds: "rest / pause", svg: `<path d="M -20 -2 Q 0 9 20 -2" ${lip()}/>` },
   MBP: {
     sounds: "M B P",
-    svg: `<path d="M -18 0 Q 0 4 18 0" ${LIP} stroke-width="6"/><path d="M -6 7 Q 0 9 6 7" ${LIP} stroke-width="2" opacity="0.5"/>`,
+    svg: `<path d="M -18 0 Q 0 4 18 0" ${lip(6)}/><path d="M -6 7 Q 0 9 6 7" ${lip(2)} opacity="0.5"/>`,
   },
   AI: {
     sounds: "A I",
@@ -106,11 +107,11 @@ export const MOUTHS = {
   },
   U: {
     sounds: "U W OO",
-    svg: `<ellipse rx="8" ry="9" ${M}/><path d="M -14 -5 Q -10 0 -14 5 M 14 -5 Q 10 0 14 5" ${LIP} stroke-width="2.5"/>`,
+    svg: `<ellipse rx="8" ry="9" ${M}/><path d="M -14 -5 Q -10 0 -14 5 M 14 -5 Q 10 0 14 5" ${lip(2.5)}/>`,
   },
   FV: {
     sounds: "F V",
-    svg: `<path d="M -20 -2 Q 0 -6 20 -2 Q 12 9 0 9 Q -12 9 -20 -2 Z" ${M}/><path d="M -14 -3 L 14 -3 L 13 3 L -13 3 Z" ${TEETH}/><path d="M -17 7 Q 0 1 17 7" ${LIP}/>`,
+    svg: `<path d="M -20 -2 Q 0 -6 20 -2 Q 12 9 0 9 Q -12 9 -20 -2 Z" ${M}/><path d="M -14 -3 L 14 -3 L 13 3 L -13 3 Z" ${TEETH}/><path d="M -17 7 Q 0 1 17 7" ${lip()}/>`,
   },
   L: {
     sounds: "L TH",

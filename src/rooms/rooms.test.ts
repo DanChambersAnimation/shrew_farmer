@@ -1,19 +1,32 @@
 import { describe, expect, it } from "vite-plus/test";
 import { rooms } from "../core/room-registry.ts";
+import type { GameObject } from "../core/game-object.ts";
 import { World } from "../core/world.ts";
+import { Seat } from "../traits/seat.ts";
 
 import.meta.glob(["./*.ts", "!./*.test.ts"], { eager: true });
 
 describe("registered rooms", () => {
-  it("includes dev0, with every seat filled", () => {
-    expect(rooms.get("dev0")?.tags).toContain("dev");
-    const room = rooms.load(new World(), "dev0");
-    const all = [...room.descendants()];
-    const seats = all.filter((o) => o.kind === "chair");
+  /** Seats and seated audience members in a freshly built room. */
+  function census(name: string) {
+    const all: GameObject[] = [...rooms.load(new World(), name).descendants()];
+    const seats = all.filter((o) => o.has(Seat));
     const people = all.filter((o) => o.kind === "audience-member");
-    expect(seats.length).toBeGreaterThan(0);
+    return { seats, people, seated: people.every((p) => p.parent?.has(Seat)) };
+  }
+
+  it("dev0 fills every seat in the hall", () => {
+    const { seats, people, seated } = census("dev0");
+    expect(seats.length).toBeGreaterThan(1);
     expect(people.length).toBe(seats.length);
-    expect(people.every((p) => p.parent?.kind === "chair")).toBe(true);
+    expect(seated).toBe(true);
+  });
+
+  it("dev1 seats exactly one audience member", () => {
+    const { seats, people, seated } = census("dev1");
+    expect(seats.length).toBe(1);
+    expect(people.length).toBe(1);
+    expect(seated).toBe(true);
   });
 
   for (const def of rooms.list()) {

@@ -14,7 +14,8 @@ export const SEAT_POINT: Point = [150, 300];
 
 const OUTLINE = "#2b1d14";
 const LINE = `stroke="${OUTLINE}" stroke-width="4" stroke-linejoin="round"`;
-const THIN = `stroke="${OUTLINE}" stroke-width="3" stroke-linecap="round" fill="none"`;
+const thin = (width = 3) =>
+  `stroke="${OUTLINE}" stroke-width="${width}" stroke-linecap="round" fill="none"`;
 const INK = `fill="${OUTLINE}"`;
 
 /* ---------------- Fixed body ---------------- */
@@ -45,7 +46,7 @@ const TOPS = {
   tee: `${torso}<path d="M 128 207 Q 150 224 172 207" fill="{{skin}}" ${LINE}/>`,
   collar: `${torso}<path d="M 132 204 L 150 226 L 168 204 L 160 200 L 150 212 L 140 200 Z" fill="{{accent}}" ${LINE}/><circle cx="150" cy="242" r="3" ${INK}/><circle cx="150" cy="262" r="3" ${INK}/>`,
   cardigan: `<path d="${TORSO_PATH}" fill="{{accent}}" ${LINE}/><path d="M 100 214 Q 120 206 138 204 L 146 304 Q 120 304 98 300 L 92 250 Q 88 224 100 214 Z" fill="{{top}}" ${LINE}/><path d="M 200 214 Q 180 206 162 204 L 154 304 Q 180 304 202 300 L 208 250 Q 212 224 200 214 Z" fill="{{top}}" ${LINE}/><circle cx="142" cy="240" r="3.5" ${INK}/><circle cx="142" cy="266" r="3.5" ${INK}/>`,
-  hoodie: `${torso}<path d="M 112 210 Q 150 236 188 210 Q 176 198 150 198 Q 124 198 112 210 Z" fill="{{accent}}" ${LINE}/><path d="M 140 222 L 138 248 M 160 222 L 162 248" ${THIN}/><path d="M 118 268 L 182 268 L 176 296 L 124 296 Z" fill="none" ${LINE}/>`,
+  hoodie: `${torso}<path d="M 112 210 Q 150 236 188 210 Q 176 198 150 198 Q 124 198 112 210 Z" fill="{{accent}}" ${LINE}/><path d="M 140 222 L 138 248 M 160 222 L 162 248" ${thin()}/><path d="M 118 268 L 182 268 L 176 296 L 124 296 Z" fill="none" ${LINE}/>`,
 } as const;
 
 /* ---------------- Hair: drawn behind and in front of the head ---------------- */
@@ -92,7 +93,7 @@ const HAIR = {
 
 const GLASSES = {
   none: "",
-  round: `<circle cx="122" cy="118" r="20" fill="#fff" fill-opacity="0.2" ${LINE}/><circle cx="178" cy="118" r="20" fill="#fff" fill-opacity="0.2" ${LINE}/><path d="M 142 116 Q 150 110 158 116 M 102 116 L 72 112 M 198 116 L 228 112" ${THIN}/>`,
+  round: `<circle cx="122" cy="118" r="20" fill="#fff" fill-opacity="0.2" ${LINE}/><circle cx="178" cy="118" r="20" fill="#fff" fill-opacity="0.2" ${LINE}/><path d="M 142 116 Q 150 110 158 116 M 102 116 L 72 112 M 198 116 L 228 112" ${thin()}/>`,
 } as const;
 
 /* ---------------- Faces: drawn around the face centre (150, 125) ---------------- */
@@ -101,13 +102,13 @@ const dotEyes = `<ellipse cx="-28" cy="-7" rx="6" ry="8" ${INK}/><ellipse cx="28
 const mouthFill = `fill="#5a1a22" ${LINE}`;
 
 export const FACES = {
-  neutral: `${dotEyes}<path d="M -12 34 L 12 34" ${THIN}/>`,
-  smile: `${dotEyes}<path d="M -18 28 Q 0 42 18 28" ${THIN}/>`,
-  laugh: `<path d="M -38 -4 Q -28 -16 -18 -4 M 18 -4 Q 28 -16 38 -4" ${THIN} stroke-width="4"/><path d="M -24 24 Q 0 28 24 24 Q 20 52 0 54 Q -20 52 -24 24 Z" ${mouthFill}/><path d="M -12 46 Q 0 38 12 46 Q 6 52 0 52 Q -6 52 -12 46 Z" fill="#e0707a"/>`,
-  bored: `<path d="M -36 -10 L -20 -10 M 20 -10 L 36 -10" ${THIN} stroke-width="4"/><path d="M -34 -9 Q -28 2 -22 -9 Z M 22 -9 Q 28 2 34 -9 Z" ${INK}/><path d="M -6 36 L 16 32" ${THIN}/>`,
-  frown: `${dotEyes}<path d="M -40 -26 L -18 -18 M 40 -26 L 18 -18" ${THIN} stroke-width="4"/><path d="M -16 40 Q 0 28 16 40" ${THIN}/>`,
-  shocked: `<circle cx="-28" cy="-7" r="12" fill="#fff" ${LINE}/><circle cx="28" cy="-7" r="12" fill="#fff" ${LINE}/><circle cx="-28" cy="-6" r="4" ${INK}/><circle cx="28" cy="-6" r="4" ${INK}/><path d="M -40 -32 Q -28 -40 -16 -32 M 16 -32 Q 28 -40 40 -32" ${THIN}/><ellipse cx="0" cy="36" rx="10" ry="13" ${mouthFill}/>`,
-  asleep: `<path d="M -38 -6 Q -28 2 -18 -6 M 18 -6 Q 28 2 38 -6" ${THIN} stroke-width="4"/><ellipse cx="0" cy="36" rx="6" ry="5" ${mouthFill}/><text x="62" y="-58" font-family="sans-serif" font-weight="bold" font-size="28" ${INK}>z</text><text x="82" y="-82" font-family="sans-serif" font-weight="bold" font-size="20" ${INK}>z</text>`,
+  neutral: `${dotEyes}<path d="M -12 34 L 12 34" ${thin()}/>`,
+  smile: `${dotEyes}<path d="M -18 28 Q 0 42 18 28" ${thin()}/>`,
+  laugh: `<path d="M -38 -4 Q -28 -16 -18 -4 M 18 -4 Q 28 -16 38 -4" ${thin(4)}/><path d="M -24 24 Q 0 28 24 24 Q 20 52 0 54 Q -20 52 -24 24 Z" ${mouthFill}/><path d="M -12 46 Q 0 38 12 46 Q 6 52 0 52 Q -6 52 -12 46 Z" fill="#e0707a"/>`,
+  bored: `<path d="M -36 -10 L -20 -10 M 20 -10 L 36 -10" ${thin(4)}/><path d="M -34 -9 Q -28 2 -22 -9 Z M 22 -9 Q 28 2 34 -9 Z" ${INK}/><path d="M -6 36 L 16 32" ${thin()}/>`,
+  frown: `${dotEyes}<path d="M -40 -26 L -18 -18 M 40 -26 L 18 -18" ${thin(4)}/><path d="M -16 40 Q 0 28 16 40" ${thin()}/>`,
+  shocked: `<circle cx="-28" cy="-7" r="12" fill="#fff" ${LINE}/><circle cx="28" cy="-7" r="12" fill="#fff" ${LINE}/><circle cx="-28" cy="-6" r="4" ${INK}/><circle cx="28" cy="-6" r="4" ${INK}/><path d="M -40 -32 Q -28 -40 -16 -32 M 16 -32 Q 28 -40 40 -32" ${thin()}/><ellipse cx="0" cy="36" rx="10" ry="13" ${mouthFill}/>`,
+  asleep: `<path d="M -38 -6 Q -28 2 -18 -6 M 18 -6 Q 28 2 38 -6" ${thin(4)}/><ellipse cx="0" cy="36" rx="6" ry="5" ${mouthFill}/><text x="62" y="-58" font-family="sans-serif" font-weight="bold" font-size="28" ${INK}>z</text><text x="82" y="-82" font-family="sans-serif" font-weight="bold" font-size="20" ${INK}>z</text>`,
 } as const;
 
 /* ---------------- Arms: a pose for each side ---------------- */

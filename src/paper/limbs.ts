@@ -30,18 +30,19 @@ export interface LimbStyle {
 /** Hands are drawn pointing along +x with the thumb toward -y. */
 function hand(shape: HandShape, style: LimbStyle): string {
   const skin = `fill="${style.skin}" stroke="${style.outline}" stroke-width="3" stroke-linejoin="round"`;
-  const line = `stroke="${style.outline}" stroke-width="2" stroke-linecap="round"`;
+  const line = (width = 2) =>
+    `stroke="${style.outline}" stroke-width="${width}" stroke-linecap="round"`;
   switch (shape) {
     case "open":
-      return `<ellipse cx="8" cy="-14" rx="6" ry="10" transform="rotate(-35 8 -14)" ${skin}/><ellipse cx="17" cy="0" rx="17" ry="14" ${skin}/><path d="M 24 -5 L 32 -5 M 25 1 L 33 1 M 24 7 L 31 7" ${line}/>`;
+      return `<ellipse cx="8" cy="-14" rx="6" ry="10" transform="rotate(-35 8 -14)" ${skin}/><ellipse cx="17" cy="0" rx="17" ry="14" ${skin}/><path d="M 24 -5 L 32 -5 M 25 1 L 33 1 M 24 7 L 31 7" ${line()}/>`;
     case "palm":
-      return `<ellipse cx="6" cy="-13" rx="5" ry="9" transform="rotate(-50 6 -13)" ${skin}/><ellipse cx="18" cy="0" rx="20" ry="11" ${skin}/><path d="M 28 -4 L 36 -4 M 29 2 L 37 2" ${line}/>`;
+      return `<ellipse cx="6" cy="-13" rx="5" ry="9" transform="rotate(-50 6 -13)" ${skin}/><ellipse cx="18" cy="0" rx="20" ry="11" ${skin}/><path d="M 28 -4 L 36 -4 M 29 2 L 37 2" ${line()}/>`;
     case "fist":
-      return `<circle cx="13" cy="0" r="15" ${skin}/><path d="M 21 -9 Q 27 0 21 9" ${line} stroke-width="2.5" fill="none"/>`;
+      return `<circle cx="13" cy="0" r="15" ${skin}/><path d="M 21 -9 Q 27 0 21 9" ${line(2.5)} fill="none"/>`;
     case "point":
       return `<rect x="16" y="-12" width="30" height="10" rx="5" ${skin}/><circle cx="11" cy="1" r="13" ${skin}/>`;
     case "thumbsUp":
-      return `<circle cx="13" cy="0" r="15" ${skin}/><rect x="5" y="-36" width="12" height="28" rx="6" ${skin}/><path d="M 21 -6 L 26 -6 M 21 2 L 26 2" ${line}/>`;
+      return `<circle cx="13" cy="0" r="15" ${skin}/><rect x="5" y="-36" width="12" height="28" rx="6" ${skin}/><path d="M 21 -6 L 26 -6 M 21 2 L 26 2" ${line()}/>`;
   }
 }
 

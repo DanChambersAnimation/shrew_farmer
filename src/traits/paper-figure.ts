@@ -81,6 +81,7 @@ export const PaperFigure = defineTrait({
         material.needsUpdate = true;
         mesh.visible = true;
       };
+      image.onerror = () => console.error(`PaperFigure: rig "${s.rig}" produced an invalid SVG`);
       image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
     };
     draw();

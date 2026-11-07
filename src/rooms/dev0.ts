@@ -1,9 +1,8 @@
 import { rooms } from "../core/room-registry.ts";
 import { spawnSpec } from "../core/spec.ts";
 import { HALL, churchHall } from "../locations/church-hall.ts";
-import { audienceMember } from "../prefabs/audience-member.ts";
+import { fillSeats } from "../prefabs/audience-member.ts";
 import { CameraView } from "../traits/camera-view.ts";
-import { Seat } from "../traits/seat.ts";
 
 rooms.register({
   name: "dev0",
@@ -17,12 +16,6 @@ rooms.register({
       lookAt: [0, 0.6, -HALL.depth / 2],
       fov: 50,
     });
-    const hall = spawnSpec(room, churchHall());
-
-    // Fill every seat in the hall.
-    let seed = 1;
-    for (const seat of [...hall.descendants()].filter((o) => o.has(Seat))) {
-      spawnSpec(seat, audienceMember(seed++, seat.settingsOf(Seat)!.sitPoint));
-    }
+    fillSeats(spawnSpec(room, churchHall()));
   },
 });
