@@ -1,4 +1,10 @@
-import { MOODS, SEAT_POINT, randomLook } from "../characters/audience.ts";
+import { SEAT_POINT, randomAppearance } from "../characters/audience.ts";
+import {
+  audienceVisual,
+  randomAudienceState,
+  randomPersonality,
+  type AudienceState,
+} from "../characters/audience-model.ts";
 import type { GameObject } from "../core/game-object.ts";
 import { type ObjectSpec, spawnSpec } from "../core/spec.ts";
 import { trait } from "../core/trait.ts";
@@ -8,28 +14,35 @@ import { Inspectable } from "../traits/inspectable.ts";
 import { PaperFigure } from "../traits/paper-figure.ts";
 import { Seat } from "../traits/seat.ts";
 import { Transform } from "../traits/transform.ts";
+import { AudienceModel } from "../traits/audience-model.ts";
 import type { Vec3 } from "../traits/types.ts";
 
-/** A seated audience member with a random (but repeatable) look and mood. */
-export function audienceMember(seed: number, position: Vec3 = [0, 0, 0]): ObjectSpec {
-  const look = randomLook(seed);
-  const mood = MOODS[look.mood];
+/** Create one seated audience member. A supplied seed makes generation repeatable. */
+export function createAudienceMember(
+  position: Vec3 = [0, 0, 0],
+  seed = Math.floor(Math.random() * 0x100000000),
+  state: AudienceState = randomAudienceState(seed ^ 0x6c2b79f5),
+): ObjectSpec {
+  const appearance = randomAppearance(seed);
+  const personality = randomPersonality(seed ^ 0x9e3779b9);
+  const visual = audienceVisual(state);
   return {
     kind: "audience-member",
     traits: [
       trait(Transform, { position }),
       trait(PaperFigure, {
         rig: "audience",
-        slots: look.slots,
-        params: look.params,
+        slots: { ...appearance.slots, face: visual.face, arms: visual.arms },
+        params: appearance.params,
         anchor: [...SEAT_POINT],
       }),
       trait(Billboard),
       trait(Inspectable, {
-        title: `Audience member · ${mood.label}`,
-        description: mood.description,
+        title: "Audience member",
+        description: visual.description,
       }),
       trait(Highlight, { intensity: 0.25 }),
+      trait(AudienceModel, { appearance, personality, state: { ...state } }),
     ],
   };
 }
@@ -39,5 +52,5 @@ export function fillSeats(root: GameObject, firstSeed = 1): GameObject[] {
   let seed = firstSeed;
   return [root, ...root.descendants()]
     .filter((o) => o.has(Seat) && !o.children.some((c) => c.kind === "audience-member"))
-    .map((seat) => spawnSpec(seat, audienceMember(seed++, seat.settingsOf(Seat)!.sitPoint)));
+    .map((seat) => spawnSpec(seat, createAudienceMember(seat.settingsOf(Seat)!.sitPoint, seed++)));
 }

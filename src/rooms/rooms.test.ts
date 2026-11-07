@@ -2,6 +2,8 @@ import { describe, expect, it } from "vite-plus/test";
 import { rooms } from "../core/room-registry.ts";
 import type { GameObject } from "../core/game-object.ts";
 import { World } from "../core/world.ts";
+import { AudienceModel } from "../traits/audience-model.ts";
+import { PaperFigure } from "../traits/paper-figure.ts";
 import { Seat } from "../traits/seat.ts";
 
 import.meta.glob(["./*.ts", "!./*.test.ts"], { eager: true });
@@ -20,6 +22,28 @@ describe("registered rooms", () => {
     expect(seats.length).toBeGreaterThan(1);
     expect(people.length).toBe(seats.length);
     expect(seated).toBe(true);
+    const states = people.map((p) => p.settingsOf(AudienceModel)!.state);
+    expect(new Set(states.map((s) => `${s.approval}/${s.engagement}`)).size).toBe(people.length);
+    const nextStates = census("dev0").people.map((p) => p.settingsOf(AudienceModel)!.state);
+    expect(nextStates).not.toEqual(states);
+  });
+
+  it("updates the figure from mutable state while preserving appearance", () => {
+    const world = new World();
+    const room = rooms.load(world, "dev0");
+    const person = [...room.descendants()].find((o) => o.kind === "audience-member")!;
+    const model = person.settingsOf(AudienceModel)!;
+    const figure = person.settingsOf(PaperFigure)!;
+    const appearance = structuredClone(model.appearance);
+    model.state.approval = -0.9;
+    model.state.engagement = 0.95;
+    world.update(0);
+    expect(figure.slots.face).toBe("frown");
+    expect(figure.slots.arms).toBe("crossed");
+    model.state.engagement = 0.05;
+    world.update(0);
+    expect(figure.slots.face).toBe("asleep");
+    expect(model.appearance).toEqual(appearance);
   });
 
   it("dev1 seats exactly one audience member", () => {

@@ -102,6 +102,7 @@ const dotEyes = `<ellipse cx="-28" cy="-7" rx="6" ry="8" ${INK}/><ellipse cx="28
 const mouthFill = `fill="#5a1a22" ${LINE}`;
 
 export const FACES = {
+  focused: `${dotEyes}<path d="M -42 -28 L -16 -22 M 16 -22 L 42 -28 M -8 34 L 8 34" ${thin()}/>`,
   neutral: `${dotEyes}<path d="M -12 34 L 12 34" ${thin()}/>`,
   smile: `${dotEyes}<path d="M -18 28 Q 0 42 18 28" ${thin()}/>`,
   laugh: `<path d="M -38 -4 Q -28 -16 -18 -4 M 18 -4 Q 28 -16 38 -4" ${thin(4)}/><path d="M -24 24 Q 0 28 24 24 Q 20 52 0 54 Q -20 52 -24 24 Z" ${mouthFill}/><path d="M -12 46 Q 0 38 12 46 Q 6 52 0 52 Q -6 52 -12 46 Z" fill="#e0707a"/>`,
@@ -194,7 +195,7 @@ export const AUDIENCE: Rig = {
 
 rigs.register("audience", AUDIENCE);
 
-/* ---------------- Looks and moods ---------------- */
+/* ---------------- Base appearances ---------------- */
 
 export const PALETTES = {
   skin: ["#f6d3b3", "#eab88f", "#d9a066", "#b97a4c", "#8d5532", "#5e3a22"],
@@ -215,67 +216,23 @@ export const PALETTES = {
   shoes: ["#1a1a1a", "#5a3a22", "#f4f4f4", "#7a2e2e"],
 } as const;
 
-/** A mood picks a face and arms together so the reaction reads as one. */
-export const MOODS = {
-  attentive: {
-    face: "neutral",
-    arms: "lap",
-    label: "Attentive",
-    description: "Listening closely.",
-  },
-  pleased: { face: "smile", arms: "lap", label: "Pleased", description: "Enjoying this so far." },
-  delighted: { face: "laugh", arms: "clap", label: "Delighted", description: "Clapping along." },
-  ecstatic: {
-    face: "laugh",
-    arms: "cheer",
-    label: "Ecstatic",
-    description: "Completely won over.",
-  },
-  curious: { face: "smile", arms: "raise", label: "Curious", description: "Has a question." },
-  thoughtful: {
-    face: "neutral",
-    arms: "chin",
-    label: "Thoughtful",
-    description: "Mulling it over.",
-  },
-  bored: { face: "bored", arms: "phone", label: "Bored", description: "Checking their phone." },
-  skeptical: { face: "frown", arms: "crossed", label: "Skeptical", description: "Not convinced." },
-  shocked: {
-    face: "shocked",
-    arms: "lap",
-    label: "Shocked",
-    description: "Did you really just say that?",
-  },
-  asleep: { face: "asleep", arms: "lap", label: "Asleep", description: "Lost them entirely." },
-} as const satisfies Record<
-  string,
-  { face: keyof typeof FACES; arms: keyof typeof ARMS; label: string; description: string }
->;
-
-export type MoodName = keyof typeof MOODS;
-
-export interface AudienceLook {
+export interface AudienceAppearance {
   readonly slots: RigSelection;
   readonly params: RigParams;
-  readonly mood: MoodName;
 }
 
-/** A random but repeatable audience member for `seed`. */
-export function randomLook(seed: number): AudienceLook {
+/** A random but repeatable appearance, independent of the person's inner state. */
+export function randomAppearance(seed: number): AudienceAppearance {
   const rng = new Random(seed);
-  const mood = rng.pick(Object.keys(MOODS) as MoodName[]);
   const params = Object.fromEntries(
     Object.entries(PALETTES).map(([name, colors]) => [name, rng.pick(colors)]),
   );
-  return {
-    mood,
-    params,
-    slots: {
+  return Object.freeze({
+    params: Object.freeze(params),
+    slots: Object.freeze({
       hair: rng.pick(Object.keys(HAIR)),
       top: rng.pick(Object.keys(TOPS)),
       glasses: rng.next() < 0.25 ? "round" : "none",
-      face: MOODS[mood].face,
-      arms: MOODS[mood].arms,
-    },
-  };
+    }),
+  });
 }

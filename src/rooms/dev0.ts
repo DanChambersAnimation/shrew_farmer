@@ -15,7 +15,10 @@ rooms.register({
       position: [0, 3.4, HALL.depth / 2 - 1],
       lookAt: [0, 0.6, -HALL.depth / 2],
       fov: 50,
+      swayDegrees: 10,
+      swayPeriodSeconds: 12,
     });
-    fillSeats(spawnSpec(room, churchHall()));
+    // A new seed gives this room a fresh audience on each opening.
+    fillSeats(spawnSpec(room, churchHall()), Math.floor(Math.random() * 0x100000000));
   },
 });
