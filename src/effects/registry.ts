@@ -1,6 +1,7 @@
 import { Registry } from "../core/registry.ts";
 import type { GameObject } from "../core/game-object.ts";
 import type { World } from "../core/world.ts";
+import type { Vec3 } from "../traits/types.ts";
 
 /**
  * What an effect can act on. Effects are called after a move resolves, by
@@ -16,6 +17,8 @@ export interface EffectContext {
   readonly verdict: Verdict;
   /** Round time in seconds. */
   readonly atSeconds: number;
+  /** World positions selected by the simulation, for matching visual effects. */
+  readonly targets?: readonly Vec3[];
 }
 
 export type Verdict = "success" | "failure";

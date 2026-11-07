@@ -14,6 +14,7 @@ const evenPersonality = {
   gullibility: 0.5,
   intelligence: 0.5,
   superstition: 0.5,
+  faithAffinity: 0.5,
   forgiveness: 0.5,
   sociability: 0.5,
 };

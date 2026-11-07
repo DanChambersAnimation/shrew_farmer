@@ -1,10 +1,13 @@
 import "./style.css";
+// Effects register themselves; the rack plays them through resolved moves.
+import "./effects/library.ts";
 import { ACESFilmicToneMapping, PCFSoftShadowMap, Timer, WebGLRenderer } from "three";
 import { rooms } from "./core/room-registry.ts";
 import { World } from "./core/world.ts";
 import { Noclip } from "./dev/noclip.ts";
 import { INSPECT, type InspectInfo } from "./traits/inspectable.ts";
 import { GameTimer } from "./traits/game-timer.ts";
+import { GambitRack } from "./hud/gambit-rack-dom.ts";
 import { CUE_CHANGED, NEXT_CUE } from "./traits/lighting-cues.ts";
 
 // Every module in src/rooms registers its room with the registry.
@@ -20,6 +23,7 @@ const roundMeterTrack = document.querySelector<HTMLElement>("#round-meter-track"
 const roundMeterFill = document.querySelector<HTMLElement>("#round-meter-fill")!;
 const roundMeterMarker = document.querySelector<HTMLElement>("#round-meter-marker")!;
 const roundMeterRemaining = document.querySelector<HTMLElement>("#round-meter-remaining")!;
+const gambitRack = new GambitRack(document.querySelector<HTMLElement>("#gambit-rack-slot")!);
 // The noclip panel builds its own markup so it never depends on index.html.
 const noclipHud = Object.assign(document.createElement("div"), { id: "noclip", hidden: true });
 noclipHud.innerHTML = "<strong>NOCLIP</strong> <code></code><small></small>";
@@ -65,6 +69,8 @@ const def = rooms.get(roomName);
 if (def) {
   rooms.load(world, roomName);
   showRoomLabel();
+  // The rack reads the room's hand, so it is rebuilt per room.
+  gambitRack.show(world.current ? { world, room: world.current } : null);
 } else {
   const known = rooms
     .list()
@@ -183,6 +189,7 @@ renderer.setAnimationLoop((time) => {
   noclip.update(dt);
   world.update(dt);
   renderRoundMeter();
+  gambitRack.refresh();
   showNoclip();
   renderer.render(world.scene, world.viewCamera);
 });

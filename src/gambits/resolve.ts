@@ -1,4 +1,5 @@
 import type { GameObject } from "../core/game-object.ts";
+import { Random } from "../core/random.ts";
 import type { World } from "../core/world.ts";
 import { type Verdict, runEffects } from "../effects/registry.ts";
 import type { Vec3 } from "../traits/types.ts";
@@ -60,9 +61,11 @@ export function resolveItem(
   roll = Math.random(),
 ): Resolution {
   const outcome = chooseOutcome(item, roll);
-  const reached = new Set(reachedBy(outcome.target, crowd));
+  const random = new Random(Math.floor(roll * 0x100000000) ^ Math.floor(atSeconds * 1000));
+  const targetIndices = reachedBy(outcome.target, crowd, random);
+  const reached = new Set(targetIndices);
   const people: (PersonResult | null)[] = crowd.map((member, index) =>
-    reached.has(index) ? resolvePerson(item, member, outcome, atSeconds) : null,
+    reached.has(index) ? resolvePerson(item, member, outcome, atSeconds, random.next()) : null,
   );
   const verdict = judge(people);
   runEffects(effectsFor(item, verdict), {
@@ -71,8 +74,9 @@ export function resolveItem(
     moveId: item.id,
     verdict,
     atSeconds,
+    targets: targetIndices.map((index) => crowd[index]!.position),
   });
-  return { item, outcome, people, atSeconds, verdict };
+  return { item, outcome, people, targetIndices, atSeconds, verdict };
 }
 
 function resolvePerson(
@@ -80,15 +84,24 @@ function resolvePerson(
   member: CrowdMember,
   outcome: Outcome,
   atSeconds: number,
+  roll: number,
 ): PersonResult {
   const effects = outcome.effects
-    .map((effect: Effect) => applyEffect(member, effect, item.id, atSeconds))
+    .map((effect: Effect) => applyEffect(member, effect, item.id, atSeconds, roll))
     .filter((result) => result !== null);
   return { effects };
 }
 
 /** Indices of the people a target selects. An empty crowd reaches nobody. */
-function reachedBy(target: Target, crowd: readonly CrowdMember[]): number[] {
+function reachedBy(target: Target, crowd: readonly CrowdMember[], random: Random): number[] {
+  if (target.kind === "random") {
+    const indices = crowd.map((_, index) => index);
+    for (let i = indices.length - 1; i > 0; i--) {
+      const j = Math.floor(random.next() * (i + 1));
+      [indices[i], indices[j]] = [indices[j]!, indices[i]!];
+    }
+    return indices.slice(0, Math.max(0, Math.floor(target.count)));
+  }
   if (target.kind !== "neighbourhood" || crowd.length === 0) {
     return crowd.map((_, index) => index);
   }

@@ -5,6 +5,8 @@ import { fillSeats } from "../prefabs/audience-member.ts";
 import { speaker } from "../prefabs/speaker.ts";
 import { CameraView } from "../traits/camera-view.ts";
 import { CrowdSimulation } from "../traits/crowd-simulation.ts";
+import { Gambits } from "../traits/gambits.ts";
+import { GambitSelection } from "../traits/gambit-selection.ts";
 import { GameTimer } from "../traits/game-timer.ts";
 import { LookAround } from "../traits/look-around.ts";
 
@@ -16,6 +18,9 @@ rooms.register({
   build(room) {
     room.add(GameTimer);
     room.add(CrowdSimulation);
+    // GambitSelection fills the hand; Gambits tracks what has been used up.
+    room.add(Gambits, { hand: [], played: [], lastUsedAt: {}, finished: false });
+    room.add(GambitSelection, { count: 5, random: true });
     room.add(CameraView, {
       // Behind and above the speaker, looking down at the audience (set with noclip),
       // with a slow side-to-side sway.

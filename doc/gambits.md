@@ -2,7 +2,7 @@
 
 What the Speaker uses to engage the audience. Every item has **upsides and downsides**, often a chance of something going wrong. See issue [#5](https://github.com/DanChambersAnimation/shrew_farmer/issues/5) for the shared effect system, [#3](https://github.com/DanChambersAnimation/shrew_farmer/issues/3) for crowd responses, and [#2](https://github.com/DanChambersAnimation/shrew_farmer/issues/2) for the icon row.
 
-**Status:** the registry and effect pipeline exist (`src/gambits/`, from #8). Two gambits are built: **personal anecdote** and **callback to anecdote**; try them in dev3. Everything else here is design only.
+**Status:** the registry and effect pipeline exist (`src/gambits/`, from #8). All five conversational gambits below are defined with simulation rules and SVG icons in `src/assets/icons/gambits/`. The icon row and in-room deployment UI are still to be built; the equipment and power-ups below remain design ideas.
 
 **How an item is defined** (`src/gambits/effect.ts`): an item is a list of **weighted outcomes**. Each outcome has a **target** (the whole audience, the room, or a neighbourhood within a radius) and **effects**. An effect changes a person's approval and/or engagement, can decide whether it reaches them at all (e.g. too bored to notice), and can scale by context (personality, what they remember, the round time). Risky items are just extra outcomes with low weights.
 
@@ -41,21 +41,21 @@ What the Speaker uses to engage the audience. Every item has **upsides and downs
 - **Kind:** conversational gambit
 - **Upside:** a modest, rhythmic engagement boost.
 - **Risk:** —
-- **Notes / issue:** from #3. Could drive colour-chase lighting in time with the three beats.
+- **Notes / issue:** from #3. **Built** with a modest engagement lift for attentive listeners, shaped by intelligence. A future visual effect could drive colour-chase lighting in time with the three beats.
 
 ### Pious statement
 
 - **Kind:** conversational gambit
 - **Upside:** raises approval among listeners with faith affinity.
 - **Risk:** lowers it among those without.
-- **Notes / issue:** from #3.
+- **Notes / issue:** from #3. **Built**: approval shifts with faith affinity, independently of superstition.
 
 ### "Praise Jesus!"
 
 - **Kind:** conversational gambit
 - **Upside:** a strong faith appeal; big approval from faith-positive listeners.
 - **Risk:** faith-negative listeners react just as strongly the other way.
-- **Notes / issue:** from #3.
+- **Notes / issue:** from #3. **Built**: a stronger faith-affinity response than the pious statement.
 
 ## Equipment and power-ups
 

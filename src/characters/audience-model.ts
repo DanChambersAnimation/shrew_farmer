@@ -6,6 +6,8 @@ export interface AudiencePersonality {
   readonly gullibility: number;
   readonly intelligence: number;
   readonly superstition: number;
+  /** Response to religious language; independent of superstition. */
+  readonly faithAffinity: number;
   readonly forgiveness: number;
   readonly sociability: number;
 }
@@ -18,6 +20,7 @@ export function randomPersonality(seed: number): AudiencePersonality {
     gullibility: trait(),
     intelligence: trait(),
     superstition: trait(),
+    faithAffinity: trait(),
     forgiveness: trait(),
     sociability: trait(),
   });

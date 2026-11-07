@@ -23,6 +23,7 @@ export interface Outcome {
 export type Target =
   | { readonly kind: "audience" }
   | { readonly kind: "room" }
+  | { readonly kind: "random"; readonly count: number }
   | { readonly kind: "neighbourhood"; readonly radiusMetres: number };
 
 /** What one person knows about the world when an effect is evaluated. */
@@ -33,6 +34,8 @@ export interface EffectContext {
   readonly memory: readonly MemoryEntry[];
   /** Round time in seconds. */
   readonly atSeconds: number;
+  /** One deterministic draw for this person and this use. */
+  readonly roll: number;
 }
 
 /** Changes one person's state in response to a move. */
@@ -53,10 +56,19 @@ export interface ItemDef {
   readonly id: string;
   readonly name: string;
   /**
-   * How the row shows the item. Gambit artwork belongs to #2; until then this
-   * is a short glyph, and the row carries the accessible label from `name`.
+   * URL of the icon used in the gambit row. The row supplies the accessible
+   * label from `name`; the artwork stays independent of the simulation.
    */
   readonly icon: string;
+  /** How often this gambit can be invoked during a round. */
+  readonly usage: Readonly<{
+    /** Null means unlimited uses; a number is the round's total allowance. */
+    maxUses: number | null;
+    /** Only every Nth accepted use releases the simulation effect. */
+    usesPerEffect: number;
+    /** Minimum seconds between accepted uses, even when an effect has not fired yet. */
+    cooldownSeconds: number;
+  }>;
   /** A spawnable scene object assembled from visual traits. */
   readonly visual: ObjectSpec;
   /** Weighted outcomes composed from effects on audience members. */
@@ -96,6 +108,8 @@ export interface Resolution {
   readonly verdict: Verdict;
   /** One entry per person passed in, or null when the outcome never reached them. */
   readonly people: readonly (PersonResult | null)[];
+  /** Indices of the people selected by the outcome's target. */
+  readonly targetIndices: readonly number[];
   readonly atSeconds: number;
 }
 
@@ -124,12 +138,14 @@ export function applyEffect(
   effect: Effect,
   moveId: string,
   atSeconds: number,
+  roll = 0.5,
 ): EffectResult | null {
   const ctx: EffectContext = {
     state: person.state,
     personality: person.personality,
     memory: person.memory,
     atSeconds,
+    roll,
   };
   if (effect.reaches && !effect.reaches(ctx)) return null;
 

@@ -1,12 +1,15 @@
 import { describe, expect, it } from "vite-plus/test";
 import { items } from "../gambits/library.ts";
 import { anecdoteCallback, personalAnecdote } from "../gambits/items/anecdote.ts";
+import { piousStatement, praiseJesus, ruleOfThree } from "../gambits/items/rhetoric.ts";
+import { tShirtCannon } from "../gambits/items/t-shirt-cannon.ts";
 import { applyEffect, chooseOutcome, type ItemDef } from "../gambits/effect.ts";
 import { effectsFor, judge, resolveItem, type CrowdMember } from "../gambits/resolve.ts";
 import { World } from "../core/world.ts";
 import { spawnSpec } from "../core/spec.ts";
 import "../effects/builtin.ts";
 import { Sign } from "../traits/sign.ts";
+import { T_SHIRT_FIRED, TShirtBarrage } from "../traits/t-shirt-barrage.ts";
 
 const scene = () => {
   const world = new World();
@@ -17,6 +20,7 @@ const personality = {
   gullibility: 0.5,
   intelligence: 0.5,
   superstition: 0.5,
+  faithAffinity: 0.5,
   forgiveness: 0.5,
   sociability: 0.5,
 };
@@ -32,12 +36,27 @@ function member(overrides: Partial<CrowdMember> = {}): CrowdMember {
 }
 
 describe("gambit registry", () => {
-  it("registers the starter gambits by id, with a name and an icon", () => {
-    expect(items.names()).toEqual(["personal-anecdote", "anecdote-callback"]);
+  it("registers the conversational gambits, each with its own icon", () => {
+    for (const id of [
+      "personal-anecdote",
+      "anecdote-callback",
+      "rule-of-three",
+      "pious-statement",
+      "praise-jesus",
+      "t-shirt-cannon",
+    ]) {
+      expect(items.has(id)).toBe(true);
+    }
     expect(items.get("personal-anecdote").name).toBe("Personal anecdote");
-    expect(items.get("anecdote-callback").icon).toBe("callback");
+    expect(items.get("anecdote-callback").name).toBe("Callback to anecdote");
+    const icons = items.names().map((id) => items.get(id).icon);
+    expect(new Set(icons).size).toBe(items.names().length);
+    expect(icons.every((icon) => icon.includes("svg"))).toBe(true);
     expect(items.get("personal-anecdote").visual.traits).toHaveLength(3);
-    expect(items.get("personal-anecdote").simulation.outcomes[0]!.effects).toHaveLength(1);
+    for (const id of items.names()) {
+      expect(items.get(id).visual.traits?.length).toBeGreaterThan(0);
+      expect(items.get(id).simulation.outcomes[0]!.effects.length).toBeGreaterThan(0);
+    }
   });
 
   it("spawns the composed visual model", () => {
@@ -55,6 +74,7 @@ describe("gambit registry", () => {
       id: "test",
       name: "Test",
       icon: "test",
+      usage: { maxUses: 1, usesPerEffect: 1, cooldownSeconds: 0 },
       visual: { kind: "test-visual" },
       simulation: {
         outcomes: [
@@ -74,6 +94,53 @@ describe("gambit registry", () => {
 });
 
 describe("gambit effects", () => {
+  it("rewards engaged listeners but can injure a disengaged listener", () => {
+    const [boost, injury] = tShirtCannon.simulation.outcomes[0]!.effects;
+    const engaged = member({ state: { approval: 0, engagement: 0.8 } });
+    expect(applyEffect(engaged, boost!, tShirtCannon.id, 2, 0.1)).not.toBeNull();
+    expect(engaged.state.approval).toBeGreaterThan(0);
+    expect(engaged.state.engagement).toBeGreaterThan(0.8);
+    expect(applyEffect(engaged, injury!, tShirtCannon.id, 2, 0.1)).toBeNull();
+
+    const injured = member({ state: { approval: 0.5, engagement: 0.2 } });
+    expect(applyEffect(injured, injury!, tShirtCannon.id, 2, 0.1)).not.toBeNull();
+    expect(injured.state).toEqual({ approval: -1, engagement: 1 });
+    const safe = member({ state: { approval: 0, engagement: 0.2 } });
+    expect(applyEffect(safe, injury!, tShirtCannon.id, 2, 0.9)).toBeNull();
+    expect(safe.state).toEqual({ approval: 0, engagement: 0.2 });
+  });
+
+  it("makes a rule of three engage attentive listeners, shaped by intelligence", () => {
+    const effect = ruleOfThree.simulation.outcomes[0]!.effects[0]!;
+    const lessReceptive = member({ personality: { ...personality, intelligence: 0 } });
+    const moreReceptive = member({ personality: { ...personality, intelligence: 1 } });
+    applyEffect(lessReceptive, effect, ruleOfThree.id, 3);
+    applyEffect(moreReceptive, effect, ruleOfThree.id, 3);
+    expect(moreReceptive.state.engagement).toBeGreaterThan(lessReceptive.state.engagement);
+    const asleep = member({ state: { approval: 0, engagement: 0.05 } });
+    expect(applyEffect(asleep, effect, ruleOfThree.id, 3)).toBeNull();
+  });
+
+  it("uses faith affinity, independently of superstition, for religious gambits", () => {
+    for (const gambit of [piousStatement, praiseJesus]) {
+      const effect = gambit.simulation.outcomes[0]!.effects[0]!;
+      const faithful = member({
+        personality: { ...personality, faithAffinity: 1, superstition: 0 },
+      });
+      const irreligious = member({
+        personality: { ...personality, faithAffinity: 0, superstition: 1 },
+      });
+      applyEffect(faithful, effect, gambit.id, 3);
+      applyEffect(irreligious, effect, gambit.id, 3);
+      expect(faithful.state.approval).toBeGreaterThan(0);
+      expect(irreligious.state.approval).toBeLessThan(0);
+      expect(faithful.state.approval).toBeCloseTo(-irreligious.state.approval);
+    }
+    expect(praiseJesus.simulation.outcomes[0]!.effects[0]!.amount.approval).toBeGreaterThan(
+      piousStatement.simulation.outcomes[0]!.effects[0]!.amount.approval!,
+    );
+  });
+
   it("lifts someone who is paying attention and remembers it", () => {
     const person = member();
     const effect = personalAnecdote.simulation.outcomes[0]!.effects[0]!;
@@ -128,6 +195,7 @@ describe("judging a move", () => {
       id: "cheer",
       name: "Cheer",
       icon: "cheer",
+      usage: { maxUses: 1, usesPerEffect: 1, cooldownSeconds: 0 },
       visual: { kind: "cheer" },
       simulation: {
         outcomes: [
@@ -152,6 +220,31 @@ describe("judging a move", () => {
 });
 
 describe("resolving an item on a crowd", () => {
+  it("fires three shirts at the same distinct people selected by the simulation", () => {
+    const { world, room } = scene();
+    const crowd = Array.from({ length: 7 }, (_, index) =>
+      member({ position: [index, 0.7, -2], state: { approval: 0, engagement: 0.8 } }),
+    );
+    const fired: unknown[] = [];
+    room.on(T_SHIRT_FIRED, (event) => fired.push(event));
+    const result = resolveItem(tShirtCannon, crowd, 3, { world, room }, 0.25);
+    expect(result.targetIndices).toHaveLength(3);
+    expect(new Set(result.targetIndices).size).toBe(3);
+    expect(result.people.filter((person) => person !== null)).toHaveLength(3);
+    const barrage = room.children.find((child) => child.has(TShirtBarrage))!;
+    expect(barrage.settingsOf(TShirtBarrage)!.targets).toEqual(
+      result.targetIndices.map((index) => crowd[index]!.position),
+    );
+    world.update(0);
+    world.update(0.22);
+    world.update(0.22);
+    expect(fired).toHaveLength(3);
+    world.update(1);
+    expect(room.children.some((child) => child.has(TShirtBarrage))).toBe(false);
+    const replay = resolveItem(tShirtCannon, crowd, 3, { world, room }, 0.25);
+    expect(replay.targetIndices).toEqual(result.targetIndices);
+  });
+
   it("reaches the whole audience and leaves a per-person record", () => {
     const crowd = [member(), member({ state: { approval: 0.5, engagement: 0.1 } })];
     const resolution = resolveItem(personalAnecdote, crowd, 3, scene(), 0.5);
@@ -168,6 +261,7 @@ describe("resolving an item on a crowd", () => {
       id: "nearby",
       name: "Nearby",
       icon: "nearby",
+      usage: { maxUses: 1, usesPerEffect: 1, cooldownSeconds: 0 },
       visual: { kind: "nearby-visual" },
       simulation: {
         outcomes: [

@@ -1,4 +1,6 @@
-// Load every item module so they register themselves.
-import.meta.glob(["./items/*.ts", "!./items/*.test.ts"], { eager: true });
+// Load the known item modules before a room draws its initial hand.
+import "./items/anecdote.ts";
+import "./items/rhetoric.ts";
+import "./items/t-shirt-cannon.ts";
 
 export { items } from "./registry.ts";
