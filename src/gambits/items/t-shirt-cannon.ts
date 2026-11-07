@@ -1,5 +1,4 @@
 import { Vector3 } from "three";
-import tShirtCannonIcon from "../../assets/icons/gambits/t-shirt-cannon.svg?url";
 import { spawnSpec } from "../../core/spec.ts";
 import { trait } from "../../core/trait.ts";
 import { effects } from "../../effects/registry.ts";
@@ -12,7 +11,7 @@ import { items } from "../registry.ts";
 export const tShirtCannon: ItemDef = {
   id: "t-shirt-cannon",
   name: "T-shirt cannon",
-  icon: tShirtCannonIcon,
+  medal: { shape: "square", emblem: "shirt", metal: 0xc89274 },
   usage: { maxUses: 1, usesPerEffect: 1, cooldownSeconds: 0 },
   visual: { kind: "t-shirt-barrage", traits: [trait(TShirtBarrage)] },
   simulation: {

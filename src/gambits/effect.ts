@@ -52,14 +52,18 @@ export interface Effect {
   readonly scale?: (ctx: EffectContext) => number;
 }
 
+export interface MedalDef {
+  readonly shape: "round" | "square";
+  /** Raised symbol built from geometry on the medal face. */
+  readonly emblem: "story" | "callback" | "three" | "book" | "praise" | "shirt";
+  readonly metal: number;
+}
+
 export interface ItemDef {
   readonly id: string;
   readonly name: string;
-  /**
-   * URL of the icon used in the gambit row. The row supplies the accessible
-   * label from `name`; the artwork stays independent of the simulation.
-   */
-  readonly icon: string;
+  /** The 3D medal shown in the overlay; its accessible label is `name`. */
+  readonly medal: MedalDef;
   /** How often this gambit can be invoked during a round. */
   readonly usage: Readonly<{
     /** Null means unlimited uses; a number is the round's total allowance. */

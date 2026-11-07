@@ -1,5 +1,3 @@
-import personalAnecdoteIcon from "../../assets/icons/gambits/personal-anecdote.svg?url";
-import anecdoteCallbackIcon from "../../assets/icons/gambits/anecdote-callback.svg?url";
 import { trait } from "../../core/trait.ts";
 import { Billboard } from "../../traits/billboard.ts";
 import { Sign } from "../../traits/sign.ts";
@@ -11,7 +9,7 @@ import { items } from "../registry.ts";
 export const personalAnecdote: ItemDef = {
   id: "personal-anecdote",
   name: "Personal anecdote",
-  icon: personalAnecdoteIcon,
+  medal: { shape: "round", emblem: "story", metal: 0xe7a83d },
   usage: { maxUses: 1, usesPerEffect: 1, cooldownSeconds: 0 },
   visual: {
     kind: "anecdote-visual",
@@ -49,7 +47,7 @@ export const personalAnecdote: ItemDef = {
 export const anecdoteCallback: ItemDef = {
   id: "anecdote-callback",
   name: "Callback to anecdote",
-  icon: anecdoteCallbackIcon,
+  medal: { shape: "square", emblem: "callback", metal: 0x9274c9 },
   usage: { maxUses: 1, usesPerEffect: 1, cooldownSeconds: 0 },
   visual: {
     kind: "callback-visual",

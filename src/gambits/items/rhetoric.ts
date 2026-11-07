@@ -1,6 +1,3 @@
-import piousStatementIcon from "../../assets/icons/gambits/pious-statement.svg?url";
-import praiseJesusIcon from "../../assets/icons/gambits/praise-jesus.svg?url";
-import ruleOfThreeIcon from "../../assets/icons/gambits/rule-of-three.svg?url";
 import { trait } from "../../core/trait.ts";
 import { Billboard } from "../../traits/billboard.ts";
 import { Sign } from "../../traits/sign.ts";
@@ -12,7 +9,7 @@ import { items } from "../registry.ts";
 export const ruleOfThree: ItemDef = {
   id: "rule-of-three",
   name: "Rule of three",
-  icon: ruleOfThreeIcon,
+  medal: { shape: "round", emblem: "three", metal: 0xe9a84d },
   usage: { maxUses: 3, usesPerEffect: 3, cooldownSeconds: 0 },
   visual: {
     kind: "rule-of-three-visual",
@@ -45,7 +42,7 @@ export const ruleOfThree: ItemDef = {
 export const piousStatement: ItemDef = {
   id: "pious-statement",
   name: "Pious statement",
-  icon: piousStatementIcon,
+  medal: { shape: "square", emblem: "book", metal: 0xa7b6be },
   usage: { maxUses: null, usesPerEffect: 1, cooldownSeconds: 12 },
   visual: {
     kind: "pious-statement-visual",
@@ -78,7 +75,7 @@ export const piousStatement: ItemDef = {
 export const praiseJesus: ItemDef = {
   id: "praise-jesus",
   name: "Praise Jesus!",
-  icon: praiseJesusIcon,
+  medal: { shape: "round", emblem: "praise", metal: 0xf4c746 },
   usage: { maxUses: 1, usesPerEffect: 1, cooldownSeconds: 0 },
   visual: {
     kind: "praise-jesus-visual",
