@@ -87,6 +87,7 @@ function showNoclip(): void {
 window.addEventListener("keydown", (event) => {
   if (event.code === "KeyN" && !event.repeat) {
     noclip.toggle();
+    world.manualCamera = noclip.active;
     if (noclip.active) world.pointer.move(null);
     else document.exitPointerLock();
     canvas.style.cursor = "default";

@@ -10,6 +10,8 @@ export class World {
   /** World-wide events, e.g. for the UI layer outside the 3D scene. */
   readonly events = new Emitter();
   readonly pointer = new PointerSystem(this);
+  /** True while something outside the game (e.g. noclip) is steering the camera. */
+  manualCamera = false;
   private root: GameObject | null = null;
 
   get current(): GameObject | null {
