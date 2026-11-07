@@ -1,5 +1,7 @@
 import type { AudiencePersonality, AudienceState } from "../characters/audience-model.ts";
 import type { MemoryEntry } from "../characters/crowd.ts";
+import type { ObjectSpec } from "../core/spec.ts";
+import type { EffectRef, Verdict } from "../effects/registry.ts";
 
 /**
  * One possible thing an item does when used: a weighted outcome, aimed at part
@@ -55,7 +57,15 @@ export interface ItemDef {
    * is a short glyph, and the row carries the accessible label from `name`.
    */
   readonly icon: string;
-  readonly outcomes: readonly Outcome[];
+  /** A spawnable scene object assembled from visual traits. */
+  readonly visual: ObjectSpec;
+  /** Weighted outcomes composed from effects on audience members. */
+  readonly simulation: Readonly<{
+    outcomes: readonly Outcome[];
+    /** Scene, lighting, animation and audio effects to play, by verdict. */
+    onSuccess?: readonly EffectRef[];
+    onFailure?: readonly EffectRef[];
+  }>;
 }
 
 /** A person the resolver can change, as the crowd simulation stores them. */
@@ -82,6 +92,8 @@ export interface PersonResult {
 export interface Resolution {
   readonly item: ItemDef;
   readonly outcome: Outcome;
+  /** How the move went, which decided which effects played. */
+  readonly verdict: Verdict;
   /** One entry per person passed in, or null when the outcome never reached them. */
   readonly people: readonly (PersonResult | null)[];
   readonly atSeconds: number;
@@ -89,15 +101,16 @@ export interface Resolution {
 
 /** Pick an outcome by weight from `roll`, a number in [0, 1). */
 export function chooseOutcome(item: ItemDef, roll: number): Outcome {
-  if (item.outcomes.length === 0) throw new Error(`Item "${item.id}" has no outcomes`);
-  const total = item.outcomes.reduce((sum, outcome) => sum + Math.max(0, outcome.weight), 0);
+  const { outcomes } = item.simulation;
+  if (outcomes.length === 0) throw new Error(`Item "${item.id}" has no outcomes`);
+  const total = outcomes.reduce((sum, outcome) => sum + Math.max(0, outcome.weight), 0);
   if (!(total > 0)) throw new Error(`Item "${item.id}" has no outcome with a positive weight`);
   let threshold = roll * total;
-  for (const outcome of item.outcomes) {
+  for (const outcome of outcomes) {
     threshold -= Math.max(0, outcome.weight);
     if (threshold < 0) return outcome;
   }
-  return item.outcomes[item.outcomes.length - 1]!;
+  return outcomes[outcomes.length - 1]!;
 }
 
 const clamp = (value: number, low: number, high: number) => Math.max(low, Math.min(high, value));

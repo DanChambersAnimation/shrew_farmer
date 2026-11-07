@@ -1,3 +1,7 @@
+import { trait } from "../../core/trait.ts";
+import { Billboard } from "../../traits/billboard.ts";
+import { Sign } from "../../traits/sign.ts";
+import { Transform } from "../../traits/transform.ts";
 import type { ItemDef } from "../effect.ts";
 import { items } from "../registry.ts";
 
@@ -6,21 +10,33 @@ export const personalAnecdote: ItemDef = {
   id: "personal-anecdote",
   name: "Personal anecdote",
   icon: "anecdote",
-  outcomes: [
-    {
-      weight: 1,
-      target: { kind: "audience" },
-      description: "They lean in to hear how it turned out.",
-      effects: [
-        {
-          name: "personal-anecdote",
-          amount: { approval: 0.1, engagement: 0.25 },
-          // Nobody ignores a story they are too bored to follow.
-          reaches: ({ state }) => state.engagement > 0.3,
-        },
-      ],
-    },
-  ],
+  visual: {
+    kind: "anecdote-visual",
+    traits: [
+      trait(Transform, { position: [0, 2.4, 0] }),
+      trait(Billboard),
+      trait(Sign, { text: "A story...", width: 1.2, height: 0.4 }),
+    ],
+  },
+  simulation: {
+    outcomes: [
+      {
+        weight: 1,
+        target: { kind: "audience" },
+        description: "They lean in to hear how it turned out.",
+        effects: [
+          {
+            name: "personal-anecdote",
+            amount: { approval: 0.1, engagement: 0.25 },
+            // Nobody ignores a story they are too bored to follow.
+            reaches: ({ state }) => state.engagement > 0.3,
+          },
+        ],
+      },
+    ],
+    onSuccess: [{ id: "house-lift" }, { id: "applause" }],
+    onFailure: [{ id: "awkward-silence" }],
+  },
 };
 
 /**
@@ -31,30 +47,42 @@ export const anecdoteCallback: ItemDef = {
   id: "anecdote-callback",
   name: "Callback to anecdote",
   icon: "callback",
-  outcomes: [
-    {
-      weight: 1,
-      target: { kind: "audience" },
-      description: "The room recognises the story.",
-      effects: [
-        {
-          name: "anecdote-callback",
-          amount: { approval: 0.2, engagement: 0.15 },
-          reaches: ({ state }) => state.engagement > 0.3,
-          scale: ({ memory, atSeconds }) => {
-            const heardAt = memory
-              .filter((entry) => entry.id === "personal-anecdote")
-              .map((entry) => entry.atSeconds)
-              .sort((a, b) => b - a)[0];
-            if (heardAt === undefined) return 0.4; // They never heard it: awkward.
-            const gap = atSeconds - heardAt;
-            // Fifteen seconds is the sweet spot; sooner is flat, later fades.
-            return gap < 5 ? 0.7 : gap <= 15 ? 2 : 1.2;
+  visual: {
+    kind: "callback-visual",
+    traits: [
+      trait(Transform, { position: [0, 2.4, 0] }),
+      trait(Billboard),
+      trait(Sign, { text: "Remember?", width: 1.2, height: 0.4 }),
+    ],
+  },
+  simulation: {
+    outcomes: [
+      {
+        weight: 1,
+        target: { kind: "audience" },
+        description: "The room recognises the story.",
+        effects: [
+          {
+            name: "anecdote-callback",
+            amount: { approval: 0.2, engagement: 0.15 },
+            reaches: ({ state }) => state.engagement > 0.3,
+            scale: ({ memory, atSeconds }) => {
+              const heardAt = memory
+                .filter((entry) => entry.id === "personal-anecdote")
+                .map((entry) => entry.atSeconds)
+                .sort((a, b) => b - a)[0];
+              if (heardAt === undefined) return 0.4; // They never heard it: awkward.
+              const gap = atSeconds - heardAt;
+              // Fifteen seconds is the sweet spot; sooner is flat, later fades.
+              return gap < 5 ? 0.7 : gap <= 15 ? 2 : 1.2;
+            },
           },
-        },
-      ],
-    },
-  ],
+        ],
+      },
+    ],
+    onSuccess: [{ id: "house-lift" }],
+    onFailure: [{ id: "house-dip" }, { id: "awkward-silence" }],
+  },
 };
 
 items.register(personalAnecdote.id, personalAnecdote);
