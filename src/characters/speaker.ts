@@ -217,3 +217,55 @@ export const SPEAKER_VIEWS = {
   head: "80 60 240 240",
 } as const;
 rigs.register("speaker", SPEAKER);
+
+/* ---------------- Back view: same slots and poses, seen from behind ---------------- */
+
+const BACK_TORSO = `
+<rect x="186" y="280" width="28" height="40" fill="${P.skin}" ${LINE}/>
+<path d="M 145 318 Q 200 300 255 318 Q 268 330 262 360 L 250 462 Q 200 474 150 462 L 138 360 Q 132 330 145 318 Z" fill="url(#spk-suit)" ${LINE}/>
+<path d="M 170 312 Q 200 302 230 312 L 228 322 Q 200 314 172 322 Z" fill="${P.shirt}" ${LINE}/>
+<path d="M 200 320 L 200 468" stroke="${P.suitDark}" stroke-width="3" fill="none"/>
+<path d="M 200 436 L 200 468 M 194 436 L 200 444" stroke="${P.outline}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+<path d="M 158 338 Q 164 400 157 452" stroke="#fff" stroke-width="5" opacity="0.45" fill="none" stroke-linecap="round"/>
+<path d="M 242 340 Q 237 380 243 428" stroke="#fff" stroke-width="4" opacity="0.3" fill="none" stroke-linecap="round"/>`;
+
+const BACK_HEAD = `
+<ellipse cx="200" cy="190" rx="112" ry="105" fill="${P.skin}" ${LINE}/>
+<path d="M 88 195 C 80 110 140 66 200 66 C 260 66 320 110 312 195 C 308 240 290 268 260 278 Q 200 292 140 278 C 110 268 92 240 88 195 Z" fill="${P.hair}" ${LINE}/>
+<g stroke="${P.hairShine}" stroke-linecap="round" fill="none" opacity="0.6">
+<path d="M 150 86 C 138 150 148 220 168 262" stroke-width="4.5"/>
+<path d="M 200 78 C 196 150 198 220 200 270" stroke-width="4"/>
+<path d="M 250 86 C 262 150 252 220 232 262" stroke-width="4.5"/>
+</g>
+<circle cx="90" cy="200" r="18" fill="${P.skin}" ${LINE}/>
+<circle cx="310" cy="200" r="18" fill="${P.skin}" ${LINE}/>
+<path d="M 100 184 Q 84 182 80 198 M 300 184 Q 316 182 320 198" stroke="${P.lens}" stroke-width="5" fill="none" stroke-linecap="round"/>`;
+
+const SILENT = variants(MOUTHS, () => "");
+
+/**
+ * The Speaker seen from behind. Slots match the front rig, and each arm slot
+ * names the same physical arm, so it appears on the opposite side of the screen.
+ * Arms are drawn behind the back, so gestures across the chest are hidden.
+ */
+export const SPEAKER_BACK: Rig = {
+  width: 400,
+  height: 560,
+  layers: [
+    { svg: DEFS + LEGS },
+    { slot: "mouth", variants: SILENT, defaultVariant: "rest" },
+    {
+      slot: "armRight",
+      variants: ARMS,
+      defaultVariant: "rest",
+      transform: "translate(400 0) scale(-1 1)",
+    },
+    { slot: "armLeft", variants: ARMS, defaultVariant: "rest" },
+    { svg: BACK_TORSO + BACK_HEAD },
+  ],
+};
+
+/** Where the Speaker's feet meet the floor, in rig units (both views). */
+export const SPEAKER_FEET: Point = [200, 534];
+
+rigs.register("speaker-back", SPEAKER_BACK);

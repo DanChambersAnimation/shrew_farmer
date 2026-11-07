@@ -1,7 +1,8 @@
 import { rooms } from "../core/room-registry.ts";
 import { spawnSpec } from "../core/spec.ts";
-import { HALL, churchHall } from "../locations/church-hall.ts";
+import { HALL, STAGE, churchHall } from "../locations/church-hall.ts";
 import { fillSeats } from "../prefabs/audience-member.ts";
+import { speaker } from "../prefabs/speaker.ts";
 import { CameraView } from "../traits/camera-view.ts";
 
 rooms.register({
@@ -20,5 +21,7 @@ rooms.register({
     });
     // A new seed gives this room a fresh audience on each opening.
     fillSeats(spawnSpec(room, churchHall()), Math.floor(Math.random() * 0x100000000));
+    // The player, on stage with his back to us, facing the audience.
+    spawnSpec(room, speaker([-2.6, STAGE.height, 2.9]));
   },
 });

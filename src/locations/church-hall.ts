@@ -11,6 +11,9 @@ import { Transform } from "../traits/transform.ts";
 /** Interior size in metres. The back wall (with the sign) is at -z. */
 export const HALL = { width: 12, depth: 16, height: 6 } as const;
 
+/** The stage: a low platform across the near (+z) end, from `front` to the wall. */
+export const STAGE = { height: 0.5, front: 2.4 } as const;
+
 const WALL = 0xe6dcc3;
 const FLOOR = 0x9a6b3f;
 
@@ -29,7 +32,20 @@ function seating(rows = 4, perSide = 5): ObjectSpec {
   return { kind: "seating", children: chairs };
 }
 
-/** The church hall: a plain box room, a sign on the back wall, and rows of seats. */
+function stage(): ObjectSpec {
+  const { width: w, depth: d } = HALL;
+  const { height: sh, front } = STAGE;
+  const depth = d / 2 - front;
+  return {
+    kind: "stage",
+    children: [
+      slab("stage-deck", [w, sh, depth], [0, sh / 2, front + depth / 2], 0xb07a45),
+      slab("stage-front", [w, sh, 0.04], [0, sh / 2, front - 0.02], 0x5e3b22),
+    ],
+  };
+}
+
+/** The church hall: a box room with a stage at one end, seats at the other, and a sign. */
 export function churchHall(): ObjectSpec {
   const { width: w, depth: d, height: h } = HALL;
   const t = 0.2;
@@ -42,6 +58,7 @@ export function churchHall(): ObjectSpec {
       slab("wall", [w, h, t], [0, h / 2, d / 2 + t / 2], WALL),
       slab("wall", [t, h, d], [-w / 2 - t / 2, h / 2, 0], WALL),
       slab("wall", [t, h, d], [w / 2 + t / 2, h / 2, 0], WALL),
+      stage(),
       seating(),
       {
         kind: "sign",
