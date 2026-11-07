@@ -10,6 +10,112 @@ canvas {
   display: block;
 }
 
+#round-meter {
+  position: fixed;
+  z-index: 10;
+  top: calc(10vh + 18px);
+  left: 50%;
+  box-sizing: border-box;
+  width: 33.333vw;
+  transform: translateX(-50%);
+  color: #211529;
+  font-family: system-ui, sans-serif;
+  font-weight: 900;
+  pointer-events: none;
+  filter: drop-shadow(3px 4px 0 rgb(20 12 25 / 0.4));
+}
+
+#round-meter[hidden] {
+  display: none;
+}
+
+.round-meter-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  margin-bottom: 5px;
+  font-size: clamp(11px, 1.2vw, 17px);
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-shadow:
+    1px 1px #ffe87b,
+    -1px -1px #ffe87b;
+}
+
+#round-meter-remaining {
+  box-sizing: border-box;
+  min-width: 3.5em;
+  padding: 3px 6px;
+  border: 3px solid #211529;
+  background: #ffe45e;
+  font-size: clamp(10px, 1.1vw, 15px);
+  text-align: center;
+  text-shadow: none;
+  transform: rotate(3deg);
+}
+
+#round-meter-track {
+  position: relative;
+  box-sizing: border-box;
+  height: 29px;
+  border: 4px solid #211529;
+  border-radius: 4px;
+  background: repeating-linear-gradient(135deg, #fff3bc 0 15px, #eacb8b 15px 30px);
+}
+
+#round-meter-track::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 24.6%,
+    #211529 25%,
+    transparent 25.4%,
+    transparent 49.6%,
+    #211529 50%,
+    transparent 50.4%,
+    transparent 74.6%,
+    #211529 75%,
+    transparent 75.4%
+  );
+  content: "";
+  opacity: 0.45;
+}
+
+#round-meter-fill {
+  box-sizing: border-box;
+  width: 0;
+  height: 100%;
+  border-right: 3px solid #211529;
+  background: repeating-linear-gradient(90deg, #ff5a86 0 22px, #ff9857 22px 44px);
+}
+
+#round-meter-marker {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 0;
+  color: #ffe45e;
+  font-size: 27px;
+  line-height: 1;
+  text-shadow:
+    -2px -2px #211529,
+    2px -2px #211529,
+    -2px 2px #211529,
+    2px 2px #211529;
+  transform: translate(-50%, -50%) rotate(-12deg);
+}
+
+#round-meter[data-complete="true"] #round-meter-remaining {
+  background: #ff5a86;
+}
+
+@media (max-width: 800px) {
+  #info {
+    top: 92px;
+  }
+}
+
 #room-label {
   position: fixed;
   left: 12px;

@@ -4,6 +4,7 @@ import { rooms } from "./core/room-registry.ts";
 import { World } from "./core/world.ts";
 import { Noclip } from "./dev/noclip.ts";
 import { INSPECT, type InspectInfo } from "./traits/inspectable.ts";
+import { GameTimer } from "./traits/game-timer.ts";
 
 // Every module in src/rooms registers its room with the registry.
 import.meta.glob(["./rooms/*.ts", "!./rooms/*.test.ts"], { eager: true });
@@ -13,6 +14,11 @@ const DEFAULT_ROOM = "dev0";
 const app = document.querySelector<HTMLDivElement>("#app")!;
 const label = document.querySelector<HTMLDivElement>("#room-label")!;
 const info = document.querySelector<HTMLDivElement>("#info")!;
+const roundMeter = document.querySelector<HTMLElement>("#round-meter")!;
+const roundMeterTrack = document.querySelector<HTMLElement>("#round-meter-track")!;
+const roundMeterFill = document.querySelector<HTMLElement>("#round-meter-fill")!;
+const roundMeterMarker = document.querySelector<HTMLElement>("#round-meter-marker")!;
+const roundMeterRemaining = document.querySelector<HTMLElement>("#round-meter-remaining")!;
 // The noclip panel builds its own markup so it never depends on index.html.
 const noclipHud = Object.assign(document.createElement("div"), { id: "noclip", hidden: true });
 noclipHud.innerHTML = "<strong>NOCLIP</strong> <code></code><small></small>";
@@ -135,12 +141,33 @@ world.events.on(INSPECT, (payload) => {
   }
 });
 
+function renderRoundMeter(): void {
+  const clock = world.current?.settingsOf(GameTimer);
+  roundMeter.hidden = !clock;
+  if (!clock) return;
+  const progress = Math.min(1, clock.elapsedSeconds / clock.durationSeconds);
+  const secondsLeft = Math.ceil(clock.durationSeconds - clock.elapsedSeconds);
+  roundMeterFill.style.width = `${progress * 100}%`;
+  roundMeterMarker.style.left = `${progress * 100}%`;
+  roundMeterRemaining.textContent = secondsLeft > 0 ? `${secondsLeft}s` : "TIME!";
+  roundMeter.dataset.complete = String(secondsLeft === 0);
+  roundMeterTrack.setAttribute("aria-valuemax", String(clock.durationSeconds));
+  roundMeterTrack.setAttribute("aria-valuenow", String(Math.floor(clock.elapsedSeconds)));
+  roundMeterTrack.setAttribute(
+    "aria-valuetext",
+    `${Math.floor(clock.elapsedSeconds)} of ${clock.durationSeconds} seconds elapsed`,
+  );
+}
+
+renderRoundMeter();
+
 const timer = new Timer();
 renderer.setAnimationLoop((time) => {
   timer.update(time);
   const dt = timer.getDelta();
   noclip.update(dt);
   world.update(dt);
+  renderRoundMeter();
   showNoclip();
   renderer.render(world.scene, world.viewCamera);
 });

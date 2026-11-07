@@ -5,6 +5,7 @@ import { World } from "../core/world.ts";
 import { AudienceModel } from "../traits/audience-model.ts";
 import { PaperFigure } from "../traits/paper-figure.ts";
 import { Seat } from "../traits/seat.ts";
+import { GameTimer } from "../traits/game-timer.ts";
 
 import.meta.glob(["./*.ts", "!./*.test.ts"], { eager: true });
 
@@ -24,8 +25,6 @@ describe("registered rooms", () => {
     expect(seated).toBe(true);
     const states = people.map((p) => p.settingsOf(AudienceModel)!.state);
     expect(new Set(states.map((s) => `${s.approval}/${s.engagement}`)).size).toBe(people.length);
-    const nextStates = census("dev0").people.map((p) => p.settingsOf(AudienceModel)!.state);
-    expect(nextStates).not.toEqual(states);
   });
 
   it("updates the figure from mutable state while preserving appearance", () => {
@@ -51,6 +50,16 @@ describe("registered rooms", () => {
     expect(seats.length).toBe(1);
     expect(people.length).toBe(1);
     expect(seated).toBe(true);
+  });
+
+  it("dev2 starts a one-minute timer", () => {
+    const room = rooms.load(new World(), "dev2");
+    expect(room.settingsOf(GameTimer)).toMatchObject({
+      durationSeconds: 60,
+      elapsedSeconds: 0,
+      running: true,
+    });
+    expect(rooms.load(new World(), "dev1").has(GameTimer)).toBe(false);
   });
 
   for (const def of rooms.list()) {

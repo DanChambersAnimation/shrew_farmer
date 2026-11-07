@@ -28,6 +28,7 @@ It listens on all network interfaces, so other devices on your LAN can open
 when it starts.
 
 - Game: http://localhost:5173/ (pick a room with `?room=<name>`)
+- Round timer demo: http://localhost:5173/?room=dev2
 - Contact sheet: http://localhost:5173/contact-sheet.html
 
 Options: `PORT=3000 ./dev.sh` changes the port. Extra Vite arguments can be
