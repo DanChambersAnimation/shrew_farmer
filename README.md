@@ -22,12 +22,16 @@ Check the latest deploy under the repo's **Actions** tab (workflow **CI**, job *
 ./dev.sh
 ```
 
-This installs dependencies on first run, then starts the dev server with hot reload:
+This installs dependencies on first run, then starts the dev server with hot reload.
+It listens on all network interfaces, so other devices on your LAN can open
+`http://<your-computer's-LAN-IP>:5173/`. Vite prints the available network URLs
+when it starts.
 
 - Game: http://localhost:5173/ (pick a room with `?room=<name>`)
 - Contact sheet: http://localhost:5173/contact-sheet.html
 
-Options: `./dev.sh --host` exposes it to other devices on your network; `PORT=3000 ./dev.sh` changes the port.
+Options: `PORT=3000 ./dev.sh` changes the port. Extra Vite arguments can be
+passed to the script.
 
 ## Checks
 
