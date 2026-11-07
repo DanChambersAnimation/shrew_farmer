@@ -13,8 +13,8 @@ rooms.register({
     room.add(CameraView, {
       // Behind the speaker, well above standing eye height, tilted down toward
       // the seated audience at the far end of the hall.
-      position: [0, 3.4, HALL.depth / 2 - 1],
-      lookAt: [0, 0.6, -HALL.depth / 2],
+      position: [0, 5.4, HALL.depth / 2 - 1],
+      lookAt: [0, -1.6, -HALL.depth / 2],
       fov: 50,
       swayDegrees: 5,
       swayPeriodSeconds: 22,
@@ -22,6 +22,6 @@ rooms.register({
     // A new seed gives this room a fresh audience on each opening.
     fillSeats(spawnSpec(room, churchHall()), Math.floor(Math.random() * 0x100000000));
     // The player, on stage with his back to us, facing the audience.
-    spawnSpec(room, speaker([-2.6, STAGE.height, 2.9]));
+    spawnSpec(room, speaker([-2.6, STAGE.height, 4.2]));
   },
 });

@@ -49,3 +49,33 @@ canvas {
   margin: 0;
   opacity: 0.85;
 }
+
+#noclip {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: calc(100vw - 24px);
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgb(0 0 0 / 0.75);
+  color: #9fffb0;
+  font:
+    12px/1.4 ui-monospace,
+    monospace;
+}
+
+#noclip[hidden] {
+  display: none;
+}
+
+#noclip code {
+  color: #fff;
+  user-select: all;
+}
+
+#noclip small {
+  opacity: 0.75;
+}

@@ -7,6 +7,10 @@ import { slab } from "./blocks.ts";
 
 const CHAIR = 0x6b4a32;
 const SEAT_HEIGHT = 0.4;
+const BACK_HEIGHT = 0.5;
+
+/** Overall chair height (floor to top of the back), in metres. */
+export const CHAIR_HEIGHT = SEAT_HEIGHT + BACK_HEIGHT;
 
 /** A plain cuboid chair facing +z, with a seat point just in front of its seat. */
 export function chair(position: Vec3 = [0, 0, 0]): ObjectSpec {
@@ -17,7 +21,7 @@ export function chair(position: Vec3 = [0, 0, 0]): ObjectSpec {
     traits: [trait(Transform, { position }), trait(Seat, { sitPoint: [0, SEAT_HEIGHT, 0.24] })],
     children: [
       slab("chair-seat", [0.5, 0.05, 0.45], [0, SEAT_HEIGHT - 0.025, 0], CHAIR),
-      slab("chair-back", [0.5, 0.5, 0.05], [0, SEAT_HEIGHT + 0.25, -0.2], CHAIR),
+      slab("chair-back", [0.5, BACK_HEIGHT, 0.05], [0, SEAT_HEIGHT + BACK_HEIGHT / 2, -0.2], CHAIR),
       leg(-0.22, -0.2),
       leg(0.22, -0.2),
       leg(-0.22, 0.2),
