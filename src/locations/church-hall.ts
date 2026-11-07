@@ -1,5 +1,7 @@
 import type { ObjectSpec } from "../core/spec.ts";
 import { trait } from "../core/trait.ts";
+import { Highlight } from "../traits/highlight.ts";
+import { Inspectable } from "../traits/inspectable.ts";
 import { Light } from "../traits/light.ts";
 import { Shape } from "../traits/shape.ts";
 import { Sign } from "../traits/sign.ts";
@@ -37,6 +39,12 @@ export function churchHall(): ObjectSpec {
         traits: [
           trait(Transform, { position: [0, h * 0.6, -d / 2 + 0.01] }),
           trait(Sign, { text: "Church Hall", width: 4, height: 1 }),
+          trait(Inspectable, {
+            title: "Church hall sign",
+            description:
+              "A hand-painted sign. Tonight's venue is humble, but everyone starts somewhere.",
+          }),
+          trait(Highlight),
         ],
       },
       {

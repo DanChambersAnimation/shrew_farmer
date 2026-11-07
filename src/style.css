@@ -20,3 +20,32 @@ canvas {
   color: rgb(255 255 255 / 0.75);
   pointer-events: none;
 }
+
+#info {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  max-width: 280px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: rgb(20 14 10 / 0.85);
+  color: #f4ecd8;
+  font:
+    14px/1.4 system-ui,
+    sans-serif;
+  pointer-events: none;
+}
+
+#info[hidden] {
+  display: none;
+}
+
+#info h2 {
+  margin: 0 0 4px;
+  font-size: 15px;
+}
+
+#info p {
+  margin: 0;
+  opacity: 0.85;
+}

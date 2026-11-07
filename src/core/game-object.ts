@@ -1,14 +1,15 @@
-import { Group } from "three";
+import { Group, type Object3D } from "three";
+import { Emitter, type Listener } from "./emitter.ts";
 import type { AnyTraitDef, TraitContext, TraitDef, TraitEntry } from "./trait.ts";
 import type { World } from "./world.ts";
-
-type Listener = (payload: unknown) => void;
 
 interface Attachment {
   readonly def: AnyTraitDef;
   readonly ctx: TraitContext<object>;
   cleanup?: () => void;
 }
+
+const OWNER = "gameObject";
 
 /**
  * A container in the world: a scene node, child objects, an event channel and
@@ -20,7 +21,7 @@ export class GameObject {
   parent: GameObject | null = null;
 
   private readonly traits = new Map<AnyTraitDef, Attachment>();
-  private readonly listeners = new Map<string, Set<Listener>>();
+  private readonly events = new Emitter();
   private disposed = false;
 
   readonly kind: string;
@@ -30,6 +31,23 @@ export class GameObject {
     this.kind = kind;
     this.world = world;
     this.node.name = kind;
+    this.node.userData[OWNER] = this;
+  }
+
+  /** The object that owns a scene node, searching up from `node`. */
+  static owning(node: Object3D | null): GameObject | null {
+    for (let n = node; n; n = n.parent) {
+      const owner: unknown = n.userData[OWNER];
+      if (owner instanceof GameObject) return owner;
+    }
+    return null;
+  }
+
+  /** This object followed by its parents, up to the root. */
+  ancestry(): GameObject[] {
+    const chain: GameObject[] = [this];
+    for (let o = this.parent; o; o = o.parent) chain.push(o);
+    return chain;
   }
 
   /** Attach a trait. Settings are merged over the trait's defaults. */
@@ -83,20 +101,18 @@ export class GameObject {
 
   /** Subscribe to an event on this object. Returns an unsubscribe function. */
   on(type: string, listener: Listener): () => void {
-    let set = this.listeners.get(type);
-    if (!set) {
-      set = new Set();
-      this.listeners.set(type, set);
-    }
-    set.add(listener);
-    return () => set.delete(listener);
+    return this.events.on(type, listener);
   }
 
-  // Iterate over snapshots so listeners and traits may add or remove things mid-loop.
   emit(type: string, payload?: unknown): void {
-    for (const listener of Array.from(this.listeners.get(type) ?? [])) listener(payload);
+    this.events.emit(type, payload);
   }
 
+  listens(type: string): boolean {
+    return this.events.listens(type);
+  }
+
+  // Iterate over snapshots so traits may add or remove things mid-loop.
   update(dt: number): void {
     for (const { def, ctx } of Array.from(this.traits.values())) def.update?.(ctx, dt);
     for (const child of Array.from(this.children)) child.update(dt);
@@ -108,7 +124,7 @@ export class GameObject {
     this.disposed = true;
     for (const child of [...this.children].reverse()) child.dispose();
     for (const def of [...this.traits.keys()].reverse()) this.remove(def);
-    this.listeners.clear();
+    this.events.clear();
     this.node.removeFromParent();
     if (this.parent) {
       const siblings = this.parent.children;

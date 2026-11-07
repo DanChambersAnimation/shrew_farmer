@@ -29,3 +29,7 @@ release. Add a tool name to select part of the graph. For example, run
 - [ ] If setup, runtime, or package-manager behavior looks wrong, run `vp env doctor` and include its output when asking for help.
 
 <!--VITE PLUS END-->
+
+# Project
+
+See `README.md` for the live GitHub Pages URLs, how to run locally (`./dev.sh`) and how the code is organised.
