@@ -1,27 +1,30 @@
 import { rooms } from "../core/room-registry.ts";
 import { spawnSpec } from "../core/spec.ts";
-import { trait } from "../core/trait.ts";
-import { fillSeats } from "../prefabs/audience-member.ts";
-import { slab } from "../prefabs/blocks.ts";
-import { chair } from "../prefabs/chair.ts";
-import { CameraView } from "../traits/camera-view.ts";
-import { GameTimer } from "../traits/game-timer.ts";
-import { Light } from "../traits/light.ts";
+import { HALL } from "../locations/church-hall.ts";
+import { spotlight } from "../prefabs/spotlight.ts";
+import { churchHallShow } from "../scenes/church-hall-show.ts";
+import { LightingCues } from "../traits/lighting-cues.ts";
 
-/** A small room for watching the one-minute meter run. */
+/** The church hall show with lighting states (L): house lights, or a spotlight. */
 rooms.register({
   name: "dev2",
-  title: "Round timer",
+  title: "Stage lighting",
   tags: ["dev"],
   build(room) {
-    room.add(GameTimer);
-    room.add(CameraView, { position: [0, 1.6, 3.2], lookAt: [0, 0.75, 0], fov: 35 });
-    spawnSpec(room, slab("floor", [6, 0.1, 6], [0, -0.05, 0], 0x9a6b3f));
-    spawnSpec(room, slab("backdrop", [6, 4, 0.1], [0, 2, -1.5], 0xe6dcc3));
-    spawnSpec(room, {
-      kind: "light",
-      traits: [trait(Light, { kind: "hemisphere", color: 0xfff4e0, groundColor: 0x6b4a2b })],
+    // Added first so lights start at the first cue's levels.
+    room.add(LightingCues, {
+      cues: {
+        "House lights": { house: 1, spot: 0 },
+        // A cheat: house lights stay faintly up so the audience stays visible.
+        Spotlight: { house: 0.18, spot: 1 },
+      },
     });
-    fillSeats(spawnSpec(room, chair()));
+    const { speakerAt: at } = churchHallShow(room);
+    // A ceiling spot above and in front of him (on the audience side): the light
+    // pools at his feet and throws his shadow back toward us.
+    spawnSpec(
+      room,
+      spotlight([at[0], HALL.height - 0.1, at[2] - 2.2], [at[0], at[1], at[2] + 0.3]),
+    );
   },
 });

@@ -1,10 +1,11 @@
 import "./style.css";
-import { ACESFilmicToneMapping, Timer, WebGLRenderer } from "three";
+import { ACESFilmicToneMapping, PCFSoftShadowMap, Timer, WebGLRenderer } from "three";
 import { rooms } from "./core/room-registry.ts";
 import { World } from "./core/world.ts";
 import { Noclip } from "./dev/noclip.ts";
 import { INSPECT, type InspectInfo } from "./traits/inspectable.ts";
 import { GameTimer } from "./traits/game-timer.ts";
+import { CUE_CHANGED, NEXT_CUE } from "./traits/lighting-cues.ts";
 
 // Every module in src/rooms registers its room with the registry.
 import.meta.glob(["./rooms/*.ts", "!./rooms/*.test.ts"], { eager: true });
@@ -27,6 +28,9 @@ document.body.appendChild(noclipHud);
 const renderer = new WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.toneMapping = ACESFilmicToneMapping;
+// Shadows are opt-in per light and per object (castShadow settings).
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = PCFSoftShadowMap;
 app.appendChild(renderer.domElement);
 
 const world = new World();
@@ -41,10 +45,19 @@ function resize(): void {
 window.addEventListener("resize", resize);
 resize();
 
+let cue = "";
+world.events.on(CUE_CHANGED, (name) => {
+  cue = String(name);
+  showRoomLabel();
+});
+
 function showRoomLabel(): void {
   if (!def) return;
-  const name = def.title ? `${def.name} · ${def.title}` : def.name;
-  label.textContent = world.projection === "orthographic" ? `${name} · orthographic (Q)` : name;
+  const parts = [def.name];
+  if (def.title) parts.push(def.title);
+  if (cue) parts.push(`${cue} (L)`);
+  if (world.projection === "orthographic") parts.push("orthographic (Q)");
+  label.textContent = parts.join(" · ");
 }
 
 const roomName = new URLSearchParams(window.location.search).get("room") ?? DEFAULT_ROOM;
@@ -103,6 +116,8 @@ window.addEventListener("keydown", (event) => {
     if (noclip.active) world.pointer.move(null);
     else document.exitPointerLock();
     canvas.style.cursor = "default";
+  } else if (event.code === "KeyL" && !event.repeat) {
+    world.events.emit(NEXT_CUE);
   } else if (event.code === "KeyQ" && !event.repeat) {
     // Toggle between perspective and orthographic projection.
     world.projection = world.projection === "perspective" ? "orthographic" : "perspective";

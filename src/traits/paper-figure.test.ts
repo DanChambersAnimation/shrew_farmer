@@ -32,7 +32,7 @@ describe("figureGeometry", () => {
     expect(box.min.y).toBeCloseTo(0);
   });
 
-  it("seats a figure: thighs forward, feet on the floor, head clear of the chair back", () => {
+  it("seats a figure: thighs forward, feet on the floor, upright torso and head", () => {
     const profile = seatedProfile(0.004, 0.41);
     const [head, neck, hips, knees, feet] = profile;
     expect(hips!.slice(1)).toEqual([0, 0]);
@@ -40,7 +40,8 @@ describe("figureGeometry", () => {
     expect(knees![2]).toBeGreaterThan(0.2);
     expect(feet![1]).toBeCloseTo(-0.41);
     expect(head![1]).toBeGreaterThan(neck![1]);
-    expect(head![2]).toBeLessThan(0); // tipped back toward the camera above
+    expect(head![2]).toBeCloseTo(0); // perpendicular to the floor
+    expect(seatedProfile(0.004, 0.41, 0.34, 20)[0]![2]).toBeLessThan(0); // optional tilt back
   });
 });
 

@@ -5,7 +5,9 @@ import {
   Float32BufferAttribute,
   type Intersection,
   Mesh,
+  MeshDepthMaterial,
   MeshStandardMaterial,
+  RGBADepthPacking,
   type Raycaster,
   SRGBColorSpace,
 } from "three";
@@ -161,6 +163,8 @@ export const PaperFigure = defineTrait({
     anchor: [0, 0] as [number, number],
     /** Optional bend; see figureGeometry. Empty = flat. */
     profile: [] as ProfilePoint[],
+    /** Cast a shadow in the drawing's outline (lights must cast shadows too). */
+    castShadow: false,
     /** Optional twist of the upper body; change it at any time. */
     twist: { degrees: 0, curve: [] } as Twist,
   },
@@ -175,6 +179,14 @@ export const PaperFigure = defineTrait({
     const material = new MeshStandardMaterial({ alphaTest: 0.5, roughness: 1, side: DoubleSide });
     const mesh = new Mesh(geometry, material);
     mesh.visible = false;
+    // Shadows use the drawing's alpha, so they're figure-shaped, not rectangles.
+    const shadowMaterial = new MeshDepthMaterial({
+      depthPacking: RGBADepthPacking,
+      alphaTest: 0.5,
+      side: DoubleSide,
+    });
+    mesh.castShadow = s.castShadow;
+    mesh.customDepthMaterial = shadowMaterial;
     object.node.add(mesh);
 
     let pixels: ImageData | null = null;
@@ -215,6 +227,8 @@ export const PaperFigure = defineTrait({
         texture.colorSpace = SRGBColorSpace;
         material.map = texture;
         material.needsUpdate = true;
+        shadowMaterial.map = texture;
+        shadowMaterial.needsUpdate = true;
         mesh.visible = true;
       };
       image.onerror = () => console.error(`PaperFigure: rig "${s.rig}" produced an invalid SVG`);
@@ -238,6 +252,7 @@ export const PaperFigure = defineTrait({
         geometry.dispose();
         material.map?.dispose();
         material.dispose();
+        shadowMaterial.dispose();
       },
     };
   },
