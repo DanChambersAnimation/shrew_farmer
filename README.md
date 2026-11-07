@@ -29,6 +29,7 @@ when it starts.
 
 - Game: http://localhost:5173/ (pick a room with `?room=<name>`)
 - Round timer demo: http://localhost:5173/?room=dev4
+- T-shirt cannon demo: http://localhost:5173/?room=dev6
 - Contact sheet: http://localhost:5173/contact-sheet.html
 
 Options: `PORT=3000 ./dev.sh` changes the port. Extra Vite arguments can be

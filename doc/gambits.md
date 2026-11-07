@@ -2,9 +2,11 @@
 
 What the Speaker uses to engage the audience. Every item has **upsides and downsides**, often a chance of something going wrong. See issue [#5](https://github.com/DanChambersAnimation/shrew_farmer/issues/5) for the shared effect system, [#3](https://github.com/DanChambersAnimation/shrew_farmer/issues/3) for crowd responses, and [#2](https://github.com/DanChambersAnimation/shrew_farmer/issues/2) for the icon row.
 
-**Status:** the registry and effect pipeline exist (`src/gambits/`, from #8). All five conversational gambits below are defined with simulation rules and SVG icons in `src/assets/icons/gambits/`. The icon row and in-room deployment UI are still to be built; the equipment and power-ups below remain design ideas.
+**Status:** the registry and effect pipeline exist (`src/gambits/`, from #8). The five conversational gambits and the T-shirt cannon below have simulation rules and SVG icons in `src/assets/icons/gambits/`. The clickable rack above the timer draws five gambits per round in dev3. Other equipment and power-ups below remain design ideas.
 
 **How an item is defined** (`src/gambits/effect.ts`): an item is a list of **weighted outcomes**. Each outcome has a **target** (the whole audience, the room, or a neighbourhood within a radius) and **effects**. An effect changes a person's approval and/or engagement, can decide whether it reaches them at all (e.g. too bored to notice), and can scale by context (personality, what they remember, the round time). Risky items are just extra outcomes with low weights.
+
+Each registry entry also has a **usage rule**: `maxUses` (or `null` for unlimited), `usesPerEffect` (build-up before the effect fires), and `cooldownSeconds`. Rule of three fires on its third use; pious statement remains available after a 12-second cooldown. The rack reflects these limits and the round timer.
 
 ## Entry template
 
@@ -42,6 +44,7 @@ What the Speaker uses to engage the audience. Every item has **upsides and downs
 - **Upside:** a modest, rhythmic engagement boost.
 - **Risk:** —
 - **Notes / issue:** from #3. **Built** with a modest engagement lift for attentive listeners, shaped by intelligence. A future visual effect could drive colour-chase lighting in time with the three beats.
+- **Uses:** three beats; the crowd effect fires on the third.
 
 ### Pious statement
 
@@ -49,6 +52,7 @@ What the Speaker uses to engage the audience. Every item has **upsides and downs
 - **Upside:** raises approval among listeners with faith affinity.
 - **Risk:** lowers it among those without.
 - **Notes / issue:** from #3. **Built**: approval shifts with faith affinity, independently of superstition.
+- **Uses:** unlimited, with a 12-second cooldown.
 
 ### "Praise Jesus!"
 
@@ -56,6 +60,16 @@ What the Speaker uses to engage the audience. Every item has **upsides and downs
 - **Upside:** a strong faith appeal; big approval from faith-positive listeners.
 - **Risk:** faith-negative listeners react just as strongly the other way.
 - **Notes / issue:** from #3. **Built**: a stronger faith-affinity response than the pious statement.
+
+### T-shirt cannon
+
+- **Kind:** spectacle gambit
+- **Upside:** three distinct, randomly selected audience members receive shirts. Already engaged people gain approval and engagement.
+- **Risk:** a hit on a disengaged person has a 35% chance of injury, setting them to furious disapproval and full engagement.
+- **Visual and audio:** three shirt-shaped projectiles arc from the Speaker to the selected people, each accompanied by a synthesized “whomp”.
+- **Uses:** once per round.
+- **Notes / issue:** built with the shared random-target resolver and effect registry.
+- **Preview:** open `?room=dev6` for a fixed cannon hand, then click its icon.
 
 ## Equipment and power-ups
 
