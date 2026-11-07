@@ -6,6 +6,12 @@ export default defineConfig({
   build: {
     // three.js alone is ~500 kB minified.
     chunkSizeWarningLimit: 1000,
+    rolldownOptions: {
+      input: {
+        main: "index.html",
+        contactSheet: "contact-sheet.html",
+      },
+    },
   },
   staged: {
     "*": "vp check --fix",

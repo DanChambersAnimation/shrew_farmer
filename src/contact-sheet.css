@@ -1,0 +1,104 @@
+:root {
+  color-scheme: light;
+  --bg: #f6f1e7;
+  --card: #fffdf8;
+  --ink: #2b1d14;
+  --muted: #7a6a5c;
+  --line: #e2d8c6;
+  font-family: system-ui, -apple-system, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+}
+
+body {
+  margin: 0;
+}
+
+#sheet {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 20px 64px;
+}
+
+h1 {
+  margin: 0 0 4px;
+  font-size: 2rem;
+}
+
+h2 {
+  margin: 40px 0 8px;
+  font-size: 1.15rem;
+}
+
+p {
+  margin: 0 0 12px;
+  max-width: 70ch;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+
+.grid.hero {
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+.grid.small {
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+}
+
+.grid.strip {
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+}
+
+.tile {
+  margin: 0;
+  padding: 8px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.tile svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.tile figcaption {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 6px;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.tile figcaption span {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.swatch {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 96px;
+  font-size: 0.72rem;
+}
+
+.swatch span {
+  height: 40px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+}
