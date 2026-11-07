@@ -46,7 +46,7 @@ If `vp` isn't installed globally, use `./node_modules/.bin/vp`. CI runs all thre
 
 ## Design docs
 
-Gambits, ideas, features and design principles are logged in [`docs/`](docs/README.md).
+Gambits, ideas, features and design principles are logged in [`doc`](doc/README.md).
 
 ## How the code is organised
 
