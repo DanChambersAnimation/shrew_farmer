@@ -1,3 +1,6 @@
+import type { GameObject } from "../core/game-object.ts";
+import type { World } from "../core/world.ts";
+import { type Verdict, runEffects } from "../effects/registry.ts";
 import type { Vec3 } from "../traits/types.ts";
 import {
   applyEffect,
@@ -11,6 +14,12 @@ import {
   type Target,
 } from "./effect.ts";
 
+/** Where a resolved move happened, for its effects to act on. */
+export interface MoveScene {
+  readonly world: World;
+  readonly room: GameObject;
+}
+
 /** One person in the room as the resolver sees them, with where they sit. */
 export interface CrowdMember extends ResolvedPerson {
   /** Seat position, used by neighbourhood targets. */
@@ -18,13 +27,36 @@ export interface CrowdMember extends ResolvedPerson {
 }
 
 /**
+ * How a move went, judged by what it actually did: if the crowd warmed to it,
+ * it landed. A move that reached nobody counts as a failure.
+ */
+export function judge(people: readonly (PersonResult | null)[]): Verdict {
+  let approval = 0;
+  let reached = 0;
+  for (const person of people) {
+    if (!person) continue;
+    reached++;
+    for (const result of person.effects) approval += result.approval;
+  }
+  return reached > 0 && approval > 0 ? "success" : "failure";
+}
+
+/** Effects a move plays for a verdict. */
+export function effectsFor(item: ItemDef, verdict: Verdict) {
+  const { onSuccess, onFailure } = item.simulation;
+  return (verdict === "success" ? onSuccess : onFailure) ?? [];
+}
+
+/**
  * Use `item` on the room. Everybody is evaluated from the same starting state,
- * so no one's response depends on the order they are resolved in.
+ * so no one's response depends on the order they are resolved in. The verdict
+ * then picks which of the item's effects play.
  */
 export function resolveItem(
   item: ItemDef,
   crowd: readonly CrowdMember[],
   atSeconds: number,
+  scene: MoveScene,
   roll = Math.random(),
 ): Resolution {
   const outcome = chooseOutcome(item, roll);
@@ -32,7 +64,15 @@ export function resolveItem(
   const people: (PersonResult | null)[] = crowd.map((member, index) =>
     reached.has(index) ? resolvePerson(item, member, outcome, atSeconds) : null,
   );
-  return { item, outcome, people, atSeconds };
+  const verdict = judge(people);
+  runEffects(effectsFor(item, verdict), {
+    world: scene.world,
+    room: scene.room,
+    moveId: item.id,
+    verdict,
+    atSeconds,
+  });
+  return { item, outcome, people, atSeconds, verdict };
 }
 
 function resolvePerson(
