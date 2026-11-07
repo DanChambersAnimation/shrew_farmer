@@ -1,6 +1,12 @@
 import { defineConfig } from "vite-plus";
 
 export default defineConfig({
+  // Relative asset URLs so the build works from any path, e.g. GitHub Pages' /shrew_farmer/.
+  base: "./",
+  build: {
+    // three.js alone is ~500 kB minified.
+    chunkSizeWarningLimit: 1000,
+  },
   staged: {
     "*": "vp check --fix",
   },

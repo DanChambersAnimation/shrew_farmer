@@ -1,41 +1,47 @@
 import "./style.css";
-import * as THREE from "three";
-import { spin } from "./spin.ts";
+import { ACESFilmicToneMapping, Timer, WebGLRenderer } from "three";
+import { rooms } from "./core/room-registry.ts";
+import { World } from "./core/world.ts";
 
-const renderer = new THREE.WebGLRenderer({ antialias: true });
+// Every module in src/rooms registers its room with the registry.
+import.meta.glob(["./rooms/*.ts", "!./rooms/*.test.ts"], { eager: true });
+
+const DEFAULT_ROOM = "dev0";
+
+const app = document.querySelector<HTMLDivElement>("#app")!;
+const label = document.querySelector<HTMLDivElement>("#room-label")!;
+
+const renderer = new WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(window.devicePixelRatio);
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.querySelector<HTMLDivElement>("#app")!.appendChild(renderer.domElement);
+renderer.toneMapping = ACESFilmicToneMapping;
+app.appendChild(renderer.domElement);
 
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x87b06a);
+const world = new World();
 
-const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
-camera.position.set(0, 1.5, 4);
-camera.lookAt(0, 0, 0);
-
-scene.add(new THREE.HemisphereLight(0xffffff, 0x445522, 1.5));
-const sun = new THREE.DirectionalLight(0xffffff, 2);
-sun.position.set(3, 5, 2);
-scene.add(sun);
-
-const cube = new THREE.Mesh(
-  new THREE.BoxGeometry(1, 1, 1),
-  new THREE.MeshStandardMaterial({ color: 0x8b5a2b }),
-);
-scene.add(cube);
-
-window.addEventListener("resize", () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
+function resize(): void {
   renderer.setSize(window.innerWidth, window.innerHeight);
-});
+  world.camera.aspect = window.innerWidth / window.innerHeight;
+  world.camera.updateProjectionMatrix();
+}
+window.addEventListener("resize", resize);
+resize();
 
-const timer = new THREE.Timer();
+const roomName = new URLSearchParams(window.location.search).get("room") ?? DEFAULT_ROOM;
+const def = rooms.get(roomName);
+if (def) {
+  rooms.load(world, roomName);
+  label.textContent = def.title ? `${def.name} · ${def.title}` : def.name;
+} else {
+  const known = rooms
+    .list()
+    .map((r) => r.name)
+    .join(", ");
+  label.textContent = `Unknown room "${roomName}". Rooms: ${known}`;
+}
+
+const timer = new Timer();
 renderer.setAnimationLoop((time) => {
   timer.update(time);
-  const dt = timer.getDelta();
-  cube.rotation.x = spin(cube.rotation.x, dt, 0.5);
-  cube.rotation.y = spin(cube.rotation.y, dt, 1);
-  renderer.render(scene, camera);
+  world.update(timer.getDelta());
+  renderer.render(world.scene, world.camera);
 });

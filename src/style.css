@@ -9,3 +9,14 @@ body,
 canvas {
   display: block;
 }
+
+#room-label {
+  position: fixed;
+  left: 12px;
+  bottom: 10px;
+  font:
+    12px/1.4 ui-monospace,
+    monospace;
+  color: rgb(255 255 255 / 0.75);
+  pointer-events: none;
+}
