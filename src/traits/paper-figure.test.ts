@@ -100,3 +100,19 @@ describe("turning the head", () => {
     expect(checked).toBeGreaterThan(0);
   });
 });
+
+describe("lean", () => {
+  // 100 x 200 rig, anchor at the bottom centre: rows 0..200 → y 2..0. Lean above row 100 (y = 1).
+  const leaned = (degrees: number) =>
+    figureGeometry(100, 200, 0.01, [50, 200], [], undefined, { degrees, from: 100 });
+
+  it("tips the part above the pivot row back, leaving the rest upright", () => {
+    const pos = leaned(90).getAttribute("position");
+    for (let i = 0; i < pos.count; i++) {
+      if (pos.getY(i) < 1 - 1e-6) expect(pos.getZ(i)).toBeCloseTo(0); // below the neck
+    }
+    const box = new Box3().setFromBufferAttribute(pos as never);
+    expect(box.max.y).toBeCloseTo(1); // the top now points straight back, at neck height
+    expect(box.min.z).toBeCloseTo(-1);
+  });
+});

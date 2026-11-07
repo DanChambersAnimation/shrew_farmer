@@ -1,4 +1,4 @@
-import { SEAT_POINT, randomAppearance, seatedProfile } from "../characters/audience.ts";
+import { LANDMARKS, SEAT_POINT, randomAppearance, seatedProfile } from "../characters/audience.ts";
 import {
   audienceVisual,
   randomAudienceState,
@@ -13,6 +13,7 @@ import { Highlight } from "../traits/highlight.ts";
 import { Inspectable } from "../traits/inspectable.ts";
 import { PaperFigure } from "../traits/paper-figure.ts";
 import { Seat } from "../traits/seat.ts";
+import { TiltToCamera } from "../traits/tilt-to-camera.ts";
 import { Transform } from "../traits/transform.ts";
 import { AudienceModel, randomAudienceMotion } from "../traits/audience-model.ts";
 import type { Vec3 } from "../traits/types.ts";
@@ -39,11 +40,15 @@ export function createAudienceMember(
         scale: SCALE,
         anchor: [...SEAT_POINT],
         profile: seatedProfile(SCALE, position[1]),
+        // Heads tip back at the neck (set by TiltToCamera below).
+        lean: { degrees: 0, from: LANDMARKS.neck },
         // Faces stay readable when the house lights go down.
         selfLight: 0.35,
       }),
       // Turn (not tilt) toward the camera, so the bent figure stays in its chair.
       trait(Billboard, { mode: "upright" }),
+      // Tip the head back so the face stays flat-on to the camera.
+      trait(TiltToCamera),
       trait(Inspectable, {
         title: "Audience member",
         description: visual.description,

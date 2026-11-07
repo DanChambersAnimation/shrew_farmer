@@ -34,6 +34,17 @@ export interface Twist {
 
 const NO_TWIST: Twist = { degrees: 0, curve: [] };
 
+/**
+ * Tip everything above rig row `from` back by `degrees` (forward if negative),
+ * pivoting at that row, e.g. a head tipped back at the neck.
+ */
+export interface Lean {
+  degrees: number;
+  from: number;
+}
+
+const NO_LEAN: Lean = { degrees: 0, from: 0 };
+
 /** Rig units between generated rows where the shape changes (twists). */
 const ROW_STEP = 6;
 /** Columns across the figure, so twisted rows bend smoothly. */
@@ -74,7 +85,8 @@ function twistAmount(curve: Twist["curve"], v: number): number {
  * it's a flat upright panel with the anchor at the origin. A profile bends it:
  * each listed rig row is placed at its [y, z], straight in between, with a crisp
  * fold at each interior point (e.g. a seated figure folds at the hips and
- * knees). A twist then turns rows about the vertical axis through the anchor.
+ * knees). A lean then tips the part above a row back (pivoting at that row),
+ * and a twist turns rows about the vertical axis through the anchor.
  */
 export function figureGeometry(
   width: number,
@@ -83,6 +95,7 @@ export function figureGeometry(
   anchor: readonly [number, number],
   profile: readonly ProfilePoint[] = [],
   twist: Twist = NO_TWIST,
+  lean: Lean = NO_LEAN,
 ): BufferGeometry {
   const points: readonly ProfilePoint[] =
     profile.length >= 2
@@ -93,7 +106,15 @@ export function figureGeometry(
         ];
   const inRange = (v: number) => v >= 0 && v <= height;
   // Folds split the figure into strips; each strip is a smooth grid.
-  const folds = [...new Set([0, height, ...points.slice(1, -1).map(([v]) => v)])]
+  const leaning = lean.degrees !== 0 && lean.from > 0 && lean.from < height;
+  const folds = [
+    ...new Set([
+      0,
+      height,
+      ...points.slice(1, -1).map(([v]) => v),
+      ...(leaning ? [lean.from] : []),
+    ]),
+  ]
     .filter(inRange)
     .sort((a, b) => a - b);
   // Extra rows wherever the twist changes, so it bends smoothly.
@@ -117,7 +138,17 @@ export function figureGeometry(
       .sort((a, b) => a - b);
     const first = positions.length / 3;
     for (const v of rows) {
-      const [y, z] = placeRow(points, v);
+      let [y, z] = placeRow(points, v);
+      if (leaning && v < lean.from) {
+        // Rotate about the pivot row: positive tips the top back (toward -z).
+        const [py, pz] = placeRow(points, lean.from);
+        const a = (lean.degrees * Math.PI) / 180;
+        const [dy, dz] = [y - py, z - pz];
+        [y, z] = [
+          py + dy * Math.cos(a) + dz * Math.sin(a),
+          pz + dz * Math.cos(a) - dy * Math.sin(a),
+        ];
+      }
       const angle = radians * twistAmount(twist.curve, v);
       const [cos, sin] = [Math.cos(angle), Math.sin(angle)];
       for (let c = 0; c <= COLUMNS; c++) {
@@ -172,12 +203,14 @@ export const PaperFigure = defineTrait({
     selfLight: 0,
     /** Optional twist of the upper body; change it at any time. */
     twist: { degrees: 0, curve: [] } as Twist,
+    /** Optional lean of the part above a row (e.g. a head tipped back). */
+    lean: { degrees: 0, from: 0 } as Lean,
   },
   setup({ object, settings: s }) {
     const rig = rigs.get(s.rig);
     const shape = () =>
-      figureGeometry(rig.width, rig.height, s.scale, s.anchor, s.profile, s.twist);
-    const shapeKey = () => JSON.stringify([s.scale, s.anchor, s.profile, s.twist]);
+      figureGeometry(rig.width, rig.height, s.scale, s.anchor, s.profile, s.twist, s.lean);
+    const shapeKey = () => JSON.stringify([s.scale, s.anchor, s.profile, s.twist, s.lean]);
     let geometry = shape();
     let shapedKey = shapeKey();
     // Double-sided: a bent figure shows faces at several angles.
