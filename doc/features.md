@@ -11,6 +11,7 @@ What exists in the game today, and where to see it. Rooms open at `?room=<name>`
 | dev2 | dev0 plus lighting states: house lights, or a spotlight (L to switch).       |
 | dev3 | Playable church hall: crowd simulation, round timer and gambits (#6–#8).     |
 | dev4 | Round timer.                                                                 |
+| dev8 | All six 3D gambit medals in a fixed rack above the timer.                    |
 
 ## Engine
 
@@ -31,7 +32,7 @@ What exists in the game today, and where to see it. Rooms open at `?room=<name>`
 
 - **Audience model:** each person has a personality and numeric state (approval, engagement); their face and arms follow their state while their appearance stays fixed.
 - **Crowd simulation:** once a second, engagement drifts down and sociable people are pulled toward their neighbours' moods.
-- **Gambits:** a registry of items and one effect pipeline for gambits, power-ups and equipment (see [gambits.md](gambits.md)). A round has a hand of gambits, each playable once.
+- **Gambits:** a registry of items and one effect pipeline for gambits, power-ups and equipment (see [gambits.md](gambits.md)). A round has a hand of gambits; each item's registry entry sets its use limit, build-up and cooldown. The 3D medal rack shows the hand above the timer.
 - **Round timer:** a round clock with an on-screen meter.
 
 ## Lighting

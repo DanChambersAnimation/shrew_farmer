@@ -2,7 +2,9 @@
 
 What the Speaker uses to engage the audience. Every item has **upsides and downsides**, often a chance of something going wrong. See issue [#5](https://github.com/DanChambersAnimation/shrew_farmer/issues/5) for the shared effect system, [#3](https://github.com/DanChambersAnimation/shrew_farmer/issues/3) for crowd responses, and [#2](https://github.com/DanChambersAnimation/shrew_farmer/issues/2) for the icon row.
 
-**Status:** the registry and effect pipeline exist (`src/gambits/`, from #8). The five conversational gambits and the T-shirt cannon below have simulation rules and SVG icons in `src/assets/icons/gambits/`. The clickable rack above the timer draws five gambits per round in dev3. Other equipment and power-ups below remain design ideas.
+**Status:** the registry and effect pipeline exist (`src/gambits/`, from #8). The five conversational gambits and the T-shirt cannon below have simulation rules and 3D medals built by `src/prefabs/gambit-medal.ts`. The clickable rack above the timer draws five gambits per round in dev3; dev8 shows all six. Other equipment and power-ups below remain design ideas.
+
+![All six 3D gambit medals above the round timer](previews/gambit-medals.png)
 
 **How an item is defined** (`src/gambits/effect.ts`): an item is a list of **weighted outcomes**. Each outcome has a **target** (the whole audience, the room, or a neighbourhood within a radius) and **effects**. An effect changes a person's approval and/or engagement, can decide whether it reaches them at all (e.g. too bored to notice), and can scale by context (personality, what they remember, the round time). Risky items are just extra outcomes with low weights.
 
@@ -69,7 +71,7 @@ Each registry entry also has a **usage rule**: `maxUses` (or `null` for unlimite
 - **Visual and audio:** three shirt-shaped projectiles arc from the Speaker to the selected people, each accompanied by a synthesized “whomp”.
 - **Uses:** once per round.
 - **Notes / issue:** built with the shared random-target resolver and effect registry.
-- **Preview:** open `?room=dev7` for a fixed cannon hand, then click its icon.
+- **Preview:** open `?room=dev7` for a fixed cannon hand, then click its medal.
 
 ## Equipment and power-ups
 

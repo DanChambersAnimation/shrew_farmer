@@ -4,6 +4,7 @@ import type { GameObject } from "../core/game-object.ts";
 import { World } from "../core/world.ts";
 import { CrowdSimulation } from "../traits/crowd-simulation.ts";
 import { GameTimer } from "../traits/game-timer.ts";
+import { Gambits } from "../traits/gambits.ts";
 import { LightingCues } from "../traits/lighting-cues.ts";
 import { AudienceModel } from "../traits/audience-model.ts";
 import { PaperFigure } from "../traits/paper-figure.ts";
@@ -61,6 +62,18 @@ describe("registered rooms", () => {
     const room = rooms.load(new World(), "dev3");
     expect(room.settingsOf(GameTimer)).toMatchObject({ durationSeconds: 60, running: true });
     expect(room.has(CrowdSimulation)).toBe(true);
+  });
+
+  it("dev8 displays every designed gambit medal", () => {
+    const room = rooms.load(new World(), "dev8");
+    expect(room.settingsOf(Gambits)?.hand).toEqual([
+      "personal-anecdote",
+      "anecdote-callback",
+      "rule-of-three",
+      "pious-statement",
+      "praise-jesus",
+      "t-shirt-cannon",
+    ]);
   });
 
   it("dev5 shows one of each expression, moving out of step", () => {

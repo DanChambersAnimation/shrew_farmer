@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title">
-  <title id="title">Personal anecdote</title>
-  <rect x="5" y="5" width="86" height="86" rx="18" fill="#fff0bd" stroke="#211529" stroke-width="5"/>
-  <path d="M20 27c0-8 6-14 14-14h31c8 0 14 6 14 14v26c0 8-6 14-14 14H42L27 79V66c-4-2-7-7-7-13Z" fill="#ff7187" stroke="#211529" stroke-width="5" stroke-linejoin="round"/>
-  <circle cx="47" cy="35" r="9" fill="#fff0bd" stroke="#211529" stroke-width="4"/>
-  <path d="M33 57c2-10 8-15 14-15s12 5 14 15" fill="#fff0bd" stroke="#211529" stroke-width="4" stroke-linecap="round"/>
-  <path d="m69 19 2-5m7 14 5-2" stroke="#211529" stroke-width="4" stroke-linecap="round"/>
-</svg>

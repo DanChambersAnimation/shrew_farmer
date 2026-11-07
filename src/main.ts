@@ -193,7 +193,8 @@ renderer.setAnimationLoop((time) => {
   noclip.update(dt);
   world.update(dt);
   renderRoundMeter();
-  gambitRack.refresh();
+  gambitRack.refresh(dt);
   showNoclip();
   frame.render(world);
+  gambitRack.render(renderer);
 });

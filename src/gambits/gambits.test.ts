@@ -36,7 +36,7 @@ function member(overrides: Partial<CrowdMember> = {}): CrowdMember {
 }
 
 describe("gambit registry", () => {
-  it("registers the conversational gambits, each with its own icon", () => {
+  it("registers the gambits, each with its own 3D medal emblem", () => {
     for (const id of [
       "personal-anecdote",
       "anecdote-callback",
@@ -49,9 +49,10 @@ describe("gambit registry", () => {
     }
     expect(items.get("personal-anecdote").name).toBe("Personal anecdote");
     expect(items.get("anecdote-callback").name).toBe("Callback to anecdote");
-    const icons = items.names().map((id) => items.get(id).icon);
-    expect(new Set(icons).size).toBe(items.names().length);
-    expect(icons.every((icon) => icon.includes("svg"))).toBe(true);
+    const emblems = items.names().map((id) => items.get(id).medal.emblem);
+    expect(new Set(emblems).size).toBe(items.names().length);
+    expect(items.get("personal-anecdote").medal.shape).toBe("round");
+    expect(items.get("anecdote-callback").medal.shape).toBe("square");
     expect(items.get("personal-anecdote").visual.traits).toHaveLength(3);
     for (const id of items.names()) {
       expect(items.get(id).visual.traits?.length).toBeGreaterThan(0);
@@ -73,7 +74,7 @@ describe("gambit registry", () => {
     const item: ItemDef = {
       id: "test",
       name: "Test",
-      icon: "test",
+      medal: { shape: "round", emblem: "story", metal: 0xffffff },
       usage: { maxUses: 1, usesPerEffect: 1, cooldownSeconds: 0 },
       visual: { kind: "test-visual" },
       simulation: {
@@ -194,7 +195,7 @@ describe("judging a move", () => {
     const item: ItemDef = {
       id: "cheer",
       name: "Cheer",
-      icon: "cheer",
+      medal: { shape: "round", emblem: "story", metal: 0xffffff },
       usage: { maxUses: 1, usesPerEffect: 1, cooldownSeconds: 0 },
       visual: { kind: "cheer" },
       simulation: {
@@ -260,7 +261,7 @@ describe("resolving an item on a crowd", () => {
     const item: ItemDef = {
       id: "nearby",
       name: "Nearby",
-      icon: "nearby",
+      medal: { shape: "round", emblem: "story", metal: 0xffffff },
       usage: { maxUses: 1, usesPerEffect: 1, cooldownSeconds: 0 },
       visual: { kind: "nearby-visual" },
       simulation: {
