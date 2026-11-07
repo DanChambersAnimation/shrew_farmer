@@ -26,6 +26,7 @@ export function speaker(
       trait(PaperFigure, {
         rig: view === "back" ? "speaker-back" : "speaker",
         anchor: [...SPEAKER_FEET],
+        castShadow: true,
         // Turning to look: the body turns from the waist, half way by the
         // shoulders; the flat head turns fully from the neck up.
         twist: {
@@ -37,9 +38,8 @@ export function speaker(
           ],
         },
       }),
-      // Face the camera fully so a steep view doesn't squash him; the panel
-      // pivots at his feet, so they stay planted on the stage.
-      trait(Billboard, { yaw }),
+      // Turn toward the camera but stay perpendicular to the floor.
+      trait(Billboard, { mode: "upright", yaw }),
       trait(Inspectable, {
         title: "You · The Speaker",
         description: "Slick hair, dark glasses, shiny suit. Ready to inspire.",

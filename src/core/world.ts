@@ -23,6 +23,8 @@ export class World {
   /** World-wide events, e.g. for the UI layer outside the 3D scene. */
   readonly events = new Emitter();
   readonly pointer = new PointerSystem(this);
+  /** Brightness (0..1) of each named light group; groups not listed are at 1. */
+  readonly lightLevels = new Map<string, number>();
   /** True while something outside the game (e.g. noclip) is steering the camera. */
   manualCamera = false;
   private root: GameObject | null = null;
@@ -77,6 +79,7 @@ export class World {
 
   clear(): void {
     this.pointer.reset();
+    this.lightLevels.clear();
     this.root?.dispose();
     this.root = null;
   }

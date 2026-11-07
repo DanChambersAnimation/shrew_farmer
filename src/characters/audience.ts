@@ -24,7 +24,7 @@ export function seatedProfile(
   scale: number,
   seatHeight: number,
   thigh = 0.34,
-  headTilt = 25,
+  headTilt = 0,
 ): [number, number, number][] {
   const { neck, hips, knees, feet } = LANDMARKS;
   const neckY = (hips - neck) * scale;

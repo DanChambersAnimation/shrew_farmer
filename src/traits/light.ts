@@ -15,6 +15,9 @@ export type LightKind = "ambient" | "hemisphere" | "directional" | "point" | "sp
 /**
  * Emits light from the object's origin. `target` is in the object's local space
  * and applies to directional and spot lights.
+ *
+ * A light in a `group` (e.g. "house") is scaled by the world's level for that
+ * group (see LightingCues), fading over `fade` seconds when the level changes.
  */
 export const Light = defineTrait({
   name: "light",
@@ -30,8 +33,10 @@ export const Light = defineTrait({
     penumbra: 0.3,
     target: [0, 0, -1] as Vec3,
     castShadow: false,
+    group: "",
+    fade: 0.8,
   },
-  setup({ object, settings: s }) {
+  setup({ object, world, settings: s }) {
     let light: ThreeLight;
     switch (s.kind) {
       case "ambient":
@@ -71,13 +76,28 @@ export const Light = defineTrait({
       light.shadow.mapSize.set(1024, 1024);
       light.shadow.bias = -0.0005;
     }
+    // three.js puts some lights 1 m above their origin by default; we want the
+    // light exactly where its object is.
+    light.position.set(0, 0, 0);
     object.node.add(light);
-    return () => {
-      if (light instanceof SpotLight || light instanceof DirectionalLight) {
-        light.target.removeFromParent();
-      }
-      light.removeFromParent();
-      light.dispose();
+    const levelNow = () => (s.group ? (world.lightLevels.get(s.group) ?? 1) : 1);
+    let level = levelNow();
+    light.intensity = s.intensity * level;
+    return {
+      update(dt) {
+        const target = levelNow();
+        if (level === target) return;
+        const step = s.fade > 0 ? dt / s.fade : 1;
+        level = target > level ? Math.min(target, level + step) : Math.max(target, level - step);
+        light.intensity = s.intensity * level;
+      },
+      dispose() {
+        if (light instanceof SpotLight || light instanceof DirectionalLight) {
+          light.target.removeFromParent();
+        }
+        light.removeFromParent();
+        light.dispose();
+      },
     };
   },
 });

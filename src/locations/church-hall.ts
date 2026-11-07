@@ -78,13 +78,20 @@ export function churchHall(): ObjectSpec {
       },
       {
         kind: "light",
-        traits: [trait(Light, { kind: "hemisphere", color: 0xfff4e0, groundColor: 0x6b4a2b })],
+        traits: [
+          trait(Light, {
+            kind: "hemisphere",
+            color: 0xfff4e0,
+            groundColor: 0x6b4a2b,
+            group: "house",
+          }),
+        ],
       },
       {
         kind: "light",
         traits: [
           trait(Transform, { position: [0, h - 0.5, 0] }),
-          trait(Light, { kind: "point", color: 0xfff1cc, intensity: 40 }),
+          trait(Light, { kind: "point", color: 0xfff1cc, intensity: 40, group: "house" }),
         ],
       },
     ],

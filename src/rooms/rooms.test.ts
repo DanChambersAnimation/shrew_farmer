@@ -2,6 +2,7 @@ import { describe, expect, it } from "vite-plus/test";
 import { rooms } from "../core/room-registry.ts";
 import type { GameObject } from "../core/game-object.ts";
 import { World } from "../core/world.ts";
+import { LightingCues } from "../traits/lighting-cues.ts";
 import { Seat } from "../traits/seat.ts";
 
 import.meta.glob(["./*.ts", "!./*.test.ts"], { eager: true });
@@ -20,6 +21,15 @@ describe("registered rooms", () => {
     expect(seats.length).toBeGreaterThan(1);
     expect(people.length).toBe(seats.length);
     expect(seated).toBe(true);
+  });
+
+  it("dev2 adds lighting states and a spotlight to the dev0 show; dev0 has neither", () => {
+    const lit = rooms.load(new World(), "dev2");
+    expect(lit.has(LightingCues)).toBe(true);
+    expect([...lit.descendants()].some((o) => o.kind === "spotlight")).toBe(true);
+    const plain = rooms.load(new World(), "dev0");
+    expect(plain.has(LightingCues)).toBe(false);
+    expect([...plain.descendants()].some((o) => o.kind === "spotlight")).toBe(false);
   });
 
   it("dev1 seats exactly one audience member", () => {
