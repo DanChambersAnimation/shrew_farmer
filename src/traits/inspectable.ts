@@ -20,6 +20,11 @@ function publish(world: World): void {
   world.events.emit(INSPECT, stack.at(-1) ?? null);
 }
 
+/** Refresh the tooltip if this object is currently being inspected. */
+export function refreshInspection(object: GameObject): void {
+  if (stacks.get(object.world)?.at(-1)?.source === object) publish(object.world);
+}
+
 /** Hovering the object shows its title and description (via the INSPECT world event). */
 export const Inspectable = defineTrait({
   name: "inspectable",
@@ -27,7 +32,15 @@ export const Inspectable = defineTrait({
   setup({ object, world, settings }) {
     if (!stacks.has(world)) stacks.set(world, []);
     const stack = stacks.get(world)!;
-    const info: InspectInfo = { ...settings, source: object };
+    const info: InspectInfo = {
+      get title() {
+        return settings.title;
+      },
+      get description() {
+        return settings.description;
+      },
+      source: object,
+    };
     const hide = () => {
       const i = stack.indexOf(info);
       if (i === -1) return;

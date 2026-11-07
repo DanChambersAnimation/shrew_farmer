@@ -19,4 +19,10 @@ export class Random {
     if (items.length === 0) throw new Error("Cannot pick from an empty list");
     return items[Math.floor(this.next() * items.length)]!;
   }
+
+  /** Normally distributed value using a Box–Muller transform. */
+  normal(mean = 0, standardDeviation = 1): number {
+    const radius = Math.sqrt(-2 * Math.log(1 - this.next()));
+    return mean + standardDeviation * radius * Math.cos(2 * Math.PI * this.next());
+  }
 }
