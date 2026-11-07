@@ -21,8 +21,9 @@ export function speaker(position: Vec3, view: "front" | "back" = "back"): Object
         rig: view === "back" ? "speaker-back" : "speaker",
         anchor: [...SPEAKER_FEET],
       }),
-      // Stay upright so his feet stay planted on the stage.
-      trait(Billboard, { mode: "upright" }),
+      // Face the camera fully so a steep view doesn't squash him; the panel
+      // pivots at his feet, so they stay planted on the stage.
+      trait(Billboard),
       trait(Inspectable, {
         title: "You · The Speaker",
         description: "Slick hair, dark glasses, shiny suit. Ready to inspire.",

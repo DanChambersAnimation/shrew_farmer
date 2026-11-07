@@ -2,6 +2,7 @@ import "./style.css";
 import { ACESFilmicToneMapping, Timer, WebGLRenderer } from "three";
 import { rooms } from "./core/room-registry.ts";
 import { World } from "./core/world.ts";
+import { Noclip } from "./dev/noclip.ts";
 import { INSPECT, type InspectInfo } from "./traits/inspectable.ts";
 
 // Every module in src/rooms registers its room with the registry.
@@ -12,6 +13,10 @@ const DEFAULT_ROOM = "dev0";
 const app = document.querySelector<HTMLDivElement>("#app")!;
 const label = document.querySelector<HTMLDivElement>("#room-label")!;
 const info = document.querySelector<HTMLDivElement>("#info")!;
+// The noclip panel builds its own markup so it never depends on index.html.
+const noclipHud = Object.assign(document.createElement("div"), { id: "noclip", hidden: true });
+noclipHud.innerHTML = "<strong>NOCLIP</strong> <code></code><small></small>";
+document.body.appendChild(noclipHud);
 
 const renderer = new WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(window.devicePixelRatio);
@@ -46,6 +51,7 @@ if (def) {
 // Mouse -> pointer system. What hovering or clicking does is up to each object's traits.
 const canvas = renderer.domElement;
 function pointerAt(event: MouseEvent): void {
+  if (noclip.active) return;
   const rect = canvas.getBoundingClientRect();
   world.pointer.move({
     x: ((event.clientX - rect.left) / rect.width) * 2 - 1,
@@ -56,9 +62,58 @@ function pointerAt(event: MouseEvent): void {
 canvas.addEventListener("pointermove", pointerAt);
 canvas.addEventListener("pointerleave", () => world.pointer.move(null));
 canvas.addEventListener("click", (event) => {
+  if (noclip.active) {
+    void canvas.requestPointerLock();
+    return;
+  }
   pointerAt(event);
   world.pointer.click();
 });
+
+// Noclip camera (N): fly around to find a camera position for a room.
+const noclip = new Noclip(world.camera);
+let copied = "";
+function showNoclip(): void {
+  noclipHud.hidden = !noclip.active;
+  if (!noclip.active) return;
+  const locked = document.pointerLockElement === canvas;
+  noclipHud.querySelector("code")!.textContent = noclip.snippet();
+  noclipHud.querySelector("small")!.textContent =
+    copied ||
+    (locked
+      ? "WASD move · Q/E down/up · Shift fast · wheel zoom · C copy · Esc free mouse · N exit"
+      : "Click the view to look around · C copy · N exit");
+}
+window.addEventListener("keydown", (event) => {
+  if (event.code === "KeyN" && !event.repeat) {
+    noclip.toggle();
+    if (noclip.active) world.pointer.move(null);
+    else document.exitPointerLock();
+    canvas.style.cursor = "default";
+  } else if (event.code === "KeyC" && noclip.active) {
+    const text = noclip.snippet();
+    navigator.clipboard?.writeText(text).then(
+      () => (copied = "Copied camera settings to the clipboard"),
+      () => (copied = "Couldn't copy; select the text above instead"),
+    );
+    setTimeout(() => (copied = ""), 2000);
+  }
+  noclip.press(event.code);
+});
+window.addEventListener("keyup", (event) => noclip.release(event.code));
+window.addEventListener("blur", () => noclip.releaseAll());
+document.addEventListener("mousemove", (event) => {
+  if (document.pointerLockElement === canvas) noclip.look(event.movementX, event.movementY);
+});
+canvas.addEventListener(
+  "wheel",
+  (event) => {
+    if (!noclip.active) return;
+    event.preventDefault();
+    noclip.zoom(Math.sign(event.deltaY) * 2);
+  },
+  { passive: false },
+);
 
 world.events.on(INSPECT, (payload) => {
   const shown = payload as InspectInfo | null;
@@ -72,6 +127,9 @@ world.events.on(INSPECT, (payload) => {
 const timer = new Timer();
 renderer.setAnimationLoop((time) => {
   timer.update(time);
-  world.update(timer.getDelta());
+  const dt = timer.getDelta();
+  noclip.update(dt);
+  world.update(dt);
+  showNoclip();
   renderer.render(world.scene, world.camera);
 });

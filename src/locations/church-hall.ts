@@ -1,6 +1,6 @@
 import type { ObjectSpec } from "../core/spec.ts";
 import { slab } from "../prefabs/blocks.ts";
-import { chair } from "../prefabs/chair.ts";
+import { CHAIR_HEIGHT, chair } from "../prefabs/chair.ts";
 import { trait } from "../core/trait.ts";
 import { Highlight } from "../traits/highlight.ts";
 import { Inspectable } from "../traits/inspectable.ts";
@@ -11,8 +11,11 @@ import { Transform } from "../traits/transform.ts";
 /** Interior size in metres. The back wall (with the sign) is at -z. */
 export const HALL = { width: 12, depth: 16, height: 6 } as const;
 
-/** The stage: a low platform across the near (+z) end, from `front` to the wall. */
-export const STAGE = { height: 0.5, front: 2.4 } as const;
+/** The stage: a chair-high platform across the near (+z) end, from `front` to the wall. */
+export const STAGE = { height: CHAIR_HEIGHT, front: 0.5 } as const;
+
+/** Distance from the stage front to the front row of chairs, in metres. */
+const FRONT_ROW_GAP = 2.8;
 
 const WALL = 0xe6dcc3;
 const FLOOR = 0x9a6b3f;
@@ -22,7 +25,7 @@ function seating(rows = 4, perSide = 5): ObjectSpec {
   const spacing = 0.78;
   const chairs: ObjectSpec[] = [];
   for (let r = 0; r < rows; r++) {
-    const z = -2.8 - r * 1.2;
+    const z = STAGE.front - FRONT_ROW_GAP - r * 1.2;
     const stagger = (r % 2) * (spacing / 2); // so rows behind see between heads
     for (let c = 0; c < perSide; c++) {
       const x = 0.7 + c * spacing + stagger;
