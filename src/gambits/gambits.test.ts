@@ -75,7 +75,7 @@ describe("gambit registry", () => {
       id: "test",
       name: "Test",
       medal: { shape: "round", emblem: "story", metal: 0xffffff },
-      usage: { maxUses: 1, usesPerEffect: 1, cooldownSeconds: 0 },
+      gambitTraits: [],
       visual: { kind: "test-visual" },
       simulation: {
         outcomes: [
@@ -196,7 +196,7 @@ describe("judging a move", () => {
       id: "cheer",
       name: "Cheer",
       medal: { shape: "round", emblem: "story", metal: 0xffffff },
-      usage: { maxUses: 1, usesPerEffect: 1, cooldownSeconds: 0 },
+      gambitTraits: [],
       visual: { kind: "cheer" },
       simulation: {
         outcomes: [
@@ -262,7 +262,7 @@ describe("resolving an item on a crowd", () => {
       id: "nearby",
       name: "Nearby",
       medal: { shape: "round", emblem: "story", metal: 0xffffff },
-      usage: { maxUses: 1, usesPerEffect: 1, cooldownSeconds: 0 },
+      gambitTraits: [],
       visual: { kind: "nearby-visual" },
       simulation: {
         outcomes: [

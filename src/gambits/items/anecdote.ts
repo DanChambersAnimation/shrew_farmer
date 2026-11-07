@@ -4,13 +4,14 @@ import { Sign } from "../../traits/sign.ts";
 import { Transform } from "../../traits/transform.ts";
 import type { ItemDef } from "../effect.ts";
 import { items } from "../registry.ts";
+import { Cooldown, LimitedUse, gambitTrait } from "../traits.ts";
 
 /** Tell a story about yourself. People lean in, and remember hearing it. */
 export const personalAnecdote: ItemDef = {
   id: "personal-anecdote",
   name: "Personal anecdote",
   medal: { shape: "round", emblem: "story", metal: 0xe7a83d },
-  usage: { maxUses: 1, usesPerEffect: 1, cooldownSeconds: 0 },
+  gambitTraits: [gambitTrait(Cooldown, { seconds: 15 })],
   visual: {
     kind: "anecdote-visual",
     traits: [
@@ -48,7 +49,7 @@ export const anecdoteCallback: ItemDef = {
   id: "anecdote-callback",
   name: "Callback to anecdote",
   medal: { shape: "square", emblem: "callback", metal: 0x9274c9 },
-  usage: { maxUses: 1, usesPerEffect: 1, cooldownSeconds: 0 },
+  gambitTraits: [gambitTrait(LimitedUse, { count: 1 })],
   visual: {
     kind: "callback-visual",
     traits: [

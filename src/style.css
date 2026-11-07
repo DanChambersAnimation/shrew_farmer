@@ -44,6 +44,10 @@ canvas {
   transition: transform 80ms ease;
 }
 
+.gambit-medal-button[data-shape="square"] {
+  border-radius: 10%;
+}
+
 .gambit-medal-button:hover:not(:disabled) {
   transform: translateY(-2px);
 }
@@ -57,8 +61,35 @@ canvas {
   outline-offset: 2px;
 }
 
-/* The medal remains while cooling, with a dark veil above the canvas. */
-.gambit-medal-button:disabled::after {
+/* The dark sector clears clockwise from noon as a cooldown ends. */
+.gambit-medal-button[data-cooling="true"]::before {
+  position: absolute;
+  inset: 2px;
+  border-radius: inherit;
+  background: conic-gradient(
+    transparent 0deg var(--cooldown-angle),
+    rgb(28 28 34 / 0.8) var(--cooldown-angle) 360deg
+  );
+  content: "";
+}
+
+.gambit-medal-button[data-cooling="true"]::after {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #fff8df;
+  content: attr(data-cooldown);
+  font:
+    900 clamp(16px, 1.7vw, 24px) / 1 system-ui,
+    sans-serif;
+  text-shadow:
+    1px 2px 0 #211529,
+    -1px -1px 0 #211529;
+}
+
+/* A spent or round-finished medal is unavailable without a countdown. */
+.gambit-medal-button:disabled:not([data-cooling="true"])::after {
   position: absolute;
   inset: 3px;
   border-radius: inherit;

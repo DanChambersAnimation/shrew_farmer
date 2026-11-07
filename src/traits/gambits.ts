@@ -1,6 +1,11 @@
 import { defineTrait } from "../core/trait.ts";
 import type { ItemDef } from "../gambits/effect.ts";
 import { items } from "../gambits/library.ts";
+import {
+  evaluateGambitTraits,
+  type GambitTraitStatus,
+  type GambitUseContext,
+} from "../gambits/traits.ts";
 import type { GameObject } from "../core/game-object.ts";
 import { GAME_TIMER_FINISHED, GameTimer } from "./game-timer.ts";
 
@@ -22,8 +27,8 @@ export interface GambitPlayed {
 }
 
 /**
- * The round's hand of gambits. Each definition decides its use limit, buildup
- * and cooldown. Nothing can be used after the round clock has stopped.
+ * The round's hand and use history. Registered traits on each item decide its
+ * cooldown, use limit and effect buildup. The round clock also gates all uses.
  */
 export const Gambits = defineTrait({
   name: "gambits",
@@ -46,6 +51,38 @@ export const Gambits = defineTrait({
   },
 });
 
+/** The use history a gambit's traits are evaluated against at this round time. */
+export function useContextFor(room: GameObject, id: string): GambitUseContext {
+  const hand = room.settingsOf(Gambits);
+  const atSeconds = room.settingsOf(GameTimer)?.elapsedSeconds ?? 0;
+  return {
+    atSeconds,
+    uses: hand?.played.filter((playedId) => playedId === id).length ?? 0,
+    lastUsedAt: hand?.lastUsedAt[id],
+  };
+}
+
+/** Whether a gambit has burned out and should leave the row. */
+export function isSpent(room: GameObject, id: string): boolean {
+  if (!room.settingsOf(Gambits) || !items.has(id)) return true;
+  return gambitStatus(room, id)?.exhausted ?? true;
+}
+
+/** Read all of an item's registered traits against its round use history. */
+export function gambitStatus(
+  room: GameObject,
+  id: string,
+  atSeconds = room.settingsOf(GameTimer)?.elapsedSeconds ?? 0,
+): GambitTraitStatus | null {
+  const hand = room.settingsOf(Gambits);
+  if (!hand || !items.has(id)) return null;
+  return evaluateGambitTraits(items.get(id).gambitTraits, {
+    atSeconds,
+    uses: hand.played.filter((playedId) => playedId === id).length,
+    lastUsedAt: hand.lastUsedAt[id],
+  });
+}
+
 /** Whether a gambit in `hand` can be used at this round time. */
 export function canPlay(
   room: GameObject,
@@ -54,16 +91,12 @@ export function canPlay(
 ): boolean {
   const hand = room.settingsOf(Gambits);
   if (!hand || hand.finished || !hand.hand.includes(id) || !items.has(id)) return false;
-  const { maxUses, cooldownSeconds } = items.get(id).usage;
-  const uses = hand.played.filter((playedId) => playedId === id).length;
-  if (maxUses !== null && uses >= maxUses) return false;
-  const lastUsedAt = hand.lastUsedAt[id];
-  return lastUsedAt === undefined || atSeconds >= lastUsedAt + cooldownSeconds;
+  return gambitStatus(room, id, atSeconds)?.canUse ?? false;
 }
 
 /**
- * Accept a use and record it. Every `usesPerEffect`th use emits GAMBIT_PLAYED;
- * intermediate uses emit GAMBIT_USED only. Returns false if unavailable.
+ * Accept a use and record it. BuildUp decides whether this use releases the
+ * simulation effect; LimitedUse removes the item when exhausted.
  */
 export function playGambit(room: GameObject, item: ItemDef, atSeconds: number): boolean {
   if (!canPlay(room, item.id, atSeconds)) return false;
@@ -71,11 +104,17 @@ export function playGambit(room: GameObject, item: ItemDef, atSeconds: number): 
   hand.played = [...hand.played, item.id];
   hand.lastUsedAt[item.id] = atSeconds;
   const uses = hand.played.filter((id) => id === item.id).length;
-  const triggered = uses % item.usage.usesPerEffect === 0;
-  if (item.usage.maxUses !== null && uses >= item.usage.maxUses) {
+  const status = gambitStatus(room, item.id, atSeconds)!;
+  const triggered = status.effectReady;
+  if (status.exhausted) {
     hand.hand = hand.hand.filter((id) => id !== item.id);
   }
-  room.emit(GAMBIT_USED, { item, atSeconds, uses, triggered } satisfies GambitUsed);
+  room.emit(GAMBIT_USED, {
+    item,
+    atSeconds,
+    uses,
+    triggered,
+  } satisfies GambitUsed);
   if (triggered) room.emit(GAMBIT_PLAYED, { item, atSeconds } satisfies GambitPlayed);
   return true;
 }

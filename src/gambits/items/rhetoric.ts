@@ -4,13 +4,14 @@ import { Sign } from "../../traits/sign.ts";
 import { Transform } from "../../traits/transform.ts";
 import type { ItemDef } from "../effect.ts";
 import { items } from "../registry.ts";
+import { BuildUp, Cooldown, LimitedUse, gambitTrait } from "../traits.ts";
 
 /** A rhythmic three-part line draws listeners back into the talk. */
 export const ruleOfThree: ItemDef = {
   id: "rule-of-three",
   name: "Rule of three",
   medal: { shape: "round", emblem: "three", metal: 0xe9a84d },
-  usage: { maxUses: 3, usesPerEffect: 3, cooldownSeconds: 0 },
+  gambitTraits: [gambitTrait(BuildUp, { count: 3 }), gambitTrait(LimitedUse, { count: 3 })],
   visual: {
     kind: "rule-of-three-visual",
     traits: [
@@ -43,7 +44,7 @@ export const piousStatement: ItemDef = {
   id: "pious-statement",
   name: "Pious statement",
   medal: { shape: "square", emblem: "book", metal: 0xa7b6be },
-  usage: { maxUses: null, usesPerEffect: 1, cooldownSeconds: 12 },
+  gambitTraits: [gambitTrait(Cooldown, { seconds: 12 })],
   visual: {
     kind: "pious-statement-visual",
     traits: [
@@ -76,7 +77,7 @@ export const praiseJesus: ItemDef = {
   id: "praise-jesus",
   name: "Praise Jesus!",
   medal: { shape: "round", emblem: "praise", metal: 0xf4c746 },
-  usage: { maxUses: 1, usesPerEffect: 1, cooldownSeconds: 0 },
+  gambitTraits: [gambitTrait(LimitedUse, { count: 1 })],
   visual: {
     kind: "praise-jesus-visual",
     traits: [

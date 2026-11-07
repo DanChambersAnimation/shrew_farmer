@@ -6,13 +6,14 @@ import { TShirtBarrage } from "../../traits/t-shirt-barrage.ts";
 import type { Vec3 } from "../../traits/types.ts";
 import type { ItemDef } from "../effect.ts";
 import { items } from "../registry.ts";
+import { LimitedUse, gambitTrait } from "../traits.ts";
 
 /** Three shirts fly into the crowd. Excited listeners love it; a bored one may be hurt. */
 export const tShirtCannon: ItemDef = {
   id: "t-shirt-cannon",
   name: "T-shirt cannon",
   medal: { shape: "square", emblem: "shirt", metal: 0xc89274 },
-  usage: { maxUses: 1, usesPerEffect: 1, cooldownSeconds: 0 },
+  gambitTraits: [gambitTrait(LimitedUse, { count: 1 })],
   visual: { kind: "t-shirt-barrage", traits: [trait(TShirtBarrage)] },
   simulation: {
     outcomes: [
