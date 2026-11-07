@@ -8,6 +8,7 @@ import {
   SphereGeometry,
 } from "three";
 import { defineTrait } from "../core/trait.ts";
+import { makeTexture } from "../textures/index.ts";
 import type { Vec3 } from "./types.ts";
 
 export type ShapeKind = "box" | "cylinder" | "sphere" | "plane";
@@ -39,10 +40,27 @@ export const Shape = defineTrait({
     emissiveIntensity: 1,
     castShadow: true,
     receiveShadow: true,
+    /** A procedural texture name (see src/textures), tinted by `color`. */
+    texture: "",
+    /** Metres covered by one repeat of the texture. */
+    textureSize: 1.2,
+    /** Turn the texture on the surface, degrees (e.g. 45 for diagonal parquet). */
+    textureRotation: 0,
   },
   setup({ object, settings: s }) {
     const geometry = makeGeometry(s.shape, s.size);
+    const map = s.texture ? makeTexture(s.texture) : null;
+    // Repeat so one copy of the texture covers `textureSize` metres (on the
+    // largest face for boxes: x by z for a floor, x by y for a wall).
+    if (map) {
+      const [x, y, z] = s.size;
+      const [u, v] = s.shape === "box" && y < z ? [x, z] : [x, y];
+      map.repeat.set(u / s.textureSize, v / s.textureSize);
+      map.center.set(0.5, 0.5);
+      map.rotation = (s.textureRotation * Math.PI) / 180;
+    }
     const material = new MeshStandardMaterial({
+      map,
       color: s.color,
       roughness: s.roughness,
       metalness: s.metalness,
@@ -57,6 +75,7 @@ export const Shape = defineTrait({
       mesh.removeFromParent();
       geometry.dispose();
       material.dispose();
+      map?.dispose();
     };
   },
 });
