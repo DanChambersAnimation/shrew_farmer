@@ -1,7 +1,9 @@
 /**
  * A paper rig: a flat 2D character built from stacked SVG layers. Static layers
  * always draw; slot layers draw one of several named variants (an arm pose, a
- * mouth shape...). Characters are rig data; the renderer knows nothing about them.
+ * mouth shape...). Drawings may contain `{{name}}` placeholders, filled from the
+ * rig's params (e.g. colours), so one rig can draw many different-looking people.
+ * Characters are rig data; the renderer knows nothing about them.
  */
 
 export interface StaticLayer {
@@ -9,7 +11,7 @@ export interface StaticLayer {
 }
 
 export interface SlotLayer {
-  /** Slot name, e.g. "mouth". Several layers may share one variant set via `variantsFrom`. */
+  /** Slot name, e.g. "mouth". */
   readonly slot: string;
   readonly variants: Readonly<Record<string, string>>;
   readonly defaultVariant: string;
@@ -23,17 +25,23 @@ export interface Rig {
   readonly width: number;
   readonly height: number;
   readonly layers: readonly RigLayer[];
+  /** Default values for `{{name}}` placeholders. */
+  readonly params?: Readonly<Record<string, string>>;
 }
 
 /** Which variant each slot shows. Missing slots use their default. */
 export type RigSelection = Readonly<Record<string, string>>;
+
+/** Placeholder values. Missing params use the rig's defaults. */
+export type RigParams = Readonly<Record<string, string>>;
 
 function isSlot(layer: RigLayer): layer is SlotLayer {
   return "slot" in layer;
 }
 
 export function slotNames(rig: Rig): string[] {
-  return rig.layers.filter(isSlot).map((l) => l.slot);
+  // Several layers may share a slot (e.g. hair drawn behind and in front of the head).
+  return [...new Set(rig.layers.filter(isSlot).map((l) => l.slot))];
 }
 
 export function variantNames(rig: Rig, slot: string): string[] {
@@ -47,6 +55,7 @@ export function renderRig(
   rig: Rig,
   selection: RigSelection = {},
   viewBox = `0 0 ${rig.width} ${rig.height}`,
+  params: RigParams = {},
 ): string {
   const known = new Set(slotNames(rig));
   for (const slot of Object.keys(selection)) {
@@ -61,5 +70,14 @@ export function renderRig(
       return layer.transform ? `<g transform="${layer.transform}">${svg}</g>` : svg;
     })
     .join("");
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}">${body}</svg>`;
+  const values = { ...rig.params, ...params };
+  for (const name of Object.keys(params)) {
+    if (!(name in (rig.params ?? {}))) throw new Error(`Rig has no param "${name}"`);
+  }
+  const filled = body.replace(/\{\{(\w+)\}\}/g, (_, name: string) => {
+    const value = values[name];
+    if (value === undefined) throw new Error(`Rig param "${name}" has no value`);
+    return value;
+  });
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}">${filled}</svg>`;
 }

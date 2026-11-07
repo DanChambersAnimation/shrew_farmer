@@ -17,10 +17,19 @@ export interface TraitDef<S extends object> {
   readonly name: string;
   /** Default settings. Settings must stay plain data (serializable). */
   readonly defaults: S;
-  /** Called when attached. May return a cleanup function, called when detached. */
-  setup?(ctx: TraitContext<S>): void | (() => void);
+  /**
+   * Called when attached. May return a cleanup function (called when detached),
+   * or a {@link TraitInstance} to keep per-object state between frames.
+   */
+  setup?(ctx: TraitContext<S>): void | (() => void) | TraitInstance;
   /** Called every frame while attached. */
   update?(ctx: TraitContext<S>, dt: number): void;
+}
+
+/** Per-attachment hooks returned from `setup`, closing over that attachment's state. */
+export interface TraitInstance {
+  update?(dt: number): void;
+  dispose?(): void;
 }
 
 export function defineTrait<S extends object>(def: TraitDef<S>): TraitDef<S> {

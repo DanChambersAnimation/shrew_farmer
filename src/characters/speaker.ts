@@ -1,4 +1,6 @@
+import { type ArmPose, drawArm, type Point, variants } from "../paper/limbs.ts";
 import type { Rig } from "../paper/rig.ts";
+import { rigs } from "../paper/rig-registry.ts";
 
 /*
  * The protagonist: a chibi motivational speaker. Slicked-back hair, sunglasses,
@@ -128,19 +130,6 @@ export type MouthName = keyof typeof MOUTHS;
 
 /* ---------------- Arms: pose data for the screen-right arm ---------------- */
 
-type Point = readonly [number, number];
-export type HandShape = "open" | "fist" | "point" | "thumbsUp" | "palm";
-
-export interface ArmPose {
-  readonly label: string;
-  /** Relative to the shoulder. */
-  readonly elbow: Point;
-  readonly wrist: Point;
-  readonly hand: HandShape;
-  /** Direction the hand points, degrees (0 = screen right, 90 = down). */
-  readonly handAngle: number;
-}
-
 const SHOULDER: Point = [255, 330];
 
 export const ARM_POSES = {
@@ -188,36 +177,14 @@ export const ARM_POSES = {
 
 export type ArmPoseName = keyof typeof ARM_POSES;
 
-const SKIN = `fill="${P.skin}" stroke="${P.outline}" stroke-width="3" stroke-linejoin="round"`;
-
-/** Hands are drawn pointing along +x with the thumb toward -y. */
-const HANDS: Record<HandShape, string> = {
-  open: `<ellipse cx="8" cy="-14" rx="6" ry="10" transform="rotate(-35 8 -14)" ${SKIN}/><ellipse cx="17" cy="0" rx="17" ry="14" ${SKIN}/><path d="M 24 -5 L 32 -5 M 25 1 L 33 1 M 24 7 L 31 7" stroke="${P.outline}" stroke-width="2" stroke-linecap="round"/>`,
-  palm: `<ellipse cx="6" cy="-13" rx="5" ry="9" transform="rotate(-50 6 -13)" ${SKIN}/><ellipse cx="18" cy="0" rx="20" ry="11" ${SKIN}/><path d="M 28 -4 L 36 -4 M 29 2 L 37 2" stroke="${P.outline}" stroke-width="2" stroke-linecap="round"/>`,
-  fist: `<circle cx="13" cy="0" r="15" ${SKIN}/><path d="M 21 -9 Q 27 0 21 9" stroke="${P.outline}" stroke-width="2.5" fill="none" stroke-linecap="round"/>`,
-  point: `<rect x="16" y="-12" width="30" height="10" rx="5" ${SKIN}/><circle cx="11" cy="1" r="13" ${SKIN}/>`,
-  thumbsUp: `<circle cx="13" cy="0" r="15" ${SKIN}/><rect x="5" y="-36" width="12" height="28" rx="6" ${SKIN}/><path d="M 21 -6 L 26 -6 M 21 2 L 26 2" stroke="${P.outline}" stroke-width="2" stroke-linecap="round"/>`,
-};
-
-function arm(pose: ArmPose): string {
-  const [sx, sy] = SHOULDER;
-  const [ex, ey] = [sx + pose.elbow[0], sy + pose.elbow[1]];
-  const [wx, wy] = [sx + pose.wrist[0], sy + pose.wrist[1]];
-  const d = `M ${sx} ${sy} L ${ex} ${ey} L ${wx} ${wy}`;
-  const tube = (color: string, width: number, extra = "") =>
-    `<path d="${d}" stroke="${color}" stroke-width="${width}" fill="none" stroke-linecap="round" stroke-linejoin="round" ${extra}/>`;
-  return [
-    tube(P.outline, 34),
-    tube(P.suitMid, 26),
-    tube(P.suitLight, 7, `opacity="0.7" transform="translate(-4 -4)"`),
-    `<circle cx="${wx}" cy="${wy}" r="12" fill="${P.shirt}" stroke="${P.outline}" stroke-width="3"/>`,
-    `<g transform="translate(${wx} ${wy}) rotate(${pose.handAngle})">${HANDS[pose.hand]}</g>`,
-  ].join("");
-}
-
-function variants<T>(table: Record<string, T>, render: (value: T) => string) {
-  return Object.fromEntries(Object.entries(table).map(([name, v]) => [name, render(v)]));
-}
+const arm = (pose: ArmPose) =>
+  drawArm(SHOULDER, pose, {
+    outline: P.outline,
+    skin: P.skin,
+    sleeve: P.suitMid,
+    sleeveShine: P.suitLight,
+    cuff: P.shirt,
+  });
 
 const ARMS = variants<ArmPose>(ARM_POSES, arm);
 
@@ -248,3 +215,4 @@ export const SPEAKER_VIEWS = {
   full: "0 0 400 560",
   head: "80 60 240 240",
 } as const;
+rigs.register("speaker", SPEAKER);

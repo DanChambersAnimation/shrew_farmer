@@ -1,12 +1,12 @@
 import { Group, type Object3D } from "three";
 import { Emitter, type Listener } from "./emitter.ts";
-import type { AnyTraitDef, TraitContext, TraitDef, TraitEntry } from "./trait.ts";
+import type { AnyTraitDef, TraitContext, TraitDef, TraitEntry, TraitInstance } from "./trait.ts";
 import type { World } from "./world.ts";
 
 interface Attachment {
   readonly def: AnyTraitDef;
   readonly ctx: TraitContext<object>;
-  cleanup?: () => void;
+  instance?: TraitInstance;
 }
 
 const OWNER = "gameObject";
@@ -62,8 +62,8 @@ export class GameObject {
     };
     const attachment: Attachment = { def, ctx };
     this.traits.set(def, attachment);
-    const cleanup = def.setup?.(ctx);
-    if (cleanup) attachment.cleanup = cleanup;
+    const result = def.setup?.(ctx);
+    if (result) attachment.instance = typeof result === "function" ? { dispose: result } : result;
     return this;
   }
 
@@ -72,7 +72,7 @@ export class GameObject {
     const attachment = this.traits.get(def);
     if (!attachment) return this;
     this.traits.delete(def);
-    attachment.cleanup?.();
+    attachment.instance?.dispose?.();
     return this;
   }
 
@@ -87,6 +87,14 @@ export class GameObject {
 
   traitNames(): string[] {
     return [...this.traits.keys()].map((def) => def.name);
+  }
+
+  /** All descendants, depth first. */
+  *descendants(): Generator<GameObject> {
+    for (const child of this.children) {
+      yield child;
+      yield* child.descendants();
+    }
   }
 
   /** Create a child object. */
@@ -114,7 +122,10 @@ export class GameObject {
 
   // Iterate over snapshots so traits may add or remove things mid-loop.
   update(dt: number): void {
-    for (const { def, ctx } of Array.from(this.traits.values())) def.update?.(ctx, dt);
+    for (const { def, ctx, instance } of Array.from(this.traits.values())) {
+      def.update?.(ctx, dt);
+      instance?.update?.(dt);
+    }
     for (const child of Array.from(this.children)) child.update(dt);
   }
 

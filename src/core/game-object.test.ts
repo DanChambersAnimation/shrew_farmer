@@ -41,6 +41,28 @@ describe("GameObject", () => {
     expect(log).toEqual(["setup t", "cleanup t"]);
   });
 
+  it("supports per-attachment instances with update and dispose", () => {
+    const log: string[] = [];
+    const Counter = defineTrait({
+      name: "counter",
+      defaults: { id: "" },
+      setup({ settings }) {
+        let ticks = 0;
+        return {
+          update: () => void log.push(`${settings.id} ${++ticks}`),
+          dispose: () => void log.push(`${settings.id} done`),
+        };
+      },
+    });
+    const root = new World().createRoot("root");
+    root.spawn("a", [trait(Counter, { id: "a" })]);
+    root.spawn("b", [trait(Counter, { id: "b" })]);
+    root.update(1);
+    root.update(1);
+    root.dispose();
+    expect(log).toEqual(["a 1", "b 1", "a 2", "b 2", "b done", "a done"]);
+  });
+
   it("rejects attaching the same trait twice", () => {
     const { Tracked } = makeLog();
     const obj = new World().createRoot("root").add(Tracked);

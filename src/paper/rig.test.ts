@@ -30,6 +30,37 @@ describe("renderRig", () => {
   });
 });
 
+describe("rig params", () => {
+  const painted: Rig = {
+    width: 1,
+    height: 1,
+    params: { top: "red" },
+    layers: [{ svg: '<rect fill="{{top}}"/>' }],
+  };
+
+  it("fills placeholders from defaults and overrides", () => {
+    expect(renderRig(painted)).toContain('fill="red"');
+    expect(renderRig(painted, {}, undefined, { top: "blue" })).toContain('fill="blue"');
+  });
+
+  it("rejects unknown params", () => {
+    expect(() => renderRig(painted, {}, undefined, { hat: "x" })).toThrow(/no param "hat"/);
+  });
+
+  it("lets several layers share one slot", () => {
+    const layered: Rig = {
+      width: 1,
+      height: 1,
+      layers: [
+        { slot: "hair", variants: { a: "<back-a/>", b: "<back-b/>" }, defaultVariant: "a" },
+        { slot: "hair", variants: { a: "<front-a/>", b: "<front-b/>" }, defaultVariant: "a" },
+      ],
+    };
+    expect(slotNames(layered)).toEqual(["hair"]);
+    expect(renderRig(layered, { hair: "b" })).toContain("<back-b/><front-b/>");
+  });
+});
+
 describe("speaker rig", () => {
   it("renders every arm pose on both arms and every mouth", () => {
     for (const pose of Object.keys(ARM_POSES)) {
