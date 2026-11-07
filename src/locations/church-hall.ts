@@ -1,6 +1,9 @@
 import type { ObjectSpec } from "../core/spec.ts";
 import { slab } from "../prefabs/blocks.ts";
 import { CHAIR_HEIGHT, chair } from "../prefabs/chair.ts";
+import { fireDoors, fireExtinguisher } from "../prefabs/fire-exit.ts";
+import { noticeboard } from "../prefabs/noticeboard.ts";
+import { windowFrame } from "../prefabs/window.ts";
 import { trait } from "../core/trait.ts";
 import { Highlight } from "../traits/highlight.ts";
 import { Inspectable } from "../traits/inspectable.ts";
@@ -18,7 +21,12 @@ export const STAGE = { height: CHAIR_HEIGHT, front: 0.5 } as const;
 const FRONT_ROW_GAP = 0.8;
 
 const WALL = 0xe6dcc3;
-const FLOOR = 0x9a6b3f;
+/** Neutral stone-coloured wall pillars. */
+const PILLAR = 0xcfc6b6;
+/** Pillars along the side walls, roughly 5 m apart; windows sit between them. */
+const PILLAR_SPACING = 5;
+/** Tint over the parquet texture (white = the wood as drawn). */
+const FLOOR = 0xffffff;
 
 /** Rows of chairs at the far (-z) end, facing the stage end, with a centre aisle. */
 function seating(rows = 4, perSide = 5): ObjectSpec {
@@ -42,9 +50,48 @@ function stage(): ObjectSpec {
   return {
     kind: "stage",
     children: [
-      slab("stage-deck", [w, sh, depth], [0, sh / 2, front + depth / 2], 0xb07a45),
+      // Floorboards running left to right across the stage.
+      slab("stage-deck", [w, sh, depth], [0, sh / 2, front + depth / 2], 0xffffff, {
+        texture: "floorboards",
+        textureSize: 2.4,
+        roughness: 0.55,
+      }),
       slab("stage-front", [w, sh, 0.04], [0, sh / 2, front - 0.02], 0x5e3b22),
     ],
+  };
+}
+
+/** Pillars down both side walls with a tall window in each bay between them. */
+function sideWalls(): ObjectSpec {
+  const { width: w, depth: d, height: h } = HALL;
+  const children: ObjectSpec[] = [];
+  const count = Math.round(d / PILLAR_SPACING);
+  const spacing = d / count;
+  for (const side of [-1, 1] as const) {
+    const wallX = side * (w / 2);
+    for (let i = 0; i <= count; i++) {
+      const z = -d / 2 + i * spacing;
+      children.push(slab("pillar", [0.3, h, 0.45], [wallX - side * 0.15, h / 2, z], PILLAR));
+      if (i < count) {
+        // Windows face into the room: +x on the left wall, -x on the right.
+        children.push(
+          windowFrame([wallX - side * 0.01, 3.2, z + spacing / 2], [0, side * -90, 0], {
+            width: 2.6,
+            height: 3,
+          }),
+        );
+      }
+    }
+  }
+  return { kind: "side-walls", children };
+}
+
+/** The back wall's fittings: fire doors at the end of the aisle, extinguisher, noticeboard. */
+function backWall(): ObjectSpec {
+  const z = -HALL.depth / 2;
+  return {
+    kind: "back-wall",
+    children: [fireDoors([0, 0, z]), fireExtinguisher([1.45, 0.3, z]), noticeboard([-3, 1.55, z])],
   };
 }
 
@@ -55,12 +102,19 @@ export function churchHall(): ObjectSpec {
   return {
     kind: "church-hall",
     children: [
-      slab("floor", [w, t, d], [0, -t / 2, 0], FLOOR),
+      // Parquet laid on the diagonal.
+      slab("floor", [w, t, d], [0, -t / 2, 0], FLOOR, {
+        texture: "parquet",
+        textureRotation: 45,
+        roughness: 0.6,
+      }),
       slab("ceiling", [w, t, d], [0, h + t / 2, 0], WALL),
       slab("wall", [w, h, t], [0, h / 2, -d / 2 - t / 2], WALL),
       slab("wall", [w, h, t], [0, h / 2, d / 2 + t / 2], WALL),
       slab("wall", [t, h, d], [-w / 2 - t / 2, h / 2, 0], WALL),
       slab("wall", [t, h, d], [w / 2 + t / 2, h / 2, 0], WALL),
+      sideWalls(),
+      backWall(),
       stage(),
       seating(),
       {

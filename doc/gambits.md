@@ -69,7 +69,7 @@ Each registry entry also has a **usage rule**: `maxUses` (or `null` for unlimite
 - **Visual and audio:** three shirt-shaped projectiles arc from the Speaker to the selected people, each accompanied by a synthesized “whomp”.
 - **Uses:** once per round.
 - **Notes / issue:** built with the shared random-target resolver and effect registry.
-- **Preview:** open `?room=dev6` for a fixed cannon hand, then click its icon.
+- **Preview:** open `?room=dev7` for a fixed cannon hand, then click its icon.
 
 ## Equipment and power-ups
 

@@ -5,6 +5,7 @@ import { ACESFilmicToneMapping, PCFSoftShadowMap, Timer, WebGLRenderer } from "t
 import { rooms } from "./core/room-registry.ts";
 import { World } from "./core/world.ts";
 import { Noclip } from "./dev/noclip.ts";
+import { FrameRenderer } from "./render/frame.ts";
 import { INSPECT, type InspectInfo } from "./traits/inspectable.ts";
 import { GameTimer } from "./traits/game-timer.ts";
 import { GambitRack } from "./hud/gambit-rack-dom.ts";
@@ -41,8 +42,11 @@ const world = new World();
 // Debug handle for the browser console in dev builds.
 if (import.meta.env.DEV) (window as unknown as { world: World }).world = world;
 
+const frame = new FrameRenderer(renderer, world);
+
 function resize(): void {
   renderer.setSize(window.innerWidth, window.innerHeight);
+  frame.setSize(window.innerWidth, window.innerHeight);
   world.camera.aspect = window.innerWidth / window.innerHeight;
   world.camera.updateProjectionMatrix();
 }
@@ -191,5 +195,5 @@ renderer.setAnimationLoop((time) => {
   renderRoundMeter();
   gambitRack.refresh();
   showNoclip();
-  renderer.render(world.scene, world.viewCamera);
+  frame.render(world);
 });
