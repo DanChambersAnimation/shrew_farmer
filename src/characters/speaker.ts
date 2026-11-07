@@ -268,4 +268,7 @@ export const SPEAKER_BACK: Rig = {
 /** Where the Speaker's feet meet the floor, in rig units (both views). */
 export const SPEAKER_FEET: Point = [200, 534];
 
+/** Rig rows (units from the top) of the joints the Speaker turns at. */
+export const SPEAKER_JOINTS = { waist: 440, shoulders: 318, neck: 292 } as const;
+
 rigs.register("speaker-back", SPEAKER_BACK);

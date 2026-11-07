@@ -13,7 +13,7 @@ describe("figureGeometry", () => {
     expect(box.max.toArray()).toEqual([0.5, 1.5, 0]);
   });
 
-  it("bends along a profile: one quad per segment", () => {
+  it("bends along a profile, with a separate smooth strip between folds", () => {
     const geometry = figureGeometry(
       100,
       200,
@@ -25,7 +25,8 @@ describe("figureGeometry", () => {
         [200, 0, 0.5],
       ],
     );
-    expect(geometry.getAttribute("position").count).toBe(12);
+    // Two strips (split at the fold at row 100), each 2 rows x 9 columns.
+    expect(geometry.getAttribute("position").count).toBe(36);
     const box = bounds(geometry);
     expect(box.max.z).toBeCloseTo(0.5);
     expect(box.min.y).toBeCloseTo(0);
@@ -40,5 +41,61 @@ describe("figureGeometry", () => {
     expect(feet![1]).toBeCloseTo(-0.41);
     expect(head![1]).toBeGreaterThan(neck![1]);
     expect(head![2]).toBeLessThan(0); // tipped back toward the camera above
+  });
+});
+
+describe("figure twist", () => {
+  // 100 x 200 rig, 1 unit = 0.01 m, anchor at the bottom centre: rows 0..200 → y 2..0.
+  const twisted = (degrees: number) =>
+    figureGeometry(100, 200, 0.01, [50, 200], [], {
+      degrees,
+      curve: [
+        [150, 0],
+        [50, 1],
+      ],
+    });
+  const zRange = (geometry: ReturnType<typeof figureGeometry>, minY: number, maxY: number) => {
+    const pos = geometry.getAttribute("position");
+    const zs: number[] = [];
+    for (let i = 0; i < pos.count; i++) {
+      const y = pos.getY(i);
+      if (y >= minY - 1e-6 && y <= maxY + 1e-6) zs.push(pos.getZ(i));
+    }
+    return Math.max(...zs) - Math.min(...zs);
+  };
+
+  it("leaves the legs flat and turns the upper body", () => {
+    const geometry = twisted(90);
+    expect(zRange(geometry, 0, 0.5)).toBeCloseTo(0); // below the waist: untouched
+    expect(zRange(geometry, 1.5, 2)).toBeCloseTo(1); // above the shoulders: edge-on, 1 m deep
+  });
+
+  it("is a flat panel with no twist", () => {
+    expect(zRange(twisted(0), 0, 2)).toBeCloseTo(0);
+  });
+});
+
+describe("turning the head", () => {
+  it("keeps everything above the last curve point flat (a rigid card)", () => {
+    // Rows 0..60 are the "head": fully turned 40°, so every vertex there has z = -x·sin40°.
+    const geometry = figureGeometry(100, 200, 0.01, [50, 200], [], {
+      degrees: 40,
+      curve: [
+        [150, 0],
+        [100, 0.5],
+        [60, 1],
+      ],
+    });
+    const pos = geometry.getAttribute("position");
+    const sin = Math.sin((40 * Math.PI) / 180);
+    const cos = Math.cos((40 * Math.PI) / 180);
+    let checked = 0;
+    for (let i = 0; i < pos.count; i++) {
+      if (pos.getY(i) < 2 - 0.6 + 1e-6) continue; // rows below 60 are lower than y = 1.4
+      const x = pos.getX(i) / cos; // un-turned x
+      expect(pos.getZ(i)).toBeCloseTo(-x * sin);
+      checked++;
+    }
+    expect(checked).toBeGreaterThan(0);
   });
 });

@@ -1,4 +1,4 @@
-import { SPEAKER_FEET } from "../characters/speaker.ts";
+import { SPEAKER_FEET, SPEAKER_JOINTS } from "../characters/speaker.ts";
 import type { ObjectSpec } from "../core/spec.ts";
 import { trait } from "../core/trait.ts";
 import { Billboard } from "../traits/billboard.ts";
@@ -26,6 +26,16 @@ export function speaker(
       trait(PaperFigure, {
         rig: view === "back" ? "speaker-back" : "speaker",
         anchor: [...SPEAKER_FEET],
+        // Turning to look: the body turns from the waist, half way by the
+        // shoulders; the flat head turns fully from the neck up.
+        twist: {
+          degrees: 0,
+          curve: [
+            [SPEAKER_JOINTS.waist, 0],
+            [SPEAKER_JOINTS.shoulders, 0.5],
+            [SPEAKER_JOINTS.neck, 1],
+          ],
+        },
       }),
       // Face the camera fully so a steep view doesn't squash him; the panel
       // pivots at his feet, so they stay planted on the stage.

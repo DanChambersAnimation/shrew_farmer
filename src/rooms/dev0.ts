@@ -4,6 +4,7 @@ import { STAGE, churchHall } from "../locations/church-hall.ts";
 import { fillSeats } from "../prefabs/audience-member.ts";
 import { speaker } from "../prefabs/speaker.ts";
 import { CameraView } from "../traits/camera-view.ts";
+import { LookAround } from "../traits/look-around.ts";
 
 rooms.register({
   name: "dev0",
@@ -20,7 +21,8 @@ rooms.register({
       swayPeriod: 22,
     });
     fillSeats(spawnSpec(room, churchHall()));
-    // The player, on stage with his back to us, turned 45° clockwise to face the audience.
-    spawnSpec(room, speaker([-2.6, STAGE.height, 2.2], "back", -45));
+    // The player, centre stage with his back to us, facing the audience and
+    // turning from the waist to look around the room.
+    spawnSpec(room, speaker([0, STAGE.height, 2.2])).add(LookAround, { degrees: 55, period: 4 });
   },
 });
