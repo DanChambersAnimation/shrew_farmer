@@ -3,6 +3,8 @@ import { slab } from "../prefabs/blocks.ts";
 import { CHAIR_HEIGHT, chair } from "../prefabs/chair.ts";
 import { fireDoors, fireExtinguisher } from "../prefabs/fire-exit.ts";
 import { noticeboard } from "../prefabs/noticeboard.ts";
+import { mopAndBucket, smilingVacuum } from "../prefabs/cleaning.ts";
+import { radiator } from "../prefabs/radiator.ts";
 import { windowFrame } from "../prefabs/window.ts";
 import { trait } from "../core/trait.ts";
 import { Highlight } from "../traits/highlight.ts";
@@ -78,7 +80,10 @@ function sideWalls(): ObjectSpec {
           windowFrame([wallX - side * 0.01, 3.2, z + spacing / 2], [0, side * -90, 0], {
             width: 2.6,
             height: 3,
+            seed: children.length,
           }),
+          // A radiator under each window.
+          radiator([wallX, 0.15, z + spacing / 2], [0, side * -90, 0]),
         );
       }
     }
@@ -91,7 +96,14 @@ function backWall(): ObjectSpec {
   const z = -HALL.depth / 2;
   return {
     kind: "back-wall",
-    children: [fireDoors([0, 0, z]), fireExtinguisher([1.45, 0.3, z]), noticeboard([-3, 1.55, z])],
+    children: [
+      fireDoors([0, 0, z]),
+      fireExtinguisher([1.45, 0.3, z]),
+      noticeboard([-3, 1.55, z]),
+      // Cleaning things tucked into the back right corner.
+      smilingVacuum([4.75, 0, z + 0.45], [0, -20, 0]),
+      mopAndBucket([5.3, 0, z + 0.45], [0, -35, 0]),
+    ],
   };
 }
 
