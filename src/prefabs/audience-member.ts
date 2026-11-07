@@ -39,6 +39,8 @@ export function createAudienceMember(
         scale: SCALE,
         anchor: [...SEAT_POINT],
         profile: seatedProfile(SCALE, position[1]),
+        // Faces stay readable when the house lights go down.
+        selfLight: 0.35,
       }),
       // Turn (not tilt) toward the camera, so the bent figure stays in its chair.
       trait(Billboard, { mode: "upright" }),

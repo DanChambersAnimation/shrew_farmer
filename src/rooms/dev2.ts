@@ -16,7 +16,7 @@ rooms.register({
       cues: {
         "House lights": { house: 1, spot: 0 },
         // A cheat: house lights stay faintly up so the audience stays visible.
-        Spotlight: { house: 0.18, spot: 1 },
+        Spotlight: { house: 0.3, spot: 1 },
       },
     });
     const { speakerAt: at } = churchHallShow(room);

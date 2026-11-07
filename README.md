@@ -44,6 +44,10 @@ vp build   # production build into dist/
 
 If `vp` isn't installed globally, use `./node_modules/.bin/vp`. CI runs all three on every push and pull request.
 
+## Design docs
+
+Gambits, ideas, features and design principles are logged in [`docs/`](docs/README.md).
+
 ## How the code is organised
 
 The guiding rule is **systems over features**: new behavior should compose with what exists, not be a special case.

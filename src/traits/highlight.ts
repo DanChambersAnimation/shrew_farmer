@@ -15,8 +15,13 @@ export const Highlight = defineTrait({
         const m = node.material;
         if (!saved.has(m))
           saved.set(m, { color: m.emissive.clone(), intensity: m.emissiveIntensity });
-        m.emissive.copy(glow);
-        m.emissiveIntensity = settings.intensity;
+        if (m.emissiveMap) {
+          // Already glowing with its own picture (e.g. a self-lit figure): glow more.
+          m.emissiveIntensity = saved.get(m)!.intensity + settings.intensity;
+        } else {
+          m.emissive.copy(glow);
+          m.emissiveIntensity = settings.intensity;
+        }
       });
     };
     const off = () => {

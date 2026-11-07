@@ -102,3 +102,20 @@ describe("pointer traits", () => {
     expect(material.emissiveIntensity).toBe(1);
   });
 });
+
+describe("Highlight on self-lit materials", () => {
+  it("adds to an existing picture glow instead of replacing it", async () => {
+    const { Texture } = await import("three");
+    const { world, box } = scene();
+    const material = (box.node.children[0] as Mesh).material as MeshStandardMaterial;
+    material.emissiveMap = new Texture();
+    material.emissive.set(0xffffff);
+    material.emissiveIntensity = 0.35;
+    box.add(Highlight, { intensity: 0.1 });
+    world.pointer.move(CENTER);
+    expect(material.emissiveIntensity).toBeCloseTo(0.45);
+    expect(material.emissive.getHex()).toBe(0xffffff);
+    world.pointer.move(CORNER);
+    expect(material.emissiveIntensity).toBeCloseTo(0.35);
+  });
+});

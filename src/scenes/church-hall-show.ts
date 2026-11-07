@@ -24,8 +24,13 @@ export function churchHallShow(room: GameObject): { speakerAt: Vec3; speaker: Ga
   });
   fillSeats(spawnSpec(room, churchHall()));
   // The player, centre stage with his back to us, facing the audience and
-  // turning from the waist to look around the room.
+  // glancing from side to side every 4 seconds.
   const speakerAt: Vec3 = [0, STAGE.height, 2.2];
-  const pc = spawnSpec(room, speaker(speakerAt)).add(LookAround, { degrees: 55, period: 4 });
+  const pc = spawnSpec(room, speaker(speakerAt)).add(LookAround, {
+    degrees: 55,
+    period: 4,
+    motion: "glance",
+    turn: 0.8,
+  });
   return { speakerAt, speaker: pc };
 }

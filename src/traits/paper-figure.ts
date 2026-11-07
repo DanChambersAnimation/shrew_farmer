@@ -165,6 +165,11 @@ export const PaperFigure = defineTrait({
     profile: [] as ProfilePoint[],
     /** Cast a shadow in the drawing's outline (lights must cast shadows too). */
     castShadow: false,
+    /**
+     * How much the drawing lights itself, regardless of the room's lights
+     * (0 = fully lit by the scene). A cheat that keeps faces readable in the dark.
+     */
+    selfLight: 0,
     /** Optional twist of the upper body; change it at any time. */
     twist: { degrees: 0, curve: [] } as Twist,
   },
@@ -226,6 +231,10 @@ export const PaperFigure = defineTrait({
         const texture = new CanvasTexture(canvas);
         texture.colorSpace = SRGBColorSpace;
         material.map = texture;
+        // Self-light: the drawing glows with its own colours.
+        material.emissive.set(0xffffff);
+        material.emissiveMap = texture;
+        material.emissiveIntensity = s.selfLight;
         material.needsUpdate = true;
         shadowMaterial.map = texture;
         shadowMaterial.needsUpdate = true;
