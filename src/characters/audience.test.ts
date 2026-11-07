@@ -2,6 +2,7 @@ import { describe, expect, it } from "vite-plus/test";
 import { renderRig } from "../paper/rig.ts";
 import { AUDIENCE, randomAppearance } from "./audience.ts";
 import { audienceVisual, randomAudienceState, randomPersonality } from "./audience-model.ts";
+import { faceFor } from "./audience-face-model.ts";
 
 describe("audience rig", () => {
   it("renders the visual states without changing base appearance", () => {
@@ -12,7 +13,7 @@ describe("audience rig", () => {
         expect(
           renderRig(
             AUDIENCE,
-            { ...appearance.slots, face: visual.face, arms: visual.arms },
+            { ...appearance.slots, ...faceFor({ approval, engagement }), arms: visual.arms },
             undefined,
             appearance.params,
           ),

@@ -16,6 +16,7 @@ import { Seat } from "../traits/seat.ts";
 import { TiltToCamera } from "../traits/tilt-to-camera.ts";
 import { Transform } from "../traits/transform.ts";
 import { AudienceModel, randomAudienceMotion } from "../traits/audience-model.ts";
+import { faceFor, randomFaceRhythm } from "../characters/audience-face-model.ts";
 import type { Vec3 } from "../traits/types.ts";
 
 const SCALE = 0.004;
@@ -29,13 +30,14 @@ export function createAudienceMember(
   const appearance = randomAppearance(seed);
   const personality = randomPersonality(seed ^ 0x9e3779b9);
   const visual = audienceVisual(state);
+  const face = faceFor(state);
   return {
     kind: "audience-member",
     traits: [
       trait(Transform, { position }),
       trait(PaperFigure, {
         rig: "audience",
-        slots: { ...appearance.slots, face: visual.face, arms: visual.arms },
+        slots: { ...appearance.slots, ...face, arms: visual.arms },
         params: appearance.params,
         scale: SCALE,
         anchor: [...SEAT_POINT],
@@ -60,6 +62,8 @@ export function createAudienceMember(
         state: { ...state },
         motion: randomAudienceMotion(seed ^ 0x85ebca6b),
         memory: [],
+        face: randomFaceRhythm(seed ^ 0x27d4eb2f),
+        faceSeed: seed ^ 0x165667b1,
       }),
     ],
   };

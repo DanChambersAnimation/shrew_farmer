@@ -2,6 +2,7 @@ import { Random } from "../core/random.ts";
 import { type ArmPose, drawArm, type Point, variants } from "../paper/limbs.ts";
 import type { Rig, RigParams, RigSelection } from "../paper/rig.ts";
 import { rigs } from "../paper/rig-registry.ts";
+import { BUBBLE, BROWS, DROOL, EYES, MOUTHS, NOSES } from "./audience-face.ts";
 
 /*
  * The generic audience member: a seated chibi person facing the camera. Every
@@ -123,21 +124,8 @@ const GLASSES = {
   round: `<circle cx="122" cy="118" r="20" fill="#fff" fill-opacity="0.2" ${LINE}/><circle cx="178" cy="118" r="20" fill="#fff" fill-opacity="0.2" ${LINE}/><path d="M 142 116 Q 150 110 158 116 M 102 116 L 72 112 M 198 116 L 228 112" ${thin()}/>`,
 } as const;
 
-/* ---------------- Faces: drawn around the face centre (150, 125) ---------------- */
-
-const dotEyes = `<ellipse cx="-28" cy="-7" rx="6" ry="8" ${INK}/><ellipse cx="28" cy="-7" rx="6" ry="8" ${INK}/>`;
-const mouthFill = `fill="#5a1a22" ${LINE}`;
-
-export const FACES = {
-  neutral: `${dotEyes}<path d="M -12 34 L 12 34" ${thin()}/>`,
-  smile: `${dotEyes}<path d="M -18 28 Q 0 42 18 28" ${thin()}/>`,
-  laugh: `<path d="M -38 -4 Q -28 -16 -18 -4 M 18 -4 Q 28 -16 38 -4" ${thin(4)}/><path d="M -24 24 Q 0 28 24 24 Q 20 52 0 54 Q -20 52 -24 24 Z" ${mouthFill}/><path d="M -12 46 Q 0 38 12 46 Q 6 52 0 52 Q -6 52 -12 46 Z" fill="#e0707a"/>`,
-  bored: `<path d="M -36 -10 L -20 -10 M 20 -10 L 36 -10" ${thin(4)}/><path d="M -34 -9 Q -28 2 -22 -9 Z M 22 -9 Q 28 2 34 -9 Z" ${INK}/><path d="M -6 36 L 16 32" ${thin()}/>`,
-  frown: `${dotEyes}<path d="M -40 -26 L -18 -18 M 40 -26 L 18 -18" ${thin(4)}/><path d="M -16 40 Q 0 28 16 40" ${thin()}/>`,
-  focused: `${dotEyes}<path d="M -42 -28 L -16 -22 M 16 -22 L 42 -28 M -8 34 L 8 34" ${thin()}/>`,
-  shocked: `<circle cx="-28" cy="-7" r="12" fill="#fff" ${LINE}/><circle cx="28" cy="-7" r="12" fill="#fff" ${LINE}/><circle cx="-28" cy="-6" r="4" ${INK}/><circle cx="28" cy="-6" r="4" ${INK}/><path d="M -40 -32 Q -28 -40 -16 -32 M 16 -32 Q 28 -40 40 -32" ${thin()}/><ellipse cx="0" cy="36" rx="10" ry="13" ${mouthFill}/>`,
-  asleep: `<path d="M -38 -6 Q -28 2 -18 -6 M 18 -6 Q 28 2 38 -6" ${thin(4)}/><ellipse cx="0" cy="36" rx="6" ry="5" ${mouthFill}/><text x="62" y="-58" font-family="sans-serif" font-weight="bold" font-size="28" ${INK}>z</text><text x="82" y="-82" font-family="sans-serif" font-weight="bold" font-size="20" ${INK}>z</text>`,
-} as const;
+/** Face parts are drawn around the face centre. */
+const FACE_ORIGIN = "translate(150 125)";
 
 /* ---------------- Arms: a pose for each side ---------------- */
 
@@ -209,7 +197,12 @@ export const AUDIENCE: Rig = {
     { svg: LEGS },
     slot("top", TOPS, "tee"),
     { svg: HEAD },
-    { ...slot("face", FACES, "neutral"), transform: "translate(150 125)" },
+    { ...slot("eyes", EYES, "open"), transform: FACE_ORIGIN },
+    { ...slot("brows", BROWS, "level"), transform: FACE_ORIGIN },
+    { ...slot("nose", NOSES, "still"), transform: FACE_ORIGIN },
+    { ...slot("mouth", MOUTHS, "line"), transform: FACE_ORIGIN },
+    { ...slot("drool", DROOL, "none"), transform: FACE_ORIGIN },
+    { ...slot("bubble", BUBBLE, "none"), transform: FACE_ORIGIN },
     slot(
       "hair",
       variants(HAIR, (h) => h.front),

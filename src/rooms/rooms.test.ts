@@ -5,6 +5,8 @@ import { World } from "../core/world.ts";
 import { CrowdSimulation } from "../traits/crowd-simulation.ts";
 import { GameTimer } from "../traits/game-timer.ts";
 import { LightingCues } from "../traits/lighting-cues.ts";
+import { AudienceModel } from "../traits/audience-model.ts";
+import { PaperFigure } from "../traits/paper-figure.ts";
 import { Seat } from "../traits/seat.ts";
 
 import.meta.glob(["./*.ts", "!./*.test.ts"], { eager: true });
@@ -59,6 +61,20 @@ describe("registered rooms", () => {
     const room = rooms.load(new World(), "dev3");
     expect(room.settingsOf(GameTimer)).toMatchObject({ durationSeconds: 60, running: true });
     expect(room.has(CrowdSimulation)).toBe(true);
+  });
+
+  it("dev5 shows one of each expression, moving out of step", () => {
+    const world = new World();
+    const room = rooms.load(world, "dev5");
+    const people = [...room.descendants()].filter((o) => o.kind === "audience-member");
+    expect(people.length).toBe(7);
+    const states = people.map((p) => p.settingsOf(AudienceModel)!.state);
+    expect(new Set(states.map((s) => `${s.approval}/${s.engagement}`)).size).toBe(7);
+    world.update(0.5);
+    // Different per-person timing means the faces do not move together.
+    const faces = people.map((p) => Object.values(p.settingsOf(PaperFigure)!.slots).join("/"));
+    expect(new Set(faces).size).toBeGreaterThan(1);
+    world.clear();
   });
 
   for (const def of rooms.list()) {

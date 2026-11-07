@@ -1,4 +1,5 @@
 import type { AudienceAppearance } from "../characters/audience.ts";
+import { type FaceRhythm, animateFace } from "../characters/audience-face-model.ts";
 import type { MemoryEntry } from "../characters/crowd.ts";
 import {
   audienceVisual,
@@ -45,21 +46,33 @@ export const AudienceModel = defineTrait({
     motion: { amplitude: 0.02, period: 9, phase: 0, tremorHz: 5 } as AudienceMotion,
     /** The moves that reached this person this round, oldest first. */
     memory: [] as MemoryEntry[],
+    /** Per-person blink, breathing and drool timing. */
+    face: {
+      blinkEvery: 3.4,
+      blinkFor: 0.12,
+      twitchEvery: 11,
+      breathEvery: 4.2,
+      droolAfter: 5,
+      bubbleAfter: 8,
+    } as FaceRhythm,
+    /** Varies the blink and speaking pattern between people. */
+    faceSeed: 1,
   },
   setup({ object, settings }) {
     const figure = object.settingsOf(PaperFigure);
     if (!figure) throw new Error("AudienceModel requires PaperFigure");
     let lastVisual = "";
     let elapsed = 0;
+    const face = animateFace(settings.face, settings.faceSeed);
     const baseX = object.node.position.x;
     const baseY = object.node.position.y;
-    const sync = () => {
+    const sync = (faceParts = face.parts) => {
       clampAudienceState(settings.state);
       const visual = audienceVisual(settings.state);
-      const key = `${visual.face}/${visual.arms}`;
+      const key = `${Object.values(faceParts).join("/")}/${visual.arms}`;
       if (key === lastVisual) return;
       lastVisual = key;
-      figure.slots = { ...settings.appearance.slots, face: visual.face, arms: visual.arms };
+      figure.slots = { ...settings.appearance.slots, ...faceParts, arms: visual.arms };
       figure.params = settings.appearance.params;
       const inspect = object.settingsOf(Inspectable);
       if (inspect) {
@@ -70,8 +83,8 @@ export const AudienceModel = defineTrait({
     sync();
     return {
       update(dt) {
-        sync();
         elapsed += dt;
+        sync(face.update(dt, settings.state));
         const { amplitude, period, phase, tremorHz } = settings.motion;
         const cycle = (Math.PI * 2 * elapsed) / period + phase;
         const rage =

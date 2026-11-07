@@ -1,4 +1,4 @@
-import { ARMS, FACES } from "./audience.ts";
+import { ARMS } from "./audience.ts";
 import { Random } from "../core/random.ts";
 
 /** Stable predispositions, independent of the person's appearance. Values are 0 to 1. */
@@ -41,40 +41,28 @@ export function clampAudienceState(state: AudienceState): void {
   state.engagement = Math.max(0, Math.min(1, state.engagement));
 }
 
-/** Project inner state onto the existing face and arm variants. */
+/**
+ * Project inner state onto arms and a description. The face is left to
+ * `faceFor` in audience-face-model.ts, which splits it into drivable parts.
+ */
 export function audienceVisual(state: Readonly<AudienceState>): {
-  face: keyof typeof FACES;
   arms: keyof typeof ARMS;
   description: string;
 } {
   const { approval, engagement } = state;
-  if (engagement < 0.15) {
-    return { face: "asleep", arms: "lap", description: "Nodding off." };
-  }
-  if (engagement < 0.4) {
-    return {
-      face: approval < -0.35 ? "frown" : approval > 0.35 ? "smile" : "bored",
-      arms: "phone",
-      description: "Distracted by their phone.",
-    };
-  }
-  if (approval <= -0.55) {
-    return { face: "frown", arms: "crossed", description: "Watching closely, but unconvinced." };
-  }
+  if (engagement < 0.15) return { arms: "lap", description: "Nodding off." };
+  if (engagement < 0.4) return { arms: "phone", description: "Distracted by their phone." };
+  if (approval <= -0.55)
+    return { arms: "crossed", description: "Watching closely, but unconvinced." };
   if (approval >= 0.75) {
     return {
-      face: "laugh",
       arms: engagement >= 0.8 ? "cheer" : "clap",
       description: "Enjoying the talk.",
     };
   }
-  if (approval >= 0.3) {
-    return { face: "smile", arms: "lap", description: "Listening with interest." };
-  }
-  if (approval <= -0.25) {
-    return { face: "frown", arms: "lap", description: "Listening with reservations." };
-  }
+  if (approval >= 0.3) return { arms: "lap", description: "Listening with interest." };
+  if (approval <= -0.25) return { arms: "lap", description: "Listening with reservations." };
   return engagement >= 0.8
-    ? { face: "focused", arms: "chin", description: "Watching intently." }
-    : { face: "neutral", arms: "lap", description: "Listening." };
+    ? { arms: "chin", description: "Watching intently." }
+    : { arms: "lap", description: "Listening." };
 }
