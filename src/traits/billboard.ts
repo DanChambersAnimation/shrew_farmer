@@ -1,4 +1,6 @@
 import { MathUtils, Vector3 } from "three";
+
+const UP = new Vector3(0, 1, 0);
 import { defineTrait } from "../core/trait.ts";
 
 /**
@@ -6,8 +8,10 @@ import { defineTrait } from "../core/trait.ts";
  * "upright" only turns around the vertical axis, so the object never leans
  * into things behind it (e.g. a chair back).
  *
- * `yaw` then turns it by a fixed angle (degrees, positive = anticlockwise seen
- * from above), e.g. so a figure faces partly away from the camera.
+ * `yaw` then swivels it about the world's vertical axis by a fixed angle
+ * (degrees, positive = anticlockwise seen from above), e.g. so a figure turns
+ * toward something other than the camera. It turns around the vertical even
+ * when the figure is tilted, so it swivels on the spot rather than twisting.
  *
  * `stretch` (upright only) scales the object vertically to undo the squash of
  * being seen from above or below, up to `maxStretch`.
@@ -32,7 +36,7 @@ export const Billboard = defineTrait({
         node.getWorldPosition(self);
         if (settings.mode === "full") {
           node.lookAt(target);
-          node.rotateY(MathUtils.degToRad(settings.yaw));
+          node.rotateOnWorldAxis(UP, MathUtils.degToRad(settings.yaw));
           return;
         }
         const horizontal = Math.hypot(target.x - self.x, target.z - self.z);
@@ -44,7 +48,7 @@ export const Billboard = defineTrait({
         node.scale.y = baseScaleY * stretch;
         target.y = self.y;
         node.lookAt(target);
-        node.rotateY(MathUtils.degToRad(settings.yaw));
+        node.rotateOnWorldAxis(UP, MathUtils.degToRad(settings.yaw));
       },
     };
   },

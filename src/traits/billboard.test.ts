@@ -1,3 +1,4 @@
+import { Vector3 } from "three";
 import { describe, expect, it } from "vite-plus/test";
 import { trait } from "../core/trait.ts";
 import { World } from "../core/world.ts";
@@ -33,5 +34,16 @@ describe("Billboard", () => {
     const facing = setup({ mode: "upright" }).node.rotation.y;
     const turned = setup({ mode: "upright", yaw: -45 }).node.rotation.y;
     expect(turned - facing).toBeCloseTo(-Math.PI / 4);
+  });
+
+  it("yaw swivels about the world vertical even when tilted", () => {
+    const { node } = setup({ mode: "full", yaw: -45 });
+    node.updateMatrixWorld();
+    // The figure's up axis stays in the plane it was tilted in: still leaning
+    // back toward the camera, not skewed sideways by the turn.
+    const up = new Vector3(0, 1, 0).applyQuaternion(node.quaternion);
+    const facing = setup({ mode: "full" }).node;
+    const facingUp = new Vector3(0, 1, 0).applyQuaternion(facing.quaternion);
+    expect(up.y).toBeCloseTo(facingUp.y);
   });
 });
