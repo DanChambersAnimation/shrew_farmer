@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Start the local dev server (with hot reload). Extra args go to `vp dev`,
-# e.g. `./dev.sh --host` to reach it from other devices on your network.
+# Start the dev server (with hot reload) on all network interfaces.
+# Extra args go to `vp dev`.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -25,4 +25,4 @@ cat <<MSG
 
 MSG
 
-exec node_modules/.bin/vp dev --port "$PORT" "$@"
+exec node_modules/.bin/vp dev --host 0.0.0.0 --port "$PORT" "$@"

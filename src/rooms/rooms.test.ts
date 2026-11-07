@@ -2,6 +2,8 @@ import { describe, expect, it } from "vite-plus/test";
 import { rooms } from "../core/room-registry.ts";
 import type { GameObject } from "../core/game-object.ts";
 import { World } from "../core/world.ts";
+import { CrowdSimulation } from "../traits/crowd-simulation.ts";
+import { GameTimer } from "../traits/game-timer.ts";
 import { LightingCues } from "../traits/lighting-cues.ts";
 import { Seat } from "../traits/seat.ts";
 
@@ -37,6 +39,26 @@ describe("registered rooms", () => {
     expect(seats.length).toBe(1);
     expect(people.length).toBe(1);
     expect(seated).toBe(true);
+  });
+
+  it("dev4 starts a one-minute timer; rooms without one have no clock", () => {
+    const room = rooms.load(new World(), "dev4");
+    expect(room.settingsOf(GameTimer)).toMatchObject({
+      durationSeconds: 60,
+      elapsedSeconds: 0,
+      running: true,
+    });
+    expect(rooms.load(new World(), "dev1").has(GameTimer)).toBe(false);
+  });
+
+  it("dev3 is the playable hall: a round clock under a simulated crowd", () => {
+    const { seats, people, seated } = census("dev3");
+    expect(seats.length).toBeGreaterThan(1);
+    expect(people.length).toBe(seats.length);
+    expect(seated).toBe(true);
+    const room = rooms.load(new World(), "dev3");
+    expect(room.settingsOf(GameTimer)).toMatchObject({ durationSeconds: 60, running: true });
+    expect(room.has(CrowdSimulation)).toBe(true);
   });
 
   for (const def of rooms.list()) {
