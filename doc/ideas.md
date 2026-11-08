@@ -16,6 +16,10 @@ Any audience member can secretly carry a trait (sleeper agent, heckler, journali
 
 At a big emotional moment, audience members hold up phone lights. A reward state driven by mood, spreading through neighbours.
 
+### Speech bubble styles
+
+Bubbles currently distinguish speech (said aloud), thought (private) and bursts (outbursts). This may be revisited. Other ideas: occasional one-word exclamations ("Amen!", "Boring!"), hidden traits leaking through bubbles, and bubbles showing mood spreading between neighbours.
+
 ## Rooms
 
 ### Dress the church hall

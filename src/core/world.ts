@@ -25,7 +25,7 @@ export class World {
   readonly pointer = new PointerSystem(this);
   /** Haze in the air (0 = clear). Makes light beams visible (see Haze, Light's `beam`). */
   haze = 0;
-  /** What's outside the windows (see WindowGlass). Kept when the room changes. */
+  /** Day or night outside (see DayNight). Kept when the room changes. */
   outside: "day" | "night" = "day";
   /** Glow around bright things, or null for none (see the Bloom trait). */
   bloom: { strength: number; radius: number; threshold: number } | null = null;

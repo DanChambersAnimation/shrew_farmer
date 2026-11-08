@@ -44,6 +44,8 @@ const world = new World();
 if (import.meta.env.DEV) (window as unknown as { world: World }).world = world;
 
 const frame = new FrameRenderer(renderer, world);
+// Debug handles for the browser console in dev builds (e.g. timing the renderer).
+if (import.meta.env.DEV) Object.assign(window, { frame, renderer });
 
 function resize(): void {
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -124,7 +126,7 @@ function showNoclip(): void {
 // Bloom trait settings, so the value lives with the room like everything else.
 const panel = Object.assign(document.createElement("div"), { id: "settings" });
 panel.innerHTML = `
-  <label>Bloom <input type="range" min="0" max="1.5" step="0.05" /> <output></output></label>
+  <label>Bloom <input type="range" min="0" max="0.1" step="0.005" /> <output></output></label>
   <button type="button"></button>`;
 document.body.appendChild(panel);
 const bloomInput = panel.querySelector("input")!;
@@ -135,7 +137,7 @@ function showSettings(): void {
   bloomInput.disabled = !bloom;
   bloomInput.title = bloom ? "" : "This room has no bloom";
   if (bloom && document.activeElement !== bloomInput) bloomInput.value = String(bloom.strength);
-  bloomValue.textContent = bloom ? bloom.strength.toFixed(2) : "–";
+  bloomValue.textContent = bloom ? bloom.strength.toFixed(3) : "–";
   outsideButton.textContent = world.outside === "day" ? "☀ Day (T)" : "☾ Night (T)";
 }
 bloomInput.addEventListener("input", () => {

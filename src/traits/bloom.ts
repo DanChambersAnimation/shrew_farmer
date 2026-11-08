@@ -7,7 +7,7 @@ import { defineTrait } from "../core/trait.ts";
  */
 export const Bloom = defineTrait({
   name: "bloom",
-  defaults: { strength: 0.3, radius: 0.35, threshold: 0.92 },
+  defaults: { strength: 0.05, radius: 0.35, threshold: 0.92 },
   setup({ world, settings: s }) {
     return {
       update() {

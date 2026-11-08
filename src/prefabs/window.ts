@@ -1,7 +1,6 @@
 import type { ObjectSpec } from "../core/spec.ts";
 import { trait } from "../core/trait.ts";
 import { Transform } from "../traits/transform.ts";
-import { WindowGlass } from "../traits/window-glass.ts";
 import type { Vec3 } from "../traits/types.ts";
 import { slab } from "./blocks.ts";
 
@@ -11,13 +10,13 @@ const GLASS = 0xd6e8f5;
 /**
  * A window of `width` x `height` metres in its local XY plane, facing +z, with
  * narrow white frames dividing it into `columns` x `rows` panes. Centred on
- * `position`; `rotation` (degrees) turns it onto a wall. The glass shows the
- * day or night outside (see WindowGlass); `seed` varies the view per window.
+ * `position`; `rotation` (degrees) turns it onto a wall. The glass is clear,
+ * so set it in a real opening to see outside.
  */
 export function windowFrame(
   position: Vec3,
   rotation: Vec3,
-  { width = 2.4, height = 3, columns = 3, rows = 4, bar = 0.05, seed = 1 } = {},
+  { width = 2.4, height = 3, columns = 3, rows = 4, bar = 0.05 } = {},
 ): ObjectSpec {
   const depth = 0.05;
   const bars: ObjectSpec[] = [];
@@ -51,14 +50,12 @@ export function windowFrame(
     kind: "window",
     traits: [trait(Transform, { position, rotation })],
     children: [
-      // The view outside, glowing through the glass.
-      (() => {
-        const glass = slab("glass", [width, height, 0.02], [0, 0, 0], GLASS, {
-          roughness: 0.1,
-          castShadow: false,
-        });
-        return { ...glass, traits: [...(glass.traits ?? []), trait(WindowGlass, { seed })] };
-      })(),
+      // Clear glass, faintly tinted.
+      slab("glass", [width, height, 0.02], [0, 0, 0], GLASS, {
+        opacity: 0.12,
+        roughness: 0.05,
+        castShadow: false,
+      }),
       ...bars,
     ],
   };
