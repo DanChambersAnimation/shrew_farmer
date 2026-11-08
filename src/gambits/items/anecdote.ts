@@ -36,8 +36,8 @@ export const personalAnecdote: ItemDef = {
         ],
       },
     ],
-    onSuccess: [{ id: "house-lift" }, { id: "applause" }],
-    onFailure: [{ id: "awkward-silence" }],
+    onSuccess: [{ id: "house-lift" }, { id: "gambit/personal-anecdote/success" }],
+    onFailure: [{ id: "gambit/personal-anecdote/failure" }],
   },
 };
 

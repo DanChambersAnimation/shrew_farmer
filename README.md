@@ -33,6 +33,7 @@ when it starts.
 - T-shirt cannon demo: http://localhost:5173/?room=dev7
 - All six gambit medals: http://localhost:5173/?room=dev8
 - Contact sheet: http://localhost:5173/contact-sheet.html
+- Audio samples: http://localhost:5173/audio-preview.html
 
 Options: `PORT=3000 ./dev.sh` changes the port. Extra Vite arguments can be
 passed to the script.
@@ -46,6 +47,21 @@ vp build   # production build into dist/
 ```
 
 If `vp` isn't installed globally, use `./node_modules/.bin/vp`. CI runs all three on every push and pull request.
+
+## Recorded audio samples
+
+Open `http://localhost:5173/audio-preview.html` to compare the provisional Speaker, gambit,
+and audience recordings. The files are committed under `public/audio/`, with their metadata and
+offline generation requests in `src/audio/clips.ts`.
+
+```sh
+vpx scripts/audio.ts list
+vpx scripts/audio.ts verify
+vpx scripts/audio.ts generate --only crowd/
+```
+
+Generation reads `ELEVENLABS_API_KEY` from the environment. Playback, builds, and CI do not need
+the key. A changed request requires `generate --replace` to overwrite its previous recording.
 
 ## Design docs
 

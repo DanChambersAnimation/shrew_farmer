@@ -2,6 +2,7 @@ import { Registry } from "../core/registry.ts";
 import type { GameObject } from "../core/game-object.ts";
 import type { World } from "../core/world.ts";
 import type { Vec3 } from "../traits/types.ts";
+import type { Clip } from "../audio/clips.ts";
 
 /**
  * What an effect can act on. Effects are called after a move resolves, by
@@ -37,6 +38,16 @@ export interface EffectDef {
   readonly kind: EffectKind;
   /** Run it. Must not throw for a merely missing target; effects are decoration. */
   run(ctx: EffectContext): void;
+}
+
+/** A file-backed sound in the effect registry, with reviewable asset metadata. */
+export interface RecordedAudioEffectDef extends EffectDef {
+  readonly kind: "audio";
+  readonly name: string;
+  readonly category: Clip["category"];
+  readonly purpose: string;
+  readonly filename: string;
+  readonly caption: string;
 }
 
 /** One effect to run, with optional settings overrides. */

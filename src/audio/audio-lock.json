@@ -1,0 +1,32 @@
+{
+  "crowd/bored/charlie-is-it-over": {
+    "requestHash": "d2428fac3f5d7466f5d071a781edb81f2622a197a249810052d9ead58fa5f10e",
+    "fileHash": "0f523fc23a2c2fd55edf1b87364a8c58409cd0aa83789640aeedd6937426b082",
+    "bytes": 30554
+  },
+  "crowd/delighted/sarah-oh-remember": {
+    "requestHash": "d83749ddf7bc4b4b1a436355e3f76acb7d67024ebbc9922cae9219a82e21c65c",
+    "fileHash": "923d791feee2f0ae42aba0bff3208e756e4ec823f7cbba642ebb5d9a554c9e58",
+    "bytes": 30554
+  },
+  "crowd/hostile/harry-rubbish": {
+    "requestHash": "658f44bd85d247a7c353ddea36b66058372cda622852473ef7f0ad3f7a39cc74",
+    "fileHash": "25ee9aad63659590f2a7a5a49e78a3b7142fefc104fdf71b07dcb78a5810de6b",
+    "bytes": 20105
+  },
+  "gambit/personal-anecdote/failure": {
+    "requestHash": "20632acbded65a24ca1bc0aded687621bf78c6e0690c93486aa6aa0003246d5f",
+    "fileHash": "45debf6093ec08730ed05f3abfa2bc81a23092564e559a7da12c9824827e92d8",
+    "bytes": 24702
+  },
+  "gambit/personal-anecdote/success": {
+    "requestHash": "a01b1d2454b2b666997059e3317447cc36a312729d2afd57426e7130e68c2729",
+    "fileHash": "5c0f71cf5ebd471be429109c0b1ff35312a85f433a67401e3572921084ad11ea",
+    "bytes": 65244
+  },
+  "speaker/round-start": {
+    "requestHash": "1d80ea736e0eb6bce52f279f75c9c5b4f3bc7fd18513174cff10840757402fa1",
+    "fileHash": "b4e1c7fd1cce4f7bd31f539e6a3c2565545e9fc4a04ee3d92b2b5e02a9c3c2b3",
+    "bytes": 43510
+  }
+}
