@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vite-plus/test";
 import "../effects/library.ts";
 import { effects } from "../effects/registry.ts";
-import { personalAnecdote } from "../gambits/items/anecdote.ts";
+import { items } from "../gambits/library.ts";
 import { AUDIO_CLIPS, clips } from "./clips.ts";
 
 describe("recorded audio registry", () => {
@@ -16,21 +16,24 @@ describe("recorded audio registry", () => {
     }
   });
 
-  it("registers distinct success and failure sounds on the gambit's verdict hooks", () => {
-    const successId = "gambit/personal-anecdote/success";
-    const failureId = "gambit/personal-anecdote/failure";
-    expect(personalAnecdote.simulation.onSuccess).toContainEqual({ id: successId });
-    expect(personalAnecdote.simulation.onFailure).toContainEqual({ id: failureId });
-    for (const id of [successId, failureId]) {
-      const clip = clips.get(id);
-      expect(effects.get(id)).toMatchObject({
-        id,
-        kind: "audio",
-        name: clip.name,
-        category: clip.category,
-        purpose: clip.purpose,
-        filename: clip.filename,
-      });
+  it("registers a different success and failure recording on every gambit", () => {
+    for (const name of items.names()) {
+      const item = items.get(name);
+      for (const verdict of ["success", "failure"] as const) {
+        const id = `gambit/${item.id}/${verdict}`;
+        expect(item.simulation[verdict === "success" ? "onSuccess" : "onFailure"]).toContainEqual({
+          id,
+        });
+        const clip = clips.get(id);
+        expect(effects.get(id)).toMatchObject({
+          id,
+          kind: "audio",
+          name: clip.name,
+          category: clip.category,
+          purpose: clip.purpose,
+          filename: clip.filename,
+        });
+      }
     }
   });
 });

@@ -3,6 +3,19 @@
 Pre-recorded vocal responses and per-gambit sound effects, generated offline with
 ElevenLabs and shipped as static files. Nothing calls ElevenLabs at runtime.
 
+## Implementation status — 8 November 2026
+
+The full proposed cue sheet has been recorded as 114 MP3s and indexed in
+`src/audio/clips.ts`: six gambit success/failure pairs, an additional T-shirt launch,
+round cues, Speaker lines, 59 mood lines across eight bands, eight situational audience
+lines, and crowd reaction, clapping, snoring and room sounds. Every gambit verdict now
+references its recorded effect. `/audio-preview.html` lets the team search and review
+each take; `vpx scripts/audio.ts verify` checks the committed files and request hashes.
+
+The other clips are content candidates. The shared mixer, round milestone events,
+audience scheduler, cross-faded beds, captions and audio settings still need runtime
+work, tracked in [#23](https://github.com/DanChambersAnimation/shrew_farmer/issues/23).
+
 Related: [#15](https://github.com/DanChambersAnimation/shrew_farmer/issues/15) (game feedback),
 [#16](https://github.com/DanChambersAnimation/shrew_farmer/issues/16) (staged beats),
 [#17](https://github.com/DanChambersAnimation/shrew_farmer/issues/17) (round audio).

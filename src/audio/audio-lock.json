@@ -1,18 +1,438 @@
 {
+  "crowd/ambience/bed": {
+    "requestHash": "c1e5515a72eb61903378db5075e16fa28825e7f9b17b169fda968f552165f2a3",
+    "fileHash": "cffe9bc29b778b54ede50a60e70c88e533967f45cf79f4943d00776d7285f5a9",
+    "bytes": 193140
+  },
+  "crowd/asleep/charlie-dreaming": {
+    "requestHash": "c10d8419e556ee030f7009d65b63c1128c2cd55570051a2eb30dbb01ef42ba1a",
+    "fileHash": "4dd41a9c4d08d06f02ce4707d349dc1b3bb17763b7b536c0b30f581ff601c308",
+    "bytes": 39331
+  },
+  "crowd/asleep/charlie-five-more-minutes": {
+    "requestHash": "7bfc1d8bc238489fb66f176d3b9427a265c7422d9ff3c352b745b7ef66a441a2",
+    "fileHash": "61c672cd320948da403eab7cd9c0441309bd8a254c319f2c4a7cbf3f220d2e2c",
+    "bytes": 35569
+  },
+  "crowd/asleep/harry-snore-awake": {
+    "requestHash": "dc6956efe76b6c85b82fa6129dc2964eda382dd1c94eab7c773850dece78c370",
+    "fileHash": "900d17dd5c9e191783eb9e92cea49f7ec3dde24753cb766d44dc9e053fcc2355",
+    "bytes": 23030
+  },
+  "crowd/asleep/harry-wasnt-sleeping": {
+    "requestHash": "45a5c13e80e98e2244cda87b3b370ccf59246a06ea1ebff558f86eea5f76b13d",
+    "fileHash": "348adc060c3f0fb6c1e1daae38ede0f36af1bee99c550e2727286a92e92344a4",
+    "bytes": 26792
+  },
+  "crowd/asleep/matilda-leave-me": {
+    "requestHash": "b3a3adacadff9cf1bfe3d3dcaffab0f5c3ce36b95ecd37b1db743ebc989cc5a1",
+    "fileHash": "26774ae24e83f164218c9c38d6464af8ef9713ca892f055f24711b56ec68a926",
+    "bytes": 31807
+  },
+  "crowd/asleep/matilda-mumbles": {
+    "requestHash": "86ff386695a5e36a03ab9be6ce030d58b7e0049d004b170512ba61a4712051d8",
+    "fileHash": "1cf40a1f2a282f18c2262567e4206f01177a3637ed01097d5278f6eb8e463c1f",
+    "bytes": 39331
+  },
+  "crowd/asleep/sarah-nearly-awake": {
+    "requestHash": "8982153a5229c7841e0bbc638cebe99c1abb576a23536b4ae734177fe812d213",
+    "fileHash": "bf179c7fb9d2023297263c3f5c2458f2dd2c9aa9b13ad20d5bfa80a80d3ffc7e",
+    "bytes": 38077
+  },
   "crowd/bored/charlie-is-it-over": {
     "requestHash": "d2428fac3f5d7466f5d071a781edb81f2622a197a249810052d9ead58fa5f10e",
     "fileHash": "0f523fc23a2c2fd55edf1b87364a8c58409cd0aa83789640aeedd6937426b082",
     "bytes": 30554
+  },
+  "crowd/bored/charlie-lost-track": {
+    "requestHash": "b00c84c66a64a282e15341b23523aced662701e36e18b3317c8e9d3f7e5d1e71",
+    "fileHash": "76c3dc4b709ae95b15ac622acfee29baa48ddf941ec2dcf5f591a0520c5417d0",
+    "bytes": 31807
+  },
+  "crowd/bored/charlie-so-bored": {
+    "requestHash": "e7f1729ace40b0b42c291490d68393d565ba0b4825d9d9278d8a77f6623d6e4a",
+    "fileHash": "59eb9f42b937ec912107843a3b7aaf69c588312bd8642a2922653afae64ea04f",
+    "bytes": 33061
+  },
+  "crowd/bored/harry-when-dinner": {
+    "requestHash": "42c4498a18a2ff45a8b6f8d6758db8cecc0eb5aca15df759d13f3a4b0cde1387",
+    "fileHash": "44154ddc900a0efc94c89a93fc8d06712b29e439503b1dbecc9e267b6f4dc4d1",
+    "bytes": 28046
+  },
+  "crowd/bored/matilda-how-long": {
+    "requestHash": "d00e264a5b6e20ad3bd15e7bf04b43a23382f2de74f592a25f88ce7401420684",
+    "fileHash": "1078743d8d252eca9a58de9b0fcc9df2cbda29d40ecf8551fd62360090acabfc",
+    "bytes": 36823
+  },
+  "crowd/bored/matilda-still-going": {
+    "requestHash": "3eea1e63cdac75c7dceceffab0644782653bed0441661b3dec2786e660b764e1",
+    "fileHash": "62bf7917763d216656940bcd043466dd7d3ac1c636a795666b87b14c82bfaf8f",
+    "bytes": 36823
+  },
+  "crowd/bored/sarah-need-a-break": {
+    "requestHash": "7c233e622e32fc057f929a59e76b929cfb1f3dcabb919559458b92a9bcdd41c9",
+    "fileHash": "306feadd542b51942f4501e92f94c307a74cd8ac1442446fcbfd609c1e4aa2c6",
+    "bytes": 31807
+  },
+  "crowd/bored/sarah-sigh-right": {
+    "requestHash": "683c0d0ffeb056c4adffdedb56620ac5e5df8ae449396cdd494292b1318e085f",
+    "fileHash": "7fe4ea4de150dabcc449012a4242ed1278e2ccac1713184d3438e3de7df23199",
+    "bytes": 29300
+  },
+  "crowd/clap/dying": {
+    "requestHash": "4fdbdc6a63bd341fe56ba44437366d48e41a30ec7435cd187c5beaed7d17cb56",
+    "fileHash": "b89e6f270ecf70cac00a27f82a406c3ac86222449bf5218f971cc46fe9f02a37",
+    "bytes": 40585
+  },
+  "crowd/clap/few": {
+    "requestHash": "42d71937fddf6743e2e978dc2eeb827e56d76ccd7a5e1496358e2d3b8650f6ad",
+    "fileHash": "0ab18d5046e7e28a2aa07950a9531bf1b3f16012e102e36d1a12e1933287575d",
+    "bytes": 48944
+  },
+  "crowd/clap/ovation": {
+    "requestHash": "48b58d44d7de2fd7c427b116c03816c69c00c94e844b8b352d6eb34a11c25807",
+    "fileHash": "24d10003d190a02a3ad2657b335175facdd07961e20cce0fe10a3ca810c972a5",
+    "bytes": 81127
+  },
+  "crowd/clap/solid": {
+    "requestHash": "09b5c0df4e29f3988a307ada2a4df0189fa8287bd7c922514b97b028508afb4e",
+    "fileHash": "f78ced8364b2b4b63d76ad9bb39770d57e8eedfb680407e7d506828526043cb2",
+    "bytes": 65244
+  },
+  "crowd/delighted/charlie-great": {
+    "requestHash": "421cd4dce883175f4b1c97cfd3288737c2e7427234343ad0ce12e9104791517c",
+    "fileHash": "fdf0b7ab570a19f9716cd344bd8e52f2b0693fbe3ca2b8af7dab6cae51166278",
+    "bytes": 18851
+  },
+  "crowd/delighted/charlie-thats-lovely": {
+    "requestHash": "31eadd08eada65c9fbd8ad819592f3704b99ca82a255208d5a2e97cdf230e0cb",
+    "fileHash": "c61603b8a5a2ea68707d7b9d83f7a7a4287d82bfe73f5ee8d919e064c1cf5162",
+    "bytes": 25538
+  },
+  "crowd/delighted/harry-good-one": {
+    "requestHash": "248a9b17490e76bee9d15d2ffcd83036a512871a28bf19e58f976aadce22f72c",
+    "fileHash": "e64d63d816b611102151f744daec334d92d5bc46c555e89c293b10ae538214b3",
+    "bytes": 30554
+  },
+  "crowd/delighted/matilda-well-done": {
+    "requestHash": "b3f89b159ee6f69c2c9626fc7fe82f208e8fbb6c5482d62815074a2b870c6e21",
+    "fileHash": "3954195cbf8ff723a6767715ee4fc2b6c8dfd5d5f75e95fb6ab6076d78fe06ab",
+    "bytes": 28046
+  },
+  "crowd/delighted/matilda-wonderful": {
+    "requestHash": "7015e4603b0f6d5880ccec6e4283722eb04c395c1b04e1cca2449924363b6dfb",
+    "fileHash": "f8a92d3444371f7d30315cd6b3c16023e11b447c8aa4dd1868e6a6fa50d21989",
+    "bytes": 26792
+  },
+  "crowd/delighted/sarah-more-of-that": {
+    "requestHash": "621aecb5b3e9ed175f268aa73b2b4948f3e90f72ff33940eb47fb67cfe3eaac5",
+    "fileHash": "dd350d8c4ed2784441c50b68f8c9c2e7a2cc9e55055d78d66ac01cc66a15ec1d",
+    "bytes": 26792
   },
   "crowd/delighted/sarah-oh-remember": {
     "requestHash": "d83749ddf7bc4b4b1a436355e3f76acb7d67024ebbc9922cae9219a82e21c65c",
     "fileHash": "923d791feee2f0ae42aba0bff3208e756e4ec823f7cbba642ebb5d9a554c9e58",
     "bytes": 30554
   },
+  "crowd/delighted/sarah-wow": {
+    "requestHash": "ab28c3d7fec6b830dff33767dd612bea5c3808e67ba43fa9af883e280af7fcd9",
+    "fileHash": "326544a741dee554fbf5f3a30eb40795ab9bbadd52ae7ec66c705b5a362d0b4c",
+    "bytes": 21358
+  },
+  "crowd/ecstatic/charlie-brilliant": {
+    "requestHash": "cda0aadbf9fc45caac50d9c26d429ffb312c95bf6faccf4d8548ac686725a123",
+    "fileHash": "6f135454e70d010f928c12b4f51817ed3e277361665e79efd8a3df8848bc53d1",
+    "bytes": 33061
+  },
+  "crowd/ecstatic/charlie-oh-my-god": {
+    "requestHash": "9dfb2de2c6654d9c451b4a97d689933614e5b2349fdeabf0ddb25eb8736d49ac",
+    "fileHash": "78b8702395b9ca880863b8e87f98a7a2aebf53ab30bd2921bdb2910aae8cbdb3",
+    "bytes": 23030
+  },
+  "crowd/ecstatic/harry-yes": {
+    "requestHash": "ef538b94b4bc483f56375a35625102d64290f9226b109f6e713f5e1008896483",
+    "fileHash": "4966f58b1ebfdbc66dca4ddec83a5f8626a4ce59b5b109f33f7884492efa2cc9",
+    "bytes": 20105
+  },
+  "crowd/ecstatic/matilda-keep-going": {
+    "requestHash": "a67bb7a700dc761ccb0d536359d102cf42d8cd0f4b17b4181e55e7b23a22000d",
+    "fileHash": "9522164f64dbd38ecdc278319a43f1bcec948fca91f8cc90599f17b341784fa1",
+    "bytes": 23030
+  },
+  "crowd/ecstatic/matilda-love-this-guy": {
+    "requestHash": "0c2dd3178901fc86b5a45555d7d82a555ba62ce02b876c48075791f175d23535",
+    "fileHash": "291beccbd77c1c56254c64d1099aeead4488ad0b5c0b34b327ec36dfc37cf909",
+    "bytes": 29300
+  },
+  "crowd/ecstatic/sarah-hes-amazing": {
+    "requestHash": "ba7adcab43dbd65681e8b114ebd8ece6ef8b6ad769b1de165f1b2c1ea2078446",
+    "fileHash": "a97deb968db3dc7448c23be6370b84919baed1a49d96c8118f01f30f68c0da57",
+    "bytes": 29300
+  },
+  "crowd/ecstatic/sarah-no-way": {
+    "requestHash": "92e0552d04dc3e0af958c4986e468fcf058c717678a47bd7e0c2963dc1646ddd",
+    "fileHash": "efb76a0079cc18e95fcefeb1ede2a41e2ca0c68a34a5f62291198f1c9fc280d8",
+    "bytes": 30554
+  },
+  "crowd/hostile/charlie-get-off": {
+    "requestHash": "895964eb7123ef0528d514c85e42594fd4cc7984b959580175959d4700a08dc2",
+    "fileHash": "2a7c5309335ef58cdc8fefff5659f331a41d2e7f118d657df10bcf7b5921f125",
+    "bytes": 18851
+  },
+  "crowd/hostile/charlie-not-listening": {
+    "requestHash": "c5873d60c33c26811e4fcabbebcce62391f2d62c95b7800bff2b617e6ec4fbd9",
+    "fileHash": "3e4f95d89ce97088d8d5c42fc0dde63568d55194abb269bc609e8240b0c2aee9",
+    "bytes": 30554
+  },
+  "crowd/hostile/harry-boo": {
+    "requestHash": "f8c7d4a7835826b68e06a92d3eea4a0d76e9737366934b0ac6435e52daaf372a",
+    "fileHash": "9098e278b79564feda6005a1a746cfb83709fe0654936c8ce338298f62b63103",
+    "bytes": 16343
+  },
+  "crowd/hostile/harry-nonsense": {
+    "requestHash": "bbee456a3a908697a37333183c2bf267767c54ce3fb53ffb8a2d9a4530b3850e",
+    "fileHash": "063b93290be3da34c5395cf9ad2f138495c2197c369db4d3c6e1b8efa8950e3d",
+    "bytes": 20105
+  },
   "crowd/hostile/harry-rubbish": {
     "requestHash": "658f44bd85d247a7c353ddea36b66058372cda622852473ef7f0ad3f7a39cc74",
     "fileHash": "25ee9aad63659590f2a7a5a49e78a3b7142fefc104fdf71b07dcb78a5810de6b",
     "bytes": 20105
+  },
+  "crowd/hostile/matilda-oh-dear": {
+    "requestHash": "3900d6f8bddf17462d6fee4c547345f752bc17b8835e303c6ac6b40d57a3fab3",
+    "fileHash": "dbd0a2b47654bd4e068d0975f255afc490163c39577b1483954358b4ab7c8eb1",
+    "bytes": 34315
+  },
+  "crowd/hostile/matilda-what-the": {
+    "requestHash": "57df860be753b906a18cd753155763d1d227a65479ca6bbbdff20339794d4aae",
+    "fileHash": "e1b77c333f7b60747b7c230cb6a9ca894f6d52c8fe8c555e8a9bfc797751b979",
+    "bytes": 21358
+  },
+  "crowd/hostile/sarah-you-what": {
+    "requestHash": "6f7fcd07961450a3f461822aa5e658151588ab925343146c5aebeffb219a5157",
+    "fileHash": "631fee89816f81a033f80d12ccbc98fb7412a50f368f1cf1d89a074290c5d68c",
+    "bytes": 21358
+  },
+  "crowd/interested/charlie-im-listening": {
+    "requestHash": "e68f6dcd681fcc3555b99563dd9cc61c449f94fef841cd01bda06d81861e7aa1",
+    "fileHash": "1dded194f546b1565c4c072b0549c42bd390cff7aabea90f933784b0b60b5fb3",
+    "bytes": 20105
+  },
+  "crowd/interested/charlie-mm": {
+    "requestHash": "cde4e0c960ed33b80437ec823bd054eb8f89b38f3de9eef7ad9e23a5218cef28",
+    "fileHash": "5e1ccd853cb2e2c0a9b4d3449425d73da1999fbe90bf1b99347c6f2487c6be91",
+    "bytes": 21358
+  },
+  "crowd/interested/harry-right": {
+    "requestHash": "6e6069f44fe260e7bd720e4264d1c8c4d44b0f9d87a4b16dd1ed7b064fac002a",
+    "fileHash": "da287ce9b86fa2e393a35e8b2a26f8aeab97bc878b00b08861f99957be7321bd",
+    "bytes": 18851
+  },
+  "crowd/interested/matilda-interesting": {
+    "requestHash": "584a9f6c4f1ad76b7e6435968076998df0d6d46837216747f8337bf9794bccc8",
+    "fileHash": "5475a406eea5ad0592951040c279f08c3c4c7a23afb4a7ce7ffd68b51328b963",
+    "bytes": 24284
+  },
+  "crowd/interested/matilda-tell-us-more": {
+    "requestHash": "9adfd9ed0b46bc673e7f8cfb2233f6121c8b4d2a647314ad34e73cc9a12259a4",
+    "fileHash": "4d8570043b00fb3603807562c51249b64e35afc481cdb9411da863ef4fc43eeb",
+    "bytes": 23030
+  },
+  "crowd/interested/sarah-and-then": {
+    "requestHash": "9302a9c6498728537d82772765675776c9065c564093c61a4f32b1ac18a6f2a3",
+    "fileHash": "2a8a6471c84ab9b7041681d5980d4cfddff6f9f87514399da6437fac6d1eb241",
+    "bytes": 20105
+  },
+  "crowd/interested/sarah-go-on": {
+    "requestHash": "595bf8151c7106970c4f1fee3143f1947ce718dd976f674b9bb99d307481f67f",
+    "fileHash": "db07725654e5fcaeb3c5ee35ae999fdfdf2a56d28229b67ec8028c9468a3ba92",
+    "bytes": 25538
+  },
+  "crowd/laughs": {
+    "requestHash": "e62de30f8b2bfbe499ed96cbc5e8569b0213413c32687e336f512eeadea57a18",
+    "fileHash": "0099ef3b6677ac84919c02b3a504a726f7782b16e61bea41e3af86b39d2acd8b",
+    "bytes": 33061
+  },
+  "crowd/murmurs": {
+    "requestHash": "0c463173b8c070f90992fc5a060b4ea2eb67b7a58ae7762b24fbee4cf943e151",
+    "fileHash": "516ccc4d335df9eaea7b3942f3cf2fd77486c68adea1e7deb49f1c4790d8d6fd",
+    "bytes": 33061
+  },
+  "crowd/neutral/charlie-huh": {
+    "requestHash": "bca1387224bb144f249150bd46a690583b98fd698a005d43369a8ce87f3281d0",
+    "fileHash": "490d8fab0d2c931acdd6972c46499dbf3722313dc37612ad1243b187befcbd2f",
+    "bytes": 13835
+  },
+  "crowd/neutral/charlie-right-then": {
+    "requestHash": "38ae43d7bbd5b52466f581051d7cce98241de18eab44c66de02a045bf0e3e73b",
+    "fileHash": "f13d9c72826dad95b2adde9a86617db92081e1a462769f1a24c8f00eafb7705e",
+    "bytes": 17597
+  },
+  "crowd/neutral/harry-sure": {
+    "requestHash": "a9da403a075b27f422bc367566d05cbf229121eae13bbbfa5c24f03eabb169d4",
+    "fileHash": "7e842bcdddeba5ff846ad2a59c1e0412f27b5d77a88512f20b8d2f311b2690f6",
+    "bytes": 15089
+  },
+  "crowd/neutral/matilda-hm": {
+    "requestHash": "4afcc7e5449611d2546974d9a67cc9f319f269c159a61de2d4b9e5be0c4c3c54",
+    "fileHash": "148fee7386873c32eabcecd4d37ef110329e118801ca41ea0e0893180af075e3",
+    "bytes": 21358
+  },
+  "crowd/neutral/matilda-i-see": {
+    "requestHash": "0b83641c12aca03b628365f71917face5e54ff4d33ca78d19ea4af8f5ecdd0aa",
+    "fileHash": "781b52219776545be148bfb6de718758bc29b5ff39614c0cf9b4451fd99c6d40",
+    "bytes": 18851
+  },
+  "crowd/neutral/sarah-fair-enough": {
+    "requestHash": "54a4add3d90999afb6447ee46c5f47481b56b52581896d30c93674cb2da8f205",
+    "fileHash": "9fec112c3854e9f5e4afd6a7362887bccc7f75dfc51a6025cdcfcd419c5b471b",
+    "bytes": 18851
+  },
+  "crowd/neutral/sarah-okay": {
+    "requestHash": "1e622fe8c3b293af8875757fe9ab70ecfb86bf1a8f082e03856233f167985d3a",
+    "fileHash": "0ce13cec6f829f5c6cd942af88ecfa4cf410da02a2f3798d0aebb125d5ec2e01",
+    "bytes": 16343
+  },
+  "crowd/reaction/ahh": {
+    "requestHash": "bb7ddf9342570a2a88d1ff0c8a7ceec012efcdc1c14b73f94d3bf7784e262378",
+    "fileHash": "5b4c492b827abffea2228b8c5a79333fedc4df4a7f950f99b7966a0985104351",
+    "bytes": 17179
+  },
+  "crowd/reaction/charlie-counting": {
+    "requestHash": "1ba2b43c719a8ba3fe7c1b7e3e6401b8865195a4a0e3b26819fc0cb1957d4612",
+    "fileHash": "f987549f0941677e992fc4ad11f956811736ed223a0e3d5d13b78adfc516eac0",
+    "bytes": 47272
+  },
+  "crowd/reaction/charlie-hes-right": {
+    "requestHash": "0f54430fae7fbeb3d94fdf7a0ca1799a1658a050248688a52c2c8ca159a35785",
+    "fileHash": "4841894a467aea61aa08bcabd0507fa0e3f75e1d334dca917819b85fb8dc9c80",
+    "bytes": 20105
+  },
+  "crowd/reaction/cough": {
+    "requestHash": "79802875af9995737d4516c6b6d1dfc6826fac353af9f4b57ff0eac06f54e9bd",
+    "fileHash": "ab917d7a04e3055bd5b3e4174ab2cecd963385c87ac094827c6241c4c65d4b5a",
+    "bytes": 13835
+  },
+  "crowd/reaction/gasp": {
+    "requestHash": "4abd9e56a1f2b4217b7907764e4f7e8d5758ea5e0b37c7f8132ff5bb274c2aca",
+    "fileHash": "e59b4aa7b0c883ae1a52b19af6fe0f54ab5486cd72066cb0accaaede09e71617",
+    "bytes": 13835
+  },
+  "crowd/reaction/harry-catch": {
+    "requestHash": "fd4a4a9772b20cdc8097db9dd13ef33f876af8facc6456f876d38ddee6d2a94f",
+    "fileHash": "f864b3e3d0eb7063d7f5c4b208d43d6e41faf7f5e406a97c1640f45f489a3848",
+    "bytes": 16343
+  },
+  "crowd/reaction/harry-no-he-isnt": {
+    "requestHash": "15ba6b916215d2f3411b18a1b116772cbef9c9ada243554578758e7815b301fa",
+    "fileHash": "73227baf53861acee8d6caa354aceb24751d22d3b127393bc8bbead68e1050ae",
+    "bytes": 26792
+  },
+  "crowd/reaction/laugh": {
+    "requestHash": "30219be9ff82722533d78011d590023f929532255e88db8b6daa1596e55f45ca",
+    "fileHash": "6a90cbba0408f0fd0a81403133103fa131ff7c0fbc15b3f9c53c832191f39561",
+    "bytes": 17179
+  },
+  "crowd/reaction/matilda-amen": {
+    "requestHash": "d2fb09ad87c98ff41afae2629f6fdf7e110ada21fd5d72f901cb412aef29e1d8",
+    "fileHash": "9ed6289e3124012e508f4fa524538c638e7a68b6ff57180e7e472bfb717c5d07",
+    "bytes": 25538
+  },
+  "crowd/reaction/matilda-seriously": {
+    "requestHash": "89c715c5df44d2e515c249dd4e79a14dc40b1c039810f420bef0b66be4c45591",
+    "fileHash": "57187862261481c1d20681154bf5fbd121cada752f3265a2bedc4d1280d55b22",
+    "bytes": 28046
+  },
+  "crowd/reaction/ooh": {
+    "requestHash": "2f6440c05624ecee95171f0c09902f882bb50f17948acd8019fadf95a15f1cce",
+    "fileHash": "e36ea2cc448a17e7a5af3fddd02337bca17b7643ee6a0aed4325289e6dba2727",
+    "bytes": 17179
+  },
+  "crowd/reaction/sarah-exactly": {
+    "requestHash": "a19090030de52ba98fe1ddb43494cf7a8e5bbf8a62c5f3579292582ebb7b68bb",
+    "fileHash": "3d7c0cec91ca2480338348472c7eb9db27a2681404a2769ee26f19d2b4236d1a",
+    "bytes": 23030
+  },
+  "crowd/reaction/sarah-remember": {
+    "requestHash": "a4aff15e70c49673a8f85d91ae155919fa596c4c58d7891102dcd46fb5ee403f",
+    "fileHash": "67a3f143f249b63ef9e3887c7f0251baf5dd4de0633b864075bcf85fc4fca35b",
+    "bytes": 34315
+  },
+  "crowd/reaction/sigh": {
+    "requestHash": "11cd6f014faea5668f1e31c117e5acf05ba7bce2d9c876da169bc91bdb219133",
+    "fileHash": "299628868b6cb94b29515c59bb5aa73f4518251b73e24c7446c14e8fbae40f09",
+    "bytes": 20105
+  },
+  "crowd/reaction/tut": {
+    "requestHash": "ad9b2646ec91440a7f8d40fa247a8351fd2c03fbd4fb2946ee6a9972a77662fa",
+    "fileHash": "249073f5e05db7d3500f951d4fe204fdb37c84c298e3fcf2ce91fa0c37c5dba5",
+    "bytes": 13835
+  },
+  "crowd/sceptical/charlie-dont-buy-it": {
+    "requestHash": "c8d862fa6f138bddda04938aeaf18eb7952e00810c4b55062b3e58ef08e333b3",
+    "fileHash": "d15be5ca2c47cb4803f244441b65d364237dd2c44dcea634e7b141e804219767",
+    "bytes": 26792
+  },
+  "crowd/sceptical/harry-prove-it": {
+    "requestHash": "4fde3d860e493ab0fdf46f69b306a078085570c4aeae6381c0c4e42958ee8db6",
+    "fileHash": "d4ba87fbada78fa88ec369b27d8d0a3c3099e4885c0adde07a89a6bea61f5a0e",
+    "bytes": 17597
+  },
+  "crowd/sceptical/harry-really": {
+    "requestHash": "f5df9c6c1b62088c332322ee4e704701a75a64cf4eb30ce5be828e7d6850ecb2",
+    "fileHash": "8948c5da8f5651bfc24622d96eee278824ffe8ebbdad53ea31033d1ea1d919b1",
+    "bytes": 17597
+  },
+  "crowd/sceptical/matilda-bit-convenient": {
+    "requestHash": "8567e77451fc028d8267e24d2051f8fae4c2ffe853deed5e9e52063f81fc1c4d",
+    "fileHash": "754dcf4d799e2c171aabcd0cce40db15e27ce28c7aed3d1f27e86e65f9bedd39",
+    "bytes": 36823
+  },
+  "crowd/sceptical/matilda-hmm-right": {
+    "requestHash": "2fe71e9c5dc3ef7ffb4fd0e366538d24ef74f53fcbf890c32b12706ff2b8917c",
+    "fileHash": "a253dcc243ebad6ab9d0c6397dc83fe9f978e469c86cb48c7ec04bc7237dd97e",
+    "bytes": 33061
+  },
+  "crowd/sceptical/sarah-are-you-sure": {
+    "requestHash": "9c473434ec7f264e73e15b9167a49b2417e74e5eff6cecd7e44bdb954f4f1b7b",
+    "fileHash": "52b78d23132d2b94bb02842398c549ad2242f384123aff639edba350b86ffd76",
+    "bytes": 26792
+  },
+  "crowd/sceptical/sarah-says-who": {
+    "requestHash": "ddc6c0aae46e614b7b1b44a5b51c5ee388198cee5f2cb98340feaf1d25366598",
+    "fileHash": "c46e85f3e90b8e9ae6b0bb55e4c31fadee0c129f3c116101a8ec5d5101c3765f",
+    "bytes": 25538
+  },
+  "crowd/settles": {
+    "requestHash": "bc94f3df341f6d337446fd06f0d371d568e2d42c63166175fb1def2584526363",
+    "fileHash": "8bd6528ccf3faff4d274991241ec81a2799030dd0d6d0698c58f7cda2832ef44",
+    "bytes": 33061
+  },
+  "crowd/snore/heavy": {
+    "requestHash": "78ff7d042204814116d145b73538450208917e37defa2f7799babe7455e47cfa",
+    "fileHash": "eb8257985fbce443880f00cc14861d9c94d5d52c5d92a01de97dba14098a0a4d",
+    "bytes": 48944
+  },
+  "crowd/snore/snort": {
+    "requestHash": "4e5d26fe71054d296f5e16670fd8b8b6baa4844cbeccfd992b673de67e016e9d",
+    "fileHash": "6d755ce0e5bcff0194f6d16054cd56744245e7a238d2234182e8c59b9c2cc81e",
+    "bytes": 13835
+  },
+  "crowd/snore/soft": {
+    "requestHash": "7ca2bdf2b04d92ac705e718132aa0317ee197d5379b6703baf6220d9c878159d",
+    "fileHash": "5a763fd4c503e0460408ffbd5498e4631823228240b18043bdbdf85f46791a4f",
+    "bytes": 40585
+  },
+  "gambit/anecdote-callback/failure": {
+    "requestHash": "9844388370170c4a0505769d2c355ef10b3681af017a8e400254243526b09f03",
+    "fileHash": "d730bf6031b675a175e5182bec5cd764d3bd05998c25a21c22bc56054249f6cc",
+    "bytes": 24702
+  },
+  "gambit/anecdote-callback/success": {
+    "requestHash": "65f98403624ceceb384a163b0a85ddc2fcfb97cbd372be306281d6756990c287",
+    "fileHash": "55d5b70170ed659f73e94aa12ac0676388ac6a295aed047c1387bee644130b54",
+    "bytes": 33061
   },
   "gambit/personal-anecdote/failure": {
     "requestHash": "20632acbded65a24ca1bc0aded687621bf78c6e0690c93486aa6aa0003246d5f",
@@ -24,9 +444,129 @@
     "fileHash": "5c0f71cf5ebd471be429109c0b1ff35312a85f433a67401e3572921084ad11ea",
     "bytes": 65244
   },
+  "gambit/pious-statement/failure": {
+    "requestHash": "66f132f5af05358e038fd75a6bc766fa077d843d545e8a04ada4445fa1ce764a",
+    "fileHash": "39e8668e0592e32db1bf4111c58458d42775d5d2e445f6f3ba1c391b42dd0338",
+    "bytes": 24702
+  },
+  "gambit/pious-statement/success": {
+    "requestHash": "53155d952f0e561813877923b4c30aa3db1a0f713b746c636502e9596802d59f",
+    "fileHash": "f65ed27fdee8f6221d15bd28132c4d91f2e1560a227472ac57562e773838b72b",
+    "bytes": 40585
+  },
+  "gambit/praise-jesus/failure": {
+    "requestHash": "4321e53423383e0ed0f3948ac6f348276dd209b241c59a3f0d1764c88e61c234",
+    "fileHash": "19de107aca31d192f67d92efd2ec557d415c81a02ac6df9e577ee1f8430be5a8",
+    "bytes": 24702
+  },
+  "gambit/praise-jesus/success": {
+    "requestHash": "c687a3c4ac0baef369433a924846780219d2b1730a3ba919f514f7146346920d",
+    "fileHash": "c02ab51321b2290109aced4e7e8effff75d32d7f449073a8ad4580f4ef055b94",
+    "bytes": 48944
+  },
+  "gambit/rule-of-three/failure": {
+    "requestHash": "fbe3e8bdf5f120a65bb85416162130387a89ad135546992a3e500d13e059e07c",
+    "fileHash": "ad7177b33cedecfbfbafa4bd1dec7c898a668aa8b90f05ad3c84a248a5e57619",
+    "bytes": 24702
+  },
+  "gambit/rule-of-three/success": {
+    "requestHash": "2bea78f6d8fe73c6816e43449d3909d89cd5466ce7b68a039fc946a09a0edb14",
+    "fileHash": "78308019774f70388c62ba4c91c989891d3a6a1abb295d1c4707ef265745743a",
+    "bytes": 40585
+  },
+  "gambit/t-shirt-cannon/failure": {
+    "requestHash": "cd6ecd01b37611bf86b2cf54d0e886d5a0f10fce24273ca9df733efe88695db4",
+    "fileHash": "0eadeefb77da080bc6ff8eb82ed051aa826a456c73cfd3eb4cd507da23a96757",
+    "bytes": 33061
+  },
+  "gambit/t-shirt-cannon/play": {
+    "requestHash": "4685c6acd6e306f2c135d4ac70deb52a89478f5629670167e308643e203cbbba",
+    "fileHash": "3c8aa2f2da332cf6adb60f1e9040b169eeeab7c49d701f613da2e81400ee5745",
+    "bytes": 13835
+  },
+  "gambit/t-shirt-cannon/success": {
+    "requestHash": "47eeac96a6663837e7f55724c5ac4b484648a9a20685a1087faff8b791183854",
+    "fileHash": "4b453b152146a079ea3f0b6ffdad74dce8b82d3ba7fab93c8a2d92239dced894",
+    "bytes": 48944
+  },
+  "round/half": {
+    "requestHash": "bc9ce22ab896761d8f4f477e22e8d6b8d6cacf0cfa95fc861619dc62aeec3174",
+    "fileHash": "7fc30126f95d488059b41a725f1a57c6b8139350f2d0106ffb57d77246591a53",
+    "bytes": 15089
+  },
+  "round/lost": {
+    "requestHash": "ad9650b6fea18804b17af4b8104bf8dee2ab1dcc31d8571801928c5a0fb65262",
+    "fileHash": "6089cf47a4aced7a28b5b65860a46686188114cec4c18832696dd6cd5653d3ff",
+    "bytes": 40585
+  },
+  "round/quarter": {
+    "requestHash": "acad9ccab7851245675aad97526e554b5d9910c27d20834dd892fb2f5b69d3d2",
+    "fileHash": "b440d8b50c41cf53c865c3c2014ec6d04f2ca54cdee3e42c383a8e8894d662bc",
+    "bytes": 10492
+  },
+  "round/start": {
+    "requestHash": "c4c847cf8cd35ed6c9c80b8cb226dd7b144d2cf67647aab62b8d3f5cd4da936c",
+    "fileHash": "34f45bb1790841e1c0d44fec5931fab12350aa4ec7675bcc45e75f23960849de",
+    "bytes": 48944
+  },
+  "round/three-quarters": {
+    "requestHash": "a4a802faf13a996327ce2e3a1bac2ebf1b98bea63cbd5f2fd715f1a4d87c73bc",
+    "fileHash": "4c7499947daefa9448c06a97357361d6d2b7649c8c23cca2996c223ee7c9c28d",
+    "bytes": 15089
+  },
+  "round/won": {
+    "requestHash": "688ee19075d660ca851ec7bb711dff08982b6c9910a9f672aef7b0e3ba10b26e",
+    "fileHash": "dd8dcef9082959c977b059e77f5eefa5e3acdce67463da8e6e7826a98022cfa4",
+    "bytes": 65244
+  },
+  "speaker/anecdote-callback": {
+    "requestHash": "fa289b28edf782cdc8e91f112e1edb4d3dc55ce28b511f17e3a1a8e278f19c27",
+    "fileHash": "e8e33ba404098e206e46b1cb975355b22f4a6cc3f3892a46372bda8ac61c5020",
+    "bytes": 59811
+  },
+  "speaker/gambit-failure": {
+    "requestHash": "681a39e146478b0eef2f2573805d8a89b50ec196110b85556cf83a02d6e33b6f",
+    "fileHash": "b2c64e8beb32bd3f3bde529a46360b69b65141dfa7f2d241cc6f624fbbf2bc77",
+    "bytes": 28046
+  },
+  "speaker/personal-anecdote": {
+    "requestHash": "0e0ca774bbf16995836bfd55aa9c4682061c65a15580f626033faa7d6365754d",
+    "fileHash": "c3833d37631ae2a722371af59841549395634dc101036759197cf883288aa703",
+    "bytes": 56049
+  },
+  "speaker/pious-statement": {
+    "requestHash": "c2f8431e6c586783cd8d5ac3ec577c8544eb85248ec86d395193527d0be32c1b",
+    "fileHash": "798708e7037af0a3e280a66731cc55bd8b7761174634195b6aae6221926f30b3",
+    "bytes": 53541
+  },
+  "speaker/praise-jesus": {
+    "requestHash": "e414ed9b017688139aa7a7fccf86ac03951a41748cadf7ea548852fb556ef70d",
+    "fileHash": "6812210cc88eb3ff01a8e6566eab97c97903bc469a32497794a5113362a75625",
+    "bytes": 41838
+  },
+  "speaker/round-lost": {
+    "requestHash": "991d47d5b68a1b65514dc1d9f0d9724758e3712fd718b847baa1333dce32faf1",
+    "fileHash": "437eb91427144ab53890c7f8ae1a86a387e4959e8607f9bfc274250ccc175559",
+    "bytes": 35569
+  },
   "speaker/round-start": {
     "requestHash": "1d80ea736e0eb6bce52f279f75c9c5b4f3bc7fd18513174cff10840757402fa1",
     "fileHash": "b4e1c7fd1cce4f7bd31f539e6a3c2565545e9fc4a04ee3d92b2b5e02a9c3c2b3",
     "bytes": 43510
+  },
+  "speaker/round-won": {
+    "requestHash": "b51709f0b7c7c451d233625d16e6dd3fcf967d52ac1ea6668ee367290a565465",
+    "fileHash": "440d54d5a947ca01b998577c3bca84882cebb3d61287207542836db0a1d357e0",
+    "bytes": 47272
+  },
+  "speaker/rule-of-three": {
+    "requestHash": "70676639cbd69058f7ae8ce4e5bd347236e2d51bb15a2ede10887c4caad3228a",
+    "fileHash": "689a5e72f73c797e3ee1b93535defb3dc5866cb8214b781572c77453816b3514",
+    "bytes": 52287
+  },
+  "speaker/t-shirt-cannon": {
+    "requestHash": "c05e33342d463c37b3ceb686711368368acd0fb895551a5ff07ab929d8cb4ec9",
+    "fileHash": "8f19de7c5dc7c2fb451aae671a08fd59218cf1dd87bbf0ddeaf131f72eb34ee2",
+    "bytes": 30554
   }
 }

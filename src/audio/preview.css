@@ -32,12 +32,45 @@ header p,
   line-height: 1.5;
 }
 
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.filters input,
+.filters select {
+  box-sizing: border-box;
+  min-height: 2.5rem;
+  border: 1px solid #7b879b;
+  border-radius: 0.5rem;
+  background: #262d3a;
+  color: inherit;
+  padding: 0.45rem 0.7rem;
+  font: inherit;
+}
+
+.filters input {
+  flex: 1 1 16rem;
+}
+
+.filters .count {
+  margin: 0;
+  color: #cbd5e4;
+}
+
 .audio-card {
   background: #262d3a;
   border: 1px solid #4a5364;
   border-radius: 1rem;
   margin: 1rem 0;
   padding: 1.25rem;
+}
+
+.audio-card[hidden] {
+  display: none;
 }
 
 .category {

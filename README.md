@@ -48,11 +48,14 @@ vp build   # production build into dist/
 
 If `vp` isn't installed globally, use `./node_modules/.bin/vp`. CI runs all three on every push and pull request.
 
-## Recorded audio samples
+## Recorded audio clips
 
-Open `http://localhost:5173/audio-preview.html` to compare the provisional Speaker, gambit,
-and audience recordings. The files are committed under `public/audio/`, with their metadata and
-offline generation requests in `src/audio/clips.ts`.
+Open `http://localhost:5173/audio-preview.html` to search and listen to all 114 recorded cues:
+Speaker lines, both outcomes for every gambit, round markers and endings, four audience voices
+across eight moods, and crowd reactions and ambience. The files are committed under
+`public/audio/`, with their metadata and offline generation requests in `src/audio/clips.ts`.
+The gambit outcome sounds play in the game; the remaining cues are available for review while
+the shared crowd and round audio scheduling is built.
 
 ```sh
 vpx scripts/audio.ts list

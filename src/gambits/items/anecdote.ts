@@ -83,8 +83,12 @@ export const anecdoteCallback: ItemDef = {
         ],
       },
     ],
-    onSuccess: [{ id: "house-lift" }],
-    onFailure: [{ id: "house-dip" }, { id: "awkward-silence" }],
+    onSuccess: [{ id: "house-lift" }, { id: "gambit/anecdote-callback/success" }],
+    onFailure: [
+      { id: "house-dip" },
+      { id: "awkward-silence" },
+      { id: "gambit/anecdote-callback/failure" },
+    ],
   },
 };
 
