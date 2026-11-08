@@ -35,7 +35,7 @@ the files it describes.
 
 ```ts
 export interface Clip {
-  /** Stable id, also the file stem: "gambit/personal-anecdote/success". */
+  /** Stable id, also the path under public/audio minus the extension. */
   readonly id: string;
   readonly kind: "speech" | "effect";
   /** The exact text sent to the text-to-speech API. Speech only. */
@@ -52,6 +52,69 @@ export interface Clip {
 `requestHash` is the trick that makes regeneration cheap: change one line of text and only that
 clip is re-requested. The CLI refuses to overwrite a clip whose text changed unless asked, so
 you hear the diff before spending credits.
+
+### 1a. Where the files go, and what they are called
+
+Everything lives under **`public/audio/`**. `public/` is Vite's default static directory and
+nothing overrides it (`vite.config.ts` sets no `publicDir`), so files there are copied verbatim
+into `dist/` and served from the site root — which also works under GitHub Pages' `/shrew_farmer/`
+base because the build already sets `base: "./"`. Reference them with a root-relative URL:
+`/audio/gambit/personal-anecdote/success.mp3`.
+
+**One directory per category.** The first path segment is the category, and it mirrors the four
+things the game can make a sound about:
+
+```
+public/audio/
+  speaker/          the Speaker's own lines
+  gambit/           per-gambit sounds, one directory per gambit id
+  crowd/            audience reactions: line bank, clapping, snoring
+  round/            round structure: start, milestones, endings
+```
+
+**Naming inside each category.** Every file is named after the _event or state it belongs to_,
+never after the recording (`nice-take-2.mp3` is how a project loses an afternoon). All lowercase,
+words joined by hyphens, `.mp3` throughout.
+
+| Category    | Path pattern                       | Examples                                                                                                                |
+| ----------- | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Speaker     | `speaker/<moment>.mp3`             | `speaker/round-start.mp3`, `speaker/round-won.mp3`, `speaker/round-lost.mp3`                                            |
+| Gambit      | `gambit/<gambit-id>/<verdict>.mp3` | `gambit/personal-anecdote/success.mp3`, `gambit/praise-jesus/failure.mp3`                                               |
+| Gambit      | `gambit/<gambit-id>/play.mp3`      | the act itself: `gambit/t-shirt-cannon/play.mp3`                                                                        |
+| Crowd lines | `crowd/<mood>/<voice>-<line>.mp3`  | `crowd/bored/elderly-sigh.mp3`, `crowd/hostile/comic-boo.mp3`                                                           |
+| Crowd beds  | `crowd/clap/<intensity>.mp3`       | `crowd/clap/few.mp3`, `crowd/clap/solid.mp3`, `crowd/clap/ovation.mp3`, `crowd/clap/dying.mp3`                          |
+| Crowd beds  | `crowd/snore/<weight>.mp3`         | `crowd/snore/soft.mp3`, `crowd/snore/heavy.mp3`, `crowd/snore/snort.mp3`                                                |
+| Round       | `round/<moment>.mp3`               | `round/start.mp3`, `round/quarter.mp3`, `round/half.mp3`, `round/three-quarters.mp3`, `round/won.mp3`, `round/lost.mp3` |
+
+The gambit ids are exactly the registered ones — `personal-anecdote`, `anecdote-callback`,
+`rule-of-three`, `pious-statement`, `praise-jesus`, `t-shirt-cannon` — so the directory name and
+the code identity are the same string. If a gambit is renamed, the directory is renamed with it,
+and the manifest hash catches the missing files.
+
+**Two rules that save pain later:**
+
+- **Ids, not sentences.** The filename carries the id, and the spoken text lives in the manifest.
+  Editing a line must never mean renaming a file.
+- **No spaces, no capitals, no version suffixes.** If a take is wrong, replace the file. Git
+  remembers the old one, and the generator's request hash is what decides whether it is stale.
+
+A manifest entry and its file line up without translation:
+
+```ts
+{
+  id: "gambit/personal-anecdote/success",
+  kind: "speech",
+  text: "So there I was, forty feet up a ladder…",
+  usedBy: "GAMBIT_PLAYED when verdict is success",
+  requestHash: "9f2c…",
+}
+// -> public/audio/gambit/personal-anecdote/success.mp3
+```
+
+**Voice names are fixed and short** — `elderly`, `comic`, `rp`, `london`, `northern`, `scots`,
+`irish`, `welsh`, `us`, `southern`, `aussie`, `south-asian`, `west-african` — and the same name is
+used in the manifest, in the filename, and in whichever content file assigns a voice to an
+audience member. One vocabulary everywhere.
 
 ### 2. A generator CLI
 
@@ -162,7 +225,7 @@ snoring are the ambience beds.
 
 ### 4a. Milestones — the one new trait this needs
 
-Nothing emits progress events today, and adding three ad-hoc timer checks would be exactly the
+Nothing emits proTHegress events today, and adding three ad-hoc timer checks would be exactly the
 special-casing `principles.md` warns about. Instead, a small room trait in the same shape as
 `GameTimer`:
 
@@ -337,5 +400,7 @@ not like.
   roguelike wants variety. Out of scope here, but it competes for the same audio budget.
 - **How rude can the crowd be?** "WTF?" versus "You what?" changes the age rating and the
   recording pass. Worth settling before the hostile lines are recorded.
-- **Where do files live?** `public/audio/` is simplest and needs no bundler configuration; the
-  cost is no hashed filenames, so caching is by explicit query string.
+- **Cache busting.** Files under `public/` get no hashed names, so a replaced clip can serve
+  stale from a browser cache. Options: a `?v=<requestHash>` query string built from the
+  manifest, or an `audio.sw.js` cache-first service worker keyed on the hash. I would start with
+  the query string — it needs no new machinery.
