@@ -10,7 +10,13 @@ function context(verdict: EffectContext["verdict"] = "success"): EffectContext {
 
 describe("effects registry", () => {
   it("registers the built-in effects with their kinds", () => {
-    expect(effects.names()).toEqual(["house-lift", "house-dip", "applause", "awkward-silence"]);
+    expect(effects.names()).toEqual([
+      "house-lift",
+      "house-dip",
+      "applause",
+      "awkward-silence",
+      "rule-of-three-tone",
+    ]);
     expect(effects.get("house-lift").kind).toBe("lighting");
     expect(effects.get("applause").kind).toBe("audio");
   });

@@ -72,6 +72,8 @@ export interface ItemDef {
   /** Weighted outcomes composed from effects on audience members. */
   readonly simulation: Readonly<{
     outcomes: readonly Outcome[];
+    /** Visual or audio effects played on every accepted use, including buildup. */
+    onUse?: readonly EffectRef[];
     /** Scene, lighting, animation and audio effects to play, by verdict. */
     onSuccess?: readonly EffectRef[];
     onFailure?: readonly EffectRef[];

@@ -28,6 +28,7 @@ It listens on all network interfaces, so other devices on your LAN can open
 when it starts.
 
 - Game: http://localhost:5173/ (pick a room with `?room=<name>`)
+- Playable round: http://localhost:5173/?room=dev3 (press **Start Round** to begin with sound)
 - Round timer demo: http://localhost:5173/?room=dev4
 - T-shirt cannon demo: http://localhost:5173/?room=dev7
 - All six gambit medals: http://localhost:5173/?room=dev8

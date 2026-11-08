@@ -1,10 +1,43 @@
 import { describe, expect, it } from "vite-plus/test";
-import { BoxGeometry, Group, Mesh, MeshStandardMaterial } from "three";
+import { BoxGeometry, Group, Mesh, MeshBasicMaterial, MeshStandardMaterial } from "three";
 import { items } from "../gambits/library.ts";
 import { createGambitMedal, medalJiggle } from "./gambit-medal.ts";
 import { createMaterialise } from "../hud/materialise.ts";
+import { ruleOfThree } from "../gambits/items/rhetoric.ts";
 
 describe("gambit medals", () => {
+  it("lights one Rule of Three mark per accepted use", () => {
+    const medal = createGambitMedal(ruleOfThree.medal);
+    const lit = () =>
+      medal.group.children.filter(
+        (child) =>
+          child instanceof Mesh &&
+          child.material instanceof MeshBasicMaterial &&
+          child.material.color.getHex() === 0xff7187,
+      ).length;
+    expect(lit()).toBe(0);
+    medal.setStage(1);
+    expect(lit()).toBe(2);
+    medal.setStage(2);
+    expect(lit()).toBe(4);
+    medal.setStage(3);
+    expect(lit()).toBe(6);
+    medal.dispose();
+  });
+
+  it("materialises an incoming medal before restoring its own material", () => {
+    const medal = createGambitMedal(ruleOfThree.medal);
+    const body = medal.group.children[0] as Mesh;
+    const original = body.material;
+    const effect = createMaterialise(medal.group, { seconds: 0.5 });
+    expect(body.material).not.toBe(original);
+    expect(effect.update(0.25)).toBe(true);
+    expect(effect.update(0.25)).toBe(false);
+    expect(body.material).toBe(original);
+    expect(medal.group.visible).toBe(true);
+    medal.dispose();
+  });
+
   it("builds a distinct 3D emblem for every registered gambit", () => {
     for (const id of items.names()) {
       const item = items.get(id);

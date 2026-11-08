@@ -11,6 +11,7 @@ import { INSPECT, type InspectInfo } from "./traits/inspectable.ts";
 import { GameTimer } from "./traits/game-timer.ts";
 import { GambitRack } from "./hud/gambit-rack-dom.ts";
 import { CUE_CHANGED, NEXT_CUE } from "./traits/lighting-cues.ts";
+import { ROUND_STARTED, RoundAudio } from "./traits/round-audio.ts";
 
 // Every module in src/rooms registers its room with the registry.
 import.meta.glob(["./rooms/*.ts", "!./rooms/*.test.ts"], { eager: true });
@@ -25,7 +26,10 @@ const roundMeterTrack = document.querySelector<HTMLElement>("#round-meter-track"
 const roundMeterFill = document.querySelector<HTMLElement>("#round-meter-fill")!;
 const roundMeterMarker = document.querySelector<HTMLElement>("#round-meter-marker")!;
 const roundMeterRemaining = document.querySelector<HTMLElement>("#round-meter-remaining")!;
-const gambitRack = new GambitRack(document.querySelector<HTMLElement>("#gambit-rack-slot")!);
+const roundStart = document.querySelector<HTMLElement>("#round-start")!;
+const roundStartButton = document.querySelector<HTMLButtonElement>("#round-start-button")!;
+const gambitRackSlot = document.querySelector<HTMLElement>("#gambit-rack-slot")!;
+const gambitRack = new GambitRack(gambitRackSlot);
 // The noclip panel builds its own markup so it never depends on index.html.
 const noclipHud = Object.assign(document.createElement("div"), { id: "noclip", hidden: true });
 noclipHud.innerHTML = "<strong>NOCLIP</strong> <code></code><small></small>";
@@ -73,9 +77,17 @@ function showRoomLabel(): void {
 
 const roomName = new URLSearchParams(window.location.search).get("room") ?? DEFAULT_ROOM;
 const def = rooms.get(roomName);
+let awaitingRoundStart = false;
 if (def) {
   rooms.load(world, roomName);
   showRoomLabel();
+  if (world.current?.has(RoundAudio)) {
+    world.current.settingsOf(GameTimer)!.running = false;
+    awaitingRoundStart = true;
+    gambitRackSlot.inert = true;
+    roundStart.hidden = false;
+    roundStartButton.focus();
+  }
   // The rack reads the room's hand, so it is rebuilt per room.
   gambitRack.show(world.current ? { world, room: world.current } : null);
 } else {
@@ -85,6 +97,17 @@ if (def) {
     .join(", ");
   label.textContent = `Unknown room "${roomName}". Rooms: ${known}`;
 }
+
+roundStartButton.addEventListener("click", () => {
+  const room = world.current;
+  if (!room?.has(RoundAudio)) return;
+  // This user gesture unlocks Web Audio and starts the clock together.
+  room.emit(ROUND_STARTED);
+  room.settingsOf(GameTimer)!.running = true;
+  awaitingRoundStart = false;
+  gambitRackSlot.inert = false;
+  roundStart.hidden = true;
+});
 
 // Mouse -> pointer system. What hovering or clicking does is up to each object's traits.
 const canvas = renderer.domElement;
@@ -230,7 +253,7 @@ renderer.setAnimationLoop((time) => {
   timer.update(time);
   const dt = timer.getDelta();
   noclip.update(dt);
-  world.update(dt);
+  world.update(awaitingRoundStart ? 0 : dt);
   renderRoundMeter();
   gambitRack.refresh(dt);
   showNoclip();

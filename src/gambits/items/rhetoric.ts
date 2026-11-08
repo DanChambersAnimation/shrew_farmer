@@ -21,6 +21,7 @@ export const ruleOfThree: ItemDef = {
     ],
   },
   simulation: {
+    onUse: [{ id: "rule-of-three-tone" }],
     outcomes: [
       {
         weight: 1,

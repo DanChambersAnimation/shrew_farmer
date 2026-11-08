@@ -97,6 +97,40 @@ canvas {
   display: none;
 }
 
+#round-start {
+  position: fixed;
+  z-index: 30;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgb(20 12 29 / 0.38);
+}
+
+#round-start[hidden] {
+  display: none;
+}
+
+#round-start-button {
+  padding: 16px 26px;
+  border: 4px solid #211529;
+  border-radius: 10px;
+  background: #ffe45e;
+  box-shadow: 5px 6px 0 rgb(20 12 25 / 0.5);
+  color: #211529;
+  cursor: pointer;
+  font:
+    900 clamp(20px, 3vw, 34px) / 1 system-ui,
+    sans-serif;
+  letter-spacing: 0.05em;
+}
+
+#round-start-button:hover,
+#round-start-button:focus-visible {
+  background: #fff3bc;
+  outline: 3px solid #ff5a86;
+  outline-offset: 3px;
+}
+
 .round-meter-heading {
   display: flex;
   align-items: end;

@@ -13,8 +13,10 @@ export interface EffectContext {
   readonly room: GameObject;
   /** The move that triggered this effect. */
   readonly moveId: string;
-  /** How the move went. Effects can behave differently for each. */
-  readonly verdict: Verdict;
+  /** How the move went, absent for effects that play on every accepted use. */
+  readonly verdict?: Verdict;
+  /** Accepted use count for an effect that plays on each use. */
+  readonly useNumber?: number;
   /** Round time in seconds. */
   readonly atSeconds: number;
   /** World positions selected by the simulation, for matching visual effects. */

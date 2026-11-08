@@ -9,6 +9,7 @@ import { Gambits } from "../traits/gambits.ts";
 import { GambitSelection } from "../traits/gambit-selection.ts";
 import { GameTimer } from "../traits/game-timer.ts";
 import { LookAround } from "../traits/look-around.ts";
+import { RoundAudio } from "../traits/round-audio.ts";
 
 /** dev0 plus the round clock and the crowd simulation: the room the game is played in. */
 rooms.register({
@@ -21,6 +22,7 @@ rooms.register({
     // GambitSelection fills the hand; Gambits tracks what has been used up.
     room.add(Gambits, { hand: [], played: [], lastUsedAt: {}, finished: false });
     room.add(GambitSelection, { count: 5, random: true });
+    room.add(RoundAudio);
     room.add(CameraView, {
       // Behind and above the speaker, looking down at the audience (set with noclip),
       // with a slow side-to-side sway.

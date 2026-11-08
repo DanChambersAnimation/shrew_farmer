@@ -1,5 +1,6 @@
 import type { EffectDef } from "./registry.ts";
 import { effects } from "./registry.ts";
+import { playRuleOfThreeBeat } from "../audio/cues.ts";
 
 /** Fade light groups to new levels, the same way LightingCues does. */
 function lights(id: string, levels: Record<string, number>): EffectDef {
@@ -37,7 +38,16 @@ export const awkwardSilence: EffectDef = {
   },
 };
 
+export const ruleOfThreeTone: EffectDef = {
+  id: "rule-of-three-tone",
+  kind: "audio",
+  run({ useNumber }) {
+    if (useNumber !== undefined) playRuleOfThreeBeat(useNumber);
+  },
+};
+
 effects.register(houseLift.id, houseLift);
 effects.register(houseDip.id, houseDip);
 effects.register(applause.id, applause);
 effects.register(awkwardSilence.id, awkwardSilence);
+effects.register(ruleOfThreeTone.id, ruleOfThreeTone);
