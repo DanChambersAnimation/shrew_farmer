@@ -1,0 +1,341 @@
+# Sound and speech — plan 1
+
+Pre-recorded vocal responses and per-gambit sound effects, generated offline with
+ElevenLabs and shipped as static files. Nothing calls ElevenLabs at runtime.
+
+Related: [#15](https://github.com/DanChambersAnimation/shrew_farmer/issues/15) (game feedback),
+[#16](https://github.com/DanChambersAnimation/shrew_farmer/issues/16) (staged beats),
+[#17](https://github.com/DanChambersAnimation/shrew_farmer/issues/17) (round audio).
+See also `doc/principles.md` — content is type-safe code, editable by tools.
+
+## What already exists
+
+- **`src/audio/cues.ts`** synthesises tones with the Web Audio API. No files, no network:
+  `playCue` schedules oscillators. Today it covers `GET_READY`, `GAME_LOST` and the three
+  Rule of Three beats (`ruleOfThreePitch`).
+- **`src/traits/round-audio.ts`** fires those cues from round events: `ROUND_STARTED`,
+  `ROUND_LOST` (emitted when a strict majority is disengaged at TIME).
+- **Events worth hanging sound on** already exist:
+  `GAMBIT_USED`, `GAMBIT_PLAYED`, `GAMBIT_REPLACED`, `CROWD_TICK`, `MOOD_CHANGED` (world event,
+  with the audience member, the mood it left and the one it entered), `ROUND_STARTED`,
+  `ROUND_LOST`, `GAME_TIMER_FINISHED`, `T_SHIRT_FIRED`, `CUE_CHANGED`.
+- **Verdicts** already exist: `resolveItem` judges every move `success` or `failure`, so a
+  gambit can sound different depending on whether it landed.
+
+So the engine plumbing is in place. What is missing is **recorded voice and authored effects**,
+and a way to keep them in sync with the code.
+
+## Proposal
+
+### 1. One manifest, generated content
+
+A single TypeScript file, `src/audio/clips.ts`, is the source of truth for every recorded
+asset. It stays type-safe code like the rest of the content, and a CLI generates and verifies
+the files it describes.
+
+```ts
+export interface Clip {
+  /** Stable id, also the file stem: "gambit/personal-anecdote/success". */
+  readonly id: string;
+  readonly kind: "speech" | "effect";
+  /** The exact text sent to the text-to-speech API. Speech only. */
+  readonly text?: string;
+  /** Voice settings for speech, sound-effect prompt for effects. */
+  readonly request: SpeechRequest | EffectRequest;
+  /** Where it is used, and by what event. For humans and the generator. */
+  readonly usedBy: string;
+  /** Generated: SHA-256 of the request, so an edited line regenerates only itself. */
+  readonly requestHash: string;
+}
+```
+
+`requestHash` is the trick that makes regeneration cheap: change one line of text and only that
+clip is re-requested. The CLI refuses to overwrite a clip whose text changed unless asked, so
+you hear the diff before spending credits.
+
+### 2. A generator CLI
+
+`scripts/audio.ts`, run with `vpx scripts/audio.ts` (the project's documented way to run
+TypeScript). I would put this behind a new room trait's doc comment rather than scatter it.
+
+```
+vpx scripts/audio.ts list                  # what exists, what's stale, what's missing
+vpx scripts/audio.ts generate             # all stale or missing clips
+vpx scripts/audio.ts generate --only gambit/   # one area
+vpx scripts/audio.ts verify               # CI: every manifest clip exists; no orphans
+vpx scripts/audio.ts prune --dry-run      # files on disk that no clip claims
+```
+
+It reads `ELEVENLABS_API_KEY` from the environment. It must never print the key, and it writes
+into `public/audio/` (Vite serves `public/` verbatim, and the build already copies it through).
+
+Two hard rules:
+
+- **Generated audio is committed.** The game ships static files; building the game must never
+  need a key. A CI `verify` step catches a manifest entry that was added without generating.
+- **The API is called offline only.** No runtime fetch, no key in the browser bundle.
+
+### 3. Which voice, which effects
+
+ElevenLabs' text-to-speech takes `voice_id`, `model_id` and `voice_settings`
+(`stability`, `similarity_boost`, `style`, `use_speaker_boost`). Sound effects take a text
+prompt plus `duration_seconds` (0.5–22) and optional `prompt_influence`.
+
+- **The Speaker** is one voice, used for all of his own lines. Pick it by ear once and pin the
+  `voice_id` in the manifest; changing it later is a one-line edit plus regeneration.
+- **The audience** should be several voices, not one. A crowd reacting in unison sounds fake.
+  Plan for three or four, assigned per person from a seed so the same member keeps the same
+  voice across replays. This is content, so it belongs in `src/characters/`, not in the audio
+  module.
+
+### 4. The cue sheet
+
+Speech is the Speaker's material and the audience's reactions; effects are the gambits' own
+sounds. Grouped by trigger:
+
+**Round — start**
+
+| Trigger         | Kind   | Content                                       |
+| --------------- | ------ | --------------------------------------------- |
+| `ROUND_STARTED` | speech | "Ladies and gentlemen, thank you for coming." |
+| `ROUND_STARTED` | effect | room settles, chairs creak, a cough           |
+
+**Round — progress milestones at 1/4, 1/2 and 3/4**
+
+These are new triggers: nothing emits them yet, so they need a small trait that watches
+`GameTimer.elapsedSeconds` and fires once per threshold (see "Milestones" below). They are
+short stings, not speech — the meter already shows the time, so these are punctuation, not
+information.
+
+| Trigger                | Kind   | Content                                        |
+| ---------------------- | ------ | ---------------------------------------------- |
+| `quarter` (25%)        | effect | a single wooden tick, low urgency              |
+| `half` (50%)           | effect | a two-note motif, warmer, "still going"        |
+| `three-quarters` (75%) | effect | a rising three-note flourish, a little tension |
+
+They should escalate in pitch and brightness across the round, so the player learns the shape
+without looking at the meter. Keep them under a second: they sit under the Speaker.
+
+**Round — finished, and it depends on how it went**
+
+The end of a round has **two outcomes that must sound different**, which the game already
+distinguishes: `ROUND_LOST` fires when a strict majority is disengaged at TIME
+(`majorityDisengaged`, threshold 0.4), and otherwise the round simply ends on
+`GAME_TIMER_FINISHED`.
+
+| Trigger                          | Kind   | Content                                                   |
+| -------------------------------- | ------ | --------------------------------------------------------- |
+| `GAME_TIMER_FINISHED`, round won | speech | "That's my time — you've been wonderful."                 |
+| `GAME_TIMER_FINISHED`, round won | effect | warm applause swelling, a few cheers, chairs              |
+| `ROUND_LOST`                     | speech | "Well. Thank you for listening."                          |
+| `ROUND_LOST`                     | effect | thin, scattered clapping that stops early, a single cough |
+
+The difference should be obvious with the sound **alone**: dense and rising versus sparse and
+dying away. A player looking away from the screen should know whether they held the room.
+
+**Which verdict a "won" round needs is worth deciding.** `ROUND_LOST` answers "did I lose?" but
+not "did I do well?". A round where the crowd merely stayed awake is not the same success as one
+where they were ecstatic. I would add a second, positive test — average approval or engagement
+above a threshold — so there are three endings, not two: **lost**, **survived**, **triumphed**,
+each with its own pair of cues. That is cheap now and awkward to retrofit once clips are
+recorded.
+
+**Per gambit — success and failure variants**
+
+Every gambit gets an effect for the act of playing it, plus a speech reaction on success. This
+is the bulk of the work: six gambits × two verdicts ≈ 12 effects plus ~8 lines.
+
+| Gambit              | Effect (play)                                    | Success speech                                       |
+| ------------------- | ------------------------------------------------ | ---------------------------------------------------- |
+| `personal-anecdote` | paper rustle, a single warm "hmm" from the crowd | "So there I was, forty feet up a ladder…"            |
+| `anecdote-callback` | a soft recognition chime                         | "Remember the ladder? Exactly. That's what this is." |
+| `rule-of-three`     | three rising thumps, one per beat                | "Simple. Honest. Unstoppable."                       |
+| `pious-statement`   | low organ swell                                  | "There are things we don't earn. We accept them."    |
+| `praise-jesus`      | a hard choir stab                                | "Praise Jesus! Amen!"                                |
+| `t-shirt-cannon`    | the cannon's pop and flight                      | "Catch it! Don't be shy!"                            |
+
+Failure variants should be **shorter and flatter**: a deflating tone, a cough, one word.
+"Right. Moving on." A failure cue that sounds funny is worth more than one that sounds sad.
+
+**Moods and ambience** — see 4b. The line bank there covers every mood band, and clapping and
+snoring are the ambience beds.
+
+### 4a. Milestones — the one new trait this needs
+
+Nothing emits progress events today, and adding three ad-hoc timer checks would be exactly the
+special-casing `principles.md` warns about. Instead, a small room trait in the same shape as
+`GameTimer`:
+
+```ts
+room.add(RoundMilestones, { at: [0.25, 0.5, 0.75] });
+```
+
+It watches `GameTimer.elapsedSeconds`, and on crossing each fraction emits one event
+(`round-milestone` with the fraction and the round time) exactly once. `SoundCue` then maps
+those events to clips like any other. It stays silent after TIME, and does nothing in a room
+without a clock.
+
+Two details worth getting right:
+
+- **Fire on crossing, not on equality.** A frame can step past a threshold; compare
+  `before < mark && after >= mark` rather than looking for an exact tick.
+- **Support a restart.** Pausing and resuming is already possible through the clock's live
+  settings, so keep the fired set in the trait's settings and clear it when `elapsedSeconds`
+  goes backwards.
+
+### 4b. Crowd reactions — voices, clapping and snoring
+
+The audience's own noises are a third category, distinct from the Speaker's lines and the
+gambits' effects. They are **layered beds and per-person stings**, not one-shots.
+
+#### A line bank, not a catalogue
+
+Isolated interjections are what make a crowd feel alive. They need **emotional direction**,
+or a bare "So bored" comes out cheerful: ElevenLabs honours bracketed audio tags such as
+`[bored]`, `[sighs]`, `[laughs]`, which direct the delivery instead of being spoken.
+
+The game already has eight mood bands (`src/characters/mood.ts`), so the bank is grouped by
+mood and the mood event decides which pool to draw from:
+
+| Band         | Lines                                                                      |
+| ------------ | -------------------------------------------------------------------------- |
+| `ecstatic`   | "He's amazing", "Oh my God!", "Yes!", "I love this guy", "[laughs] No way" |
+| `delighted`  | "Wow", "Great", "Wonderful", "Ha! Good one", "More of that"                |
+| `interested` | "Mm", "Go on", "Right...", "Interesting"                                   |
+| `neutral`    | "Huh", "Okay", "Sure", "Hm", "Right then", "Fair enough"                   |
+| `bored`      | "So bored", "How long is this?", "[sighs] Right", "Is it over yet?"        |
+| `asleep`     | "[snores]", "...five more minutes", "[mumbles]"                            |
+| `sceptical`  | "Really?", "Says who?", "I don't buy it", "Hmm. Right"                     |
+| `hostile`    | "Boo!", "Get off!", "Rubbish!", "You what?", "[laughs] Oh dear"            |
+
+Also worth having:
+
+- **Pure non-verbal** — `[gasp]`, `[laughs]`, `[tuts]`, `[sighs]`, `[coughs]`, "ooh", "ahh".
+  These carry more emotion than words and suit every voice.
+- **Gambit-specific reactions**, which land far better than generic ones because they answer
+  something: "Go on..." for an anecdote; "Oh! I remember" for a callback; counting along with
+  the rule of three; "Amen" for a pious statement; "Catch!" for the t-shirt cannon.
+- **Agreement and dissent between neighbours** — "Exactly!", "He's right", "No he isn't".
+  These pair naturally with the influence `CrowdSimulation` already models.
+
+**"WTF?" should become** "What the—?", "You what?" or "Are you serious?". Same shock, and it
+keeps us clear of age ratings without a second censored recording pass later.
+
+#### Voice roster
+
+Ten to twelve voices, covering gender, age and accent: British RP, London, Northern English,
+Scottish, Irish, Welsh, American general and Southern, Australian, South Asian, West African.
+Include one **elderly** voice (nothing sells weary disapproval like it) and one **big comic**
+voice for the extremes.
+
+Do not record the full cross-product. Eight bands × six lines × ten voices is ~480 clips.
+Assign each line to **two or three voices** and target ~60 clips for a first pass — variety
+comes from the roster, not from every voice saying everything.
+
+#### Clapping — a volume control
+
+Clapping is the one crowd sound the player can already see: the audience rig has a `clap` arm
+pose (approval ≥ 0.75, engagement ≥ 0.8). So it should track that state directly.
+
+| Clip                 | Use                                                |
+| -------------------- | -------------------------------------------------- |
+| `crowd/clap/few`     | a handful of people, sparse and polite             |
+| `crowd/clap/solid`   | a warm, full round                                 |
+| `crowd/clap/ovation` | the room on its feet, whooping                     |
+| `crowd/clap/dying`   | scattered, stopping early — the **lost round** cue |
+
+The first three are an intensity ladder chosen by how many members are in a clapping state, and
+cross-faded as that number changes. Nothing reports that count today, so the trait must derive it
+the same way `RoundAudio` already counts disengaged people: walk the room for seated
+`audience-member` objects and read their `AudienceModel` state. `dying` is a distinct one-shot for the round ending, so the
+verdict applause never gets confused with the ambience.
+
+#### Snoring — sparse and per-person
+
+Tie it to the `asleep` band (`src/characters/mood.ts` puts engagement below 0.15 there, which the
+face model already draws as closed eyes and a sleep bubble). **One sleeper is funny; twelve in sync is a kazoo orchestra**, so:
+cap it to one or two voices at a time, stagger their starts, and leave long gaps.
+
+- `crowd/snore/soft` — inhale, whistle, exhale
+- `crowd/snore/heavy` — louder, for a room that has given up
+- `crowd/snore/snort` — the wake-up startle, for someone re-engaging
+
+#### Looping is the difficult part
+
+ElevenLabs effects are good one-shots and unreliable loops; a badly looped snore clicks audibly
+every cycle. Cross-fading two copies of a short generated clip is cheaper to iterate on than
+prompting for a seamless loop, and the same machinery serves the clapping beds.
+
+#### Never all at once
+
+`CROWD_TICK` fires once a second, and `MOOD_CHANGED` fires per person. Neither is a suitable
+trigger on its own: the crowd tick carries no per-person detail (only the tick number and round
+time), and the mood event can fire for a dozen people in one frame. Without a limiter, forty
+people would shout "Wow" in unison. The scheduler needs to allow **one or two voices per tick**,
+refuse to repeat the same clip twice running, and mute a person's quips while they are snoring.
+
+#### Mapping onto traits
+
+Nothing here needs special-case code. `SoundCue` can carry a pool per mood band and pick from it
+on `MOOD_CHANGED`, and a `CrowdAudio` trait can count the clapping and sleeping members once a
+tick and drive the bed volumes. Both are settings, not new behaviour.
+
+### 5. Playing it — a new trait, not special cases
+
+The engine already says behaviour belongs in traits. So:
+
+- **`src/audio/player.ts`** — a thin wrapper: fetch a clip, decode once, cache the buffer, play
+  with an optional gain and pitch. Replaces the oscillator-only path for recorded sound; keeps
+  `cues.ts` tone generation for anything still synthesised (the Rule of Three pitch ladder is
+  lovely and cheap — keep it).
+- **`SoundCue` trait** — settings are a map from event name to clip ids, so any object can
+  sound like anything without new code:
+
+  ```ts
+  room.add(SoundCue, {
+    cues: { "gambit-played": "gambit/{item}/success", "round-lost": "speaker/lost" },
+  });
+  ```
+
+  Templating on `{item}` and `{verdict}` is what keeps this from becoming six special cases.
+
+- **Autoplay**: browsers block audio until a gesture. The existing `Start Round` action is the
+  natural unlock point — resume the `AudioContext` there and keep every cue silent before it.
+
+### 6. Accessibility and taste
+
+- **Sound needs its own opt-out.** `prefers-reduced-motion` covers the visuals; audio deserves a
+  mute toggle (persisted) and a lower default volume. Strobing light already has a photosensitivity concern; loud sudden effects
+  (cannon, choir stab) deserve a "reduce sudden sounds" option.
+- **Every clip gets a caption.** The game already has speech bubbles; a spoken line should show
+  its text too, which also gives you the transcript for free.
+- **Never block play on audio.** Missing file, blocked context, decode failure: log once and
+  continue silently.
+
+## What I would build first
+
+A thin vertical slice, not the whole cue sheet:
+
+1. `Clip` manifest plus `scripts/audio.ts` with `list`, `generate --only`, `verify`.
+2. Three clips: one Speaker line, one success effect, one failure effect.
+3. `src/audio/player.ts` with decode and cache; wire it to `GAMBIT_PLAYED` and the verdict.
+4. The mute toggle and caption.
+5. Cross-faded beds, for clapping and snoring.
+6. Only then expand the cue sheet, one gambit at a time.
+
+That gets the pipeline proven end to end before anyone spends credits on forty clips they might
+not like.
+
+## Open questions
+
+- **How much of the Speaker should be voiced?** Full lines make him a character; grunts and
+  fragments keep him flexible and cheap. My instinct: full lines for the round openers and each
+  gambit's success, silence otherwise.
+- **Do audience voices need to be per-person?** If callbacks and moods already distinguish
+  people, a shared pool of reactions may be enough.
+- **Music or no music?** A loop under a sixty-second round is a strong flavour choice, and a
+  roguelike wants variety. Out of scope here, but it competes for the same audio budget.
+- **How rude can the crowd be?** "WTF?" versus "You what?" changes the age rating and the
+  recording pass. Worth settling before the hostile lines are recorded.
+- **Where do files live?** `public/audio/` is simplest and needs no bundler configuration; the
+  cost is no hashed filenames, so caching is by explicit query string.
