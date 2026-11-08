@@ -9,6 +9,7 @@ import {
   type WebGLRenderer,
 } from "three";
 import { items } from "../gambits/library.ts";
+import { runEffects } from "../effects/registry.ts";
 import type { ItemDef } from "../gambits/effect.ts";
 import { resolveItem, type CrowdMember } from "../gambits/resolve.ts";
 import { AudienceModel } from "../traits/audience-model.ts";
@@ -26,11 +27,12 @@ export interface RackHost {
 
 interface RackEntry {
   readonly button: HTMLButtonElement;
-  /** The icon face inside the button. Cooldown marks live here, not on the row slot. */
-  readonly icon: HTMLSpanElement;
   readonly item: ItemDef;
   readonly medal: ReturnType<typeof createGambitMedal>;
   readonly phase: number;
+  stage: number;
+  appear: ReturnType<typeof createMaterialise> | null;
+  appearancePending: boolean;
   dissolve: ReturnType<typeof createMaterialise> | null;
   placed: boolean;
 }
@@ -85,6 +87,7 @@ export class GambitRack {
   show(host: RackHost | null): void {
     this.host = host;
     for (const entry of this.medals.values()) {
+      entry.appear?.finish();
       entry.dissolve?.finish();
       this.scene.remove(entry.medal.group);
       entry.medal.dispose();
@@ -115,20 +118,17 @@ export class GambitRack {
     button.title = item.name;
     button.setAttribute("aria-label", item.name);
     button.addEventListener("click", () => this.play(id));
-    // The icon travels with its gambit; the button only reserves the slot.
-    const icon = document.createElement("span");
-    icon.className = "gambit-medal-icon";
-    icon.setAttribute("aria-hidden", "true");
-    button.appendChild(icon);
     this.root.appendChild(button);
     const medal = createGambitMedal(item.medal);
     this.scene.add(medal.group);
     this.medals.set(id, {
       button,
-      icon,
       item,
       medal,
       phase: phaseFor(id),
+      stage: -1,
+      appear: null,
+      appearancePending: true,
       dissolve: null,
       placed: false,
     });
@@ -155,7 +155,8 @@ export class GambitRack {
     this.elapsed += dt;
     const clock = host.room.settingsOf(GameTimer);
     const atSeconds = clock?.elapsedSeconds ?? 0;
-    const over = clock !== undefined && !clock.running;
+    const over =
+      clock !== undefined && !clock.running && clock.elapsedSeconds >= clock.durationSeconds;
     const hand = host.room.settingsOf(Gambits)?.hand ?? [];
     // A fresh gambit may have replaced a burned one; add it and order the row
     // the way the hand is ordered, so it takes the burned gambit's place.
@@ -166,6 +167,16 @@ export class GambitRack {
       const spent = !hand.includes(id);
       const playable = canPlay(host.room, id, atSeconds);
       button.disabled = !playable;
+      const uses =
+        host.room.settingsOf(Gambits)?.played.filter((playedId) => playedId === id).length ?? 0;
+      if (entry.stage !== uses) {
+        if (entry.appear) {
+          entry.appear.finish();
+          entry.appear = null;
+        }
+        medal.setStage(uses);
+        entry.stage = uses;
+      }
       const cooldown = !over && !spent ? gambitStatus(host.room, id, atSeconds)?.cooldown : null;
       // The countdown is part of the medal's own 3D group, so it travels with
       // the icon when the row re-sorts rather than staying in its old slot.
@@ -177,10 +188,15 @@ export class GambitRack {
         button.setAttribute("aria-label", label);
       } else {
         medal.setCooldown(0, 0);
-        button.title = item.name;
-        button.setAttribute("aria-label", item.name);
+        const label =
+          item.medal.emblem === "three" && !spent ? `${item.name}, ${uses} of 3 beats` : item.name;
+        button.title = label;
+        button.setAttribute("aria-label", label);
       }
       if (spent && !entry.dissolve) {
+        entry.appear?.finish();
+        entry.appear = null;
+        entry.appearancePending = false;
         entry.dissolve = createMaterialise(medal.group, {
           seconds: 0.9,
           out: true,
@@ -201,6 +217,15 @@ export class GambitRack {
       medal.group.rotation.set(motion.x, motion.y, motion.z);
       const hovered = button.matches(":hover, :focus-visible") && playable;
       medal.group.scale.setScalar(rect.width * (hovered ? 0.95 : 0.88));
+      if (entry.appearancePending && !spent) {
+        // Compute Perlin frequency after the medal has its on-screen size.
+        entry.appearancePending = false;
+        entry.appear = createMaterialise(medal.group, {
+          seconds: 0.9,
+          reduced: window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false,
+        });
+      }
+      if (entry.appear && !entry.appear.update(dt)) entry.appear = null;
       if (entry.dissolve && !entry.dissolve.update(dt)) {
         this.scene.remove(medal.group);
         medal.dispose();
@@ -244,6 +269,16 @@ export class GambitRack {
     const accepted = playGambit(host.room, item, atSeconds);
     off();
     if (!accepted) return;
+    const useNumber = host.room
+      .settingsOf(Gambits)!
+      .played.filter((playedId) => playedId === id).length;
+    runEffects(item.simulation.onUse ?? [], {
+      world: host.world,
+      room: host.room,
+      moveId: id,
+      atSeconds,
+      useNumber,
+    });
     if (triggered) this.resolve(item, atSeconds);
     this.refresh();
   }

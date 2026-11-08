@@ -49,13 +49,17 @@ describe("GambitSelection", () => {
   };
 
   it("fills the hand with a fixed list when one is given", () => {
-    const root = room({ hand: ["praise-jesus", "personal-anecdote"], random: false });
+    const root = room({
+      hand: ["praise-jesus", "personal-anecdote"],
+      random: false,
+      refill: false,
+    });
     expect(root.settingsOf(Gambits)!.hand).toEqual(["praise-jesus", "personal-anecdote"]);
   });
 
   it("draws the requested number, and the same draw for the same seed", () => {
-    const seeded = room({ count: 4, seed: 42, random: false });
-    const again = room({ count: 4, seed: 42, random: false });
+    const seeded = room({ count: 4, keep: 4, seed: 42, random: false });
+    const again = room({ count: 4, keep: 4, seed: 42, random: false });
     expect(seeded.settingsOf(Gambits)!.hand).toHaveLength(4);
     expect(again.settingsOf(Gambits)!.hand).toEqual(seeded.settingsOf(Gambits)!.hand);
   });
@@ -83,7 +87,7 @@ describe("replacing a burned gambit", () => {
     const root = world.createRoot("room");
     root.add(GameTimer);
     root.add(Gambits, { hand: [...hand], played: [], lastUsedAt: {}, finished: false });
-    root.add(GambitSelection, { hand, refill, random: false });
+    root.add(GambitSelection, { hand, keep: hand.length, refill, random: false });
     return root;
   };
 

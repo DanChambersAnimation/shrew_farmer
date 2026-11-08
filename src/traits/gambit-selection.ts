@@ -23,7 +23,7 @@ export interface GambitReplaced {
 export const GambitSelection = defineTrait({
   name: "gambit-selection",
   defaults: {
-    /** Fixed ids to offer instead of drawing, in display order. Empty means draw. */
+    /** Ids to seed the hand, in display order. Empty means draw. */
     hand: [] as string[],
     /** How many to draw when `hand` is empty. */
     count: RACK_SIZE,
@@ -33,8 +33,8 @@ export const GambitSelection = defineTrait({
     random: true,
     /** When true a burned gambit is replaced so the hand stays full. */
     refill: true,
-    /** The row size to keep topped up; 0 means the size the hand started with. */
-    keep: 0,
+    /** The row size to keep topped up. Preview rooms can override it. */
+    keep: RACK_SIZE,
   },
   setup({ object, settings }) {
     const gambits = object.settingsOf(Gambits);
@@ -43,7 +43,7 @@ export const GambitSelection = defineTrait({
       settings.hand.length > 0
         ? [...settings.hand]
         : chooseHand(itemPool(), seedFor(settings), settings.count);
-    settings.keep = gambits.hand.length;
+    if (settings.refill) refillHand(object, settings.keep);
   },
   update({ object, settings }) {
     if (!settings.refill) return;
@@ -56,16 +56,16 @@ function seedFor(settings: { readonly random: boolean; readonly seed: number }):
 }
 
 /**
- * Keep the hand full. A burned gambit is removed from the hand by playGambit,
- * so this tops the row back up to `count` with gambits that are neither still
- * in hand nor already used this round. When the pool runs dry the row simply
- * gets shorter.
+ * Keep the hand full. An exhausted gambit stays until its cooldown ends; then
+ * it leaves the row and a fresh one fills the gap. Draw only gambits that are
+ * neither in hand nor already used this round. The row can shrink when the
+ * pool runs dry.
  */
 export function refillHand(room: GameObject, count: number): readonly GambitReplaced[] {
   const gambits = room.settingsOf(Gambits);
   if (!gambits || gambits.finished) return [];
 
-  // Clear out anything already spent that is somehow still sitting in the row.
+  // Retire exhausted gambits once any final cooldown has ended.
   const spent = [...gambits.hand].filter((id) => isSpent(room, id));
   for (const id of spent) {
     gambits.hand = gambits.hand.filter((held) => held !== id);

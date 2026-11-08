@@ -62,10 +62,15 @@ export function useContextFor(room: GameObject, id: string): GambitUseContext {
   };
 }
 
-/** Whether a gambit has burned out and should leave the row. */
-export function isSpent(room: GameObject, id: string): boolean {
+/** Whether an exhausted gambit has finished cooling and should leave the row. */
+export function isSpent(
+  room: GameObject,
+  id: string,
+  atSeconds = room.settingsOf(GameTimer)?.elapsedSeconds ?? 0,
+): boolean {
   if (!room.settingsOf(Gambits) || !items.has(id)) return true;
-  return gambitStatus(room, id)?.exhausted ?? true;
+  const status = gambitStatus(room, id, atSeconds);
+  return status === null || (status.exhausted && status.cooldown === null);
 }
 
 /** Read all of an item's registered traits against its round use history. */
@@ -96,7 +101,7 @@ export function canPlay(
 
 /**
  * Accept a use and record it. BuildUp decides whether this use releases the
- * simulation effect; LimitedUse removes the item when exhausted.
+ * simulation effect; LimitedUse removes the item after any final cooldown.
  */
 export function playGambit(room: GameObject, item: ItemDef, atSeconds: number): boolean {
   if (!canPlay(room, item.id, atSeconds)) return false;
@@ -106,7 +111,7 @@ export function playGambit(room: GameObject, item: ItemDef, atSeconds: number): 
   const uses = hand.played.filter((id) => id === item.id).length;
   const status = gambitStatus(room, item.id, atSeconds)!;
   const triggered = status.effectReady;
-  if (status.exhausted) {
+  if (isSpent(room, item.id, atSeconds)) {
     hand.hand = hand.hand.filter((id) => id !== item.id);
   }
   room.emit(GAMBIT_USED, {

@@ -14,7 +14,7 @@ rooms.register({
     room.add(GameTimer);
     room.add(CrowdSimulation);
     room.add(Gambits);
-    room.add(GambitSelection, { hand: ["t-shirt-cannon"], random: false });
+    room.add(GambitSelection, { hand: ["t-shirt-cannon"], keep: 1, random: false });
     churchHallShow(room);
   },
 });

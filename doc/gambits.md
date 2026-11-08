@@ -8,7 +8,7 @@ What the Speaker uses to engage the audience. Every item has **upsides and downs
 
 **How an item is defined** (`src/gambits/effect.ts`): an item is a list of **weighted outcomes**. Each outcome has a **target** (the whole audience, the room, or a neighbourhood within a radius) and **effects**. An effect changes a person's approval and/or engagement, can decide whether it reaches them at all (e.g. too bored to notice), and can scale by context (personality, what they remember, the round time). Risky items are just extra outcomes with low weights.
 
-Each registry entry also has a **usage rule**: `maxUses` (or `null` for unlimited), `usesPerEffect` (build-up before the effect fires), and `cooldownSeconds`. Rule of three fires on its third use; pious statement remains available after a 12-second cooldown. The rack reflects these limits and the round timer.
+Each item attaches named traits from `src/gambits/traits.ts`. **Cooldown** gates repeat use and drives a clock-face sweep on the medal. **LimitedUse** exhausts the item after its final use. When combined with Cooldown, the exhausted medal stays in its slot until the countdown ends, then burns away. **BuildUp** releases the crowd effect after several accepted uses. The replacement trait tries to keep five gambits in the playable rack, drawing an unused item when a slot opens; the fixed preview rooms set their own rack sizes.
 
 ## Entry template
 
@@ -30,6 +30,7 @@ Each registry entry also has a **usage rule**: `maxUses` (or `null` for unlimite
 - **Upside:** raises engagement; attentive listeners remember the story.
 - **Risk:** inattentive listeners miss it, so later callbacks fall flat for them.
 - **Combines with:** callback.
+- **Uses:** repeatable after a 15-second cooldown.
 - **Notes / issue:** from #3. **Built** (`src/gambits/items/anecdote.ts`).
 
 ### Callback to anecdote
@@ -45,8 +46,8 @@ Each registry entry also has a **usage rule**: `maxUses` (or `null` for unlimite
 - **Kind:** conversational gambit
 - **Upside:** a modest, rhythmic engagement boost.
 - **Risk:** —
-- **Notes / issue:** from #3. **Built** with a modest engagement lift for attentive listeners, shaped by intelligence. A future visual effect could drive colour-chase lighting in time with the three beats.
-- **Uses:** three beats; the crowd effect fires on the third.
+- **Notes / issue:** from #3. **Built** with a modest engagement lift for attentive listeners, shaped by intelligence. Each accepted use lights another mark on its medal and plays a note one whole tone higher. A future visual effect could drive colour-chase lighting in time with the three beats.
+- **Uses:** three beats; the crowd effect fires on the third, then the medal burns away.
 
 ### Pious statement
 

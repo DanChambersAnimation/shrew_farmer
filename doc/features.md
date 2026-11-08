@@ -9,7 +9,7 @@ What exists in the game today, and where to see it. Rooms open at `?room=<name>`
 | dev0 | The church hall: stage, audience, the Speaker glancing around, house lights.       |
 | dev1 | One audience member on one chair, close up.                                        |
 | dev2 | dev0 plus lighting states: house lights, or a spotlight (L to switch).             |
-| dev3 | Playable church hall: crowd simulation, round timer and gambits (#6–#8).           |
+| dev3 | Playable church hall: start cue, crowd simulation, round timer and gambits.        |
 | dev4 | Round timer.                                                                       |
 | dev8 | All six 3D gambit medals in a fixed rack above the timer.                          |
 | dev9 | Speech bubbles: audience mood changes shown as pictogram bubbles, max two at once. |
@@ -33,8 +33,9 @@ What exists in the game today, and where to see it. Rooms open at `?room=<name>`
 
 - **Audience model:** each person has a personality and numeric state (approval, engagement); their face and arms follow their state while their appearance stays fixed.
 - **Crowd simulation:** once a second, engagement drifts down and sociable people are pulled toward their neighbours' moods.
-- **Gambits:** a registry of items and one effect pipeline for gambits, power-ups and equipment (see [gambits.md](gambits.md)). A round has a hand of gambits; each item's registry entry sets its use limit, build-up and cooldown. The 3D medal rack shows the hand above the timer.
+- **Gambits:** a registry of items, registered availability traits, and one effect pipeline for gambits, power-ups and equipment (see [gambits.md](gambits.md)). A round has a hand of gambits; their 3D medals appear with Perlin noise, show cooldown in the medal itself, and burn away after their last use.
 - **Round timer:** a round clock with an on-screen meter.
+- **Round audio:** the playable room starts on a click with a get-ready cue. If more than half the audience is disengaged at the end, a loss cue plays.
 
 ## Speech bubbles
 
