@@ -12,6 +12,8 @@ import { LimitedUse, gambitTrait } from "../traits.ts";
 export const tShirtCannon: ItemDef = {
   id: "t-shirt-cannon",
   name: "T-shirt cannon",
+  summary:
+    "Launches T-shirts at 3 randomly chosen audience members. Anyone asleep or switched off may be hurt by it.",
   medal: { shape: "square", emblem: "shirt", metal: 0xc89274 },
   gambitTraits: [gambitTrait(LimitedUse, { count: 1 })],
   visual: { kind: "t-shirt-barrage", traits: [trait(TShirtBarrage)] },

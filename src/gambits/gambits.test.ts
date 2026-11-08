@@ -48,6 +48,12 @@ describe("gambit registry", () => {
       expect(items.has(id)).toBe(true);
     }
     expect(items.get("personal-anecdote").name).toBe("Personal anecdote");
+    // Every gambit carries a readable line for the strip under the medals.
+    for (const id of items.names()) {
+      const summary = items.get(id).summary;
+      expect(summary.length).toBeGreaterThan(20);
+      expect(summary.length).toBeLessThan(160);
+    }
     expect(items.get("anecdote-callback").name).toBe("Callback to anecdote");
     const emblems = items.names().map((id) => items.get(id).medal.emblem);
     expect(new Set(emblems).size).toBe(items.names().length);
@@ -74,6 +80,7 @@ describe("gambit registry", () => {
     const item: ItemDef = {
       id: "test",
       name: "Test",
+      summary: "Does a test thing.",
       medal: { shape: "round", emblem: "story", metal: 0xffffff },
       gambitTraits: [],
       visual: { kind: "test-visual" },
@@ -195,6 +202,7 @@ describe("judging a move", () => {
     const item: ItemDef = {
       id: "cheer",
       name: "Cheer",
+      summary: "Raises approval.",
       medal: { shape: "round", emblem: "story", metal: 0xffffff },
       gambitTraits: [],
       visual: { kind: "cheer" },
@@ -261,6 +269,7 @@ describe("resolving an item on a crowd", () => {
     const item: ItemDef = {
       id: "nearby",
       name: "Nearby",
+      summary: "Reaches only the nearest listeners.",
       medal: { shape: "round", emblem: "story", metal: 0xffffff },
       gambitTraits: [],
       visual: { kind: "nearby-visual" },

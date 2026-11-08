@@ -10,6 +10,8 @@ import { Cooldown, LimitedUse, gambitTrait } from "../traits.ts";
 export const personalAnecdote: ItemDef = {
   id: "personal-anecdote",
   name: "Personal anecdote",
+  summary:
+    "Tells a story about yourself. Raises approval and attention, and listeners remember it. Anyone bored misses it.",
   medal: { shape: "round", emblem: "story", metal: 0xe7a83d },
   gambitTraits: [gambitTrait(Cooldown, { seconds: 15 })],
   visual: {
@@ -48,6 +50,8 @@ export const personalAnecdote: ItemDef = {
 export const anecdoteCallback: ItemDef = {
   id: "anecdote-callback",
   name: "Callback to anecdote",
+  summary:
+    "Pays off the earlier story. Lands hardest about fifteen seconds after it; falls flat on anyone who missed it.",
   medal: { shape: "square", emblem: "callback", metal: 0x9274c9 },
   gambitTraits: [gambitTrait(LimitedUse, { count: 1 })],
   visual: {

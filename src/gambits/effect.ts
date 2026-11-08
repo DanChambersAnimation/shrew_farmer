@@ -63,6 +63,11 @@ export interface MedalDef {
 export interface ItemDef {
   readonly id: string;
   readonly name: string;
+  /**
+   * One line the player can read: what the gambit does, and what it risks.
+   * Stays short enough to sit under the row of medals.
+   */
+  readonly summary: string;
   /** The 3D medal shown in the overlay; its accessible label is `name`. */
   readonly medal: MedalDef;
   /** Registered traits that gate use, exhaust the item, or build up an effect. */

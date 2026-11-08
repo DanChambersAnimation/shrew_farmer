@@ -1,10 +1,10 @@
 import "./preview.css";
 import { AUDIO_CLIPS } from "./clips.ts";
-import { clipUrl } from "./player.ts";
+import { clipUrl, playRecorded, setAudioListenerPose } from "./player.ts";
 
 const root = document.querySelector<HTMLElement>("#audio-preview")!;
 const header = document.createElement("header");
-header.innerHTML = `<a href="./">← Game</a><h1>Audio samples</h1><p>${AUDIO_CLIPS.length} recorded cues for the round, gambits, and audience. These takes are available for listening review.</p>`;
+header.innerHTML = `<a href="./">← Game</a><h1>Audio samples</h1><p>${AUDIO_CLIPS.length} recorded cues for the round, gambits, and audience. For crowd clips, compare the original with a left or right seat. Headphones make the position easier to hear.</p>`;
 root.appendChild(header);
 
 const filters = document.createElement("div");
@@ -42,6 +42,26 @@ for (const clip of AUDIO_CLIPS) {
   audio.preload = "none";
   audio.src = clipUrl(clip.id);
   audio.setAttribute("aria-label", clip.name);
+  const inRoom = document.createElement("div");
+  if (clip.category === "crowd") {
+    inRoom.className = "seat-listen";
+    for (const [label, x] of [
+      ["Left seat", -3],
+      ["Right seat", 3],
+    ] as const) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "in-room";
+      button.textContent = label;
+      button.setAttribute("aria-label", `Hear ${clip.name} from the ${label.toLowerCase()}`);
+      button.addEventListener("click", () => {
+        audio.pause();
+        setAudioListenerPose([0, 2.5, 5], [0, 0, -1]);
+        playRecorded(clip.id, [x, 1.4, -1.5]);
+      });
+      inRoom.appendChild(button);
+    }
+  }
   const caption = document.createElement("p");
   caption.className = "caption";
   caption.textContent = `Caption: ${clip.caption}`;
@@ -51,7 +71,9 @@ for (const clip of AUDIO_CLIPS) {
   const request = document.createElement("pre");
   request.textContent = `${clip.filename}\n\n${JSON.stringify(clip.request, null, 2)}`;
   details.append(summary, request);
-  card.append(category, title, purpose, audio, caption, details);
+  card.append(category, title, purpose, audio);
+  if (clip.category === "crowd") card.append(inRoom);
+  card.append(caption, details);
   root.appendChild(card);
   cards.push({
     card,

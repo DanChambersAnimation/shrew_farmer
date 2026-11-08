@@ -10,6 +10,8 @@ import { BuildUp, Cooldown, LimitedUse, gambitTrait } from "../traits.ts";
 export const ruleOfThree: ItemDef = {
   id: "rule-of-three",
   name: "Rule of three",
+  summary:
+    "A rhythmic three-part line. Each use lifts engagement a little; the third releases it fully. Clever listeners feel it most.",
   medal: { shape: "round", emblem: "three", metal: 0xe9a84d },
   gambitTraits: [gambitTrait(BuildUp, { count: 3 }), gambitTrait(LimitedUse, { count: 3 })],
   visual: {
@@ -46,6 +48,8 @@ export const ruleOfThree: ItemDef = {
 export const piousStatement: ItemDef = {
   id: "pious-statement",
   name: "Pious statement",
+  summary:
+    "A solemn religious remark. Wins over the faithful and cools everyone else, in proportion to their faith.",
   medal: { shape: "square", emblem: "book", metal: 0xa7b6be },
   gambitTraits: [gambitTrait(Cooldown, { seconds: 12 })],
   visual: {
@@ -81,6 +85,8 @@ export const piousStatement: ItemDef = {
 export const praiseJesus: ItemDef = {
   id: "praise-jesus",
   name: "Praise Jesus!",
+  summary:
+    "A bold declaration of faith. Strong approval from the devout, strong disapproval from the rest. Once a round.",
   medal: { shape: "round", emblem: "praise", metal: 0xf4c746 },
   gambitTraits: [gambitTrait(LimitedUse, { count: 1 })],
   visual: {

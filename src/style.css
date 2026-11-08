@@ -10,6 +10,38 @@ canvas {
   display: block;
 }
 
+#gambit-summary {
+  position: fixed;
+  z-index: 10;
+  top: calc(10vh - 6px);
+  left: 50%;
+  box-sizing: border-box;
+  width: 33.333vw;
+  min-height: 2.6em;
+  margin: 0;
+  transform: translateX(-50%);
+  color: #f4ecd8;
+  font:
+    700 clamp(10px, 1vw, 13px) / 1.35 system-ui,
+    sans-serif;
+  text-align: center;
+  text-shadow:
+    0 1px 2px rgb(0 0 0 / 0.9),
+    0 0 6px rgb(0 0 0 / 0.7);
+  pointer-events: none;
+}
+
+#gambit-summary:empty {
+  display: none;
+}
+
+#gambit-summary strong {
+  display: block;
+  color: #ffe45e;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+}
+
 #gambit-rack-slot {
   position: fixed;
   z-index: 10;
