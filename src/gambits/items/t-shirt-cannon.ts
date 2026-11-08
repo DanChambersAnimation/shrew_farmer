@@ -35,8 +35,16 @@ export const tShirtCannon: ItemDef = {
         ],
       },
     ],
-    onSuccess: [{ id: "t-shirt-volley" }, { id: "house-lift" }],
-    onFailure: [{ id: "t-shirt-volley" }, { id: "house-dip" }],
+    onSuccess: [
+      { id: "t-shirt-volley" },
+      { id: "house-lift" },
+      { id: "gambit/t-shirt-cannon/success" },
+    ],
+    onFailure: [
+      { id: "t-shirt-volley" },
+      { id: "house-dip" },
+      { id: "gambit/t-shirt-cannon/failure" },
+    ],
   },
 };
 

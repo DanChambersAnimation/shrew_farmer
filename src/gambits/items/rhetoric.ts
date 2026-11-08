@@ -22,6 +22,8 @@ export const ruleOfThree: ItemDef = {
   },
   simulation: {
     onUse: [{ id: "rule-of-three-tone" }],
+    onSuccess: [{ id: "gambit/rule-of-three/success" }],
+    onFailure: [{ id: "gambit/rule-of-three/failure" }],
     outcomes: [
       {
         weight: 1,
@@ -55,6 +57,8 @@ export const piousStatement: ItemDef = {
     ],
   },
   simulation: {
+    onSuccess: [{ id: "gambit/pious-statement/success" }],
+    onFailure: [{ id: "gambit/pious-statement/failure" }],
     outcomes: [
       {
         weight: 1,
@@ -88,6 +92,8 @@ export const praiseJesus: ItemDef = {
     ],
   },
   simulation: {
+    onSuccess: [{ id: "gambit/praise-jesus/success" }],
+    onFailure: [{ id: "gambit/praise-jesus/failure" }],
     outcomes: [
       {
         weight: 1,

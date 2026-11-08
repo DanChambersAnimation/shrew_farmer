@@ -7,7 +7,7 @@ import { applyEffect, chooseOutcome, type ItemDef } from "../gambits/effect.ts";
 import { effectsFor, judge, resolveItem, type CrowdMember } from "../gambits/resolve.ts";
 import { World } from "../core/world.ts";
 import { spawnSpec } from "../core/spec.ts";
-import "../effects/builtin.ts";
+import "../effects/library.ts";
 import { Sign } from "../traits/sign.ts";
 import { T_SHIRT_FIRED, TShirtBarrage } from "../traits/t-shirt-barrage.ts";
 

@@ -1,0 +1,109 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: #f5ede0;
+  background: #171b24;
+}
+
+body {
+  margin: 0;
+}
+
+#audio-preview {
+  width: min(820px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 2rem 0 4rem;
+}
+
+header {
+  margin-bottom: 2rem;
+}
+
+a {
+  color: #efc982;
+}
+
+h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  margin: 0.7rem 0;
+}
+
+header p,
+.audio-card p {
+  line-height: 1.5;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.filters input,
+.filters select {
+  box-sizing: border-box;
+  min-height: 2.5rem;
+  border: 1px solid #7b879b;
+  border-radius: 0.5rem;
+  background: #262d3a;
+  color: inherit;
+  padding: 0.45rem 0.7rem;
+  font: inherit;
+}
+
+.filters input {
+  flex: 1 1 16rem;
+}
+
+.filters .count {
+  margin: 0;
+  color: #cbd5e4;
+}
+
+.audio-card {
+  background: #262d3a;
+  border: 1px solid #4a5364;
+  border-radius: 1rem;
+  margin: 1rem 0;
+  padding: 1.25rem;
+}
+
+.audio-card[hidden] {
+  display: none;
+}
+
+.category {
+  color: #efc982;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+h2 {
+  margin: 0.5rem 0;
+}
+
+audio {
+  width: 100%;
+  margin: 0.5rem 0;
+}
+
+.caption {
+  color: #cbd5e4;
+  font-style: italic;
+}
+
+summary {
+  cursor: pointer;
+  color: #efc982;
+}
+
+pre {
+  overflow-x: auto;
+  background: #171b24;
+  border-radius: 0.5rem;
+  padding: 0.8rem;
+  font-size: 0.8rem;
+}

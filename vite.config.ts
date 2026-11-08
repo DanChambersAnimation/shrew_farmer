@@ -10,6 +10,7 @@ export default defineConfig({
       input: {
         main: "index.html",
         contactSheet: "contact-sheet.html",
+        audioPreview: "audio-preview.html",
       },
     },
   },

@@ -3,6 +3,19 @@
 Pre-recorded vocal responses and per-gambit sound effects, generated offline with
 ElevenLabs and shipped as static files. Nothing calls ElevenLabs at runtime.
 
+## Implementation status — 8 November 2026
+
+The full proposed cue sheet has been recorded as 114 MP3s and indexed in
+`src/audio/clips.ts`: six gambit success/failure pairs, an additional T-shirt launch,
+round cues, Speaker lines, 59 mood lines across eight bands, eight situational audience
+lines, and crowd reaction, clapping, snoring and room sounds. Every gambit verdict now
+references its recorded effect. `/audio-preview.html` lets the team search and review
+each take; `vpx scripts/audio.ts verify` checks the committed files and request hashes.
+
+The other clips are content candidates. The shared mixer, round milestone events,
+audience scheduler, cross-faded beds, captions and audio settings still need runtime
+work, tracked in [#23](https://github.com/DanChambersAnimation/shrew_farmer/issues/23).
+
 Related: [#15](https://github.com/DanChambersAnimation/shrew_farmer/issues/15) (game feedback),
 [#16](https://github.com/DanChambersAnimation/shrew_farmer/issues/16) (staged beats),
 [#17](https://github.com/DanChambersAnimation/shrew_farmer/issues/17) (round audio).
@@ -38,28 +51,31 @@ export interface Clip {
   /** Stable id, also the path under public/audio minus the extension. */
   readonly id: string;
   readonly kind: "speech" | "effect";
+  readonly name: string;
+  readonly category: "speaker" | "gambit" | "crowd" | "round";
+  readonly purpose: string;
+  readonly filename: string;
+  readonly caption: string;
   /** The exact text sent to the text-to-speech API. Speech only. */
   readonly text?: string;
   /** Voice settings for speech, sound-effect prompt for effects. */
   readonly request: SpeechRequest | EffectRequest;
   /** Where it is used, and by what event. For humans and the generator. */
   readonly usedBy: string;
-  /** Generated: SHA-256 of the request, so an edited line regenerates only itself. */
-  readonly requestHash: string;
 }
 ```
 
-`requestHash` is the trick that makes regeneration cheap: change one line of text and only that
-clip is re-requested. The CLI refuses to overwrite a clip whose text changed unless asked, so
-you hear the diff before spending credits.
+The generator records each request hash and the generated file's content hash in
+`src/audio/audio-lock.json`. Change one request and only that clip becomes stale. The CLI refuses
+to overwrite a stale recording without `--replace`, so it can be heard before spending more
+credits. The content hash also changes the browser URL when a new take uses the same request.
 
 ### 1a. Where the files go, and what they are called
 
 Everything lives under **`public/audio/`**. `public/` is Vite's default static directory and
 nothing overrides it (`vite.config.ts` sets no `publicDir`), so files there are copied verbatim
-into `dist/` and served from the site root — which also works under GitHub Pages' `/shrew_farmer/`
-base because the build already sets `base: "./"`. Reference them with a root-relative URL:
-`/audio/gambit/personal-anecdote/success.mp3`.
+into `dist/`. The player builds URLs from `import.meta.env.BASE_URL` because GitHub Pages serves
+the game under `/shrew_farmer/`; a literal `/audio/...` would point at the wrong site root.
 
 **One directory per category.** The first path segment is the category, and it mirrors the four
 things the game can make a sound about:
@@ -103,10 +119,14 @@ A manifest entry and its file line up without translation:
 ```ts
 {
   id: "gambit/personal-anecdote/success",
-  kind: "speech",
-  text: "So there I was, forty feet up a ladder…",
-  usedBy: "GAMBIT_PLAYED when verdict is success",
-  requestHash: "9f2c…",
+  name: "Personal anecdote lands — rousing applause",
+  category: "gambit",
+  kind: "effect",
+  purpose: "A sustained ovation when the anecdote raises approval.",
+  filename: "gambit/personal-anecdote/success.mp3",
+  caption: "The crowd breaks into sustained applause and cheers.",
+  usedBy: "Personal Anecdote onSuccess",
+  request: { text: "A small audience breaks into rousing applause…", modelId: "eleven_text_to_sound_v3" },
 }
 // -> public/audio/gambit/personal-anecdote/success.mp3
 ```
@@ -142,7 +162,8 @@ Two hard rules:
 
 ElevenLabs' text-to-speech takes `voice_id`, `model_id` and `voice_settings`
 (`stability`, `similarity_boost`, `style`, `use_speaker_boost`). Sound effects take a text
-prompt plus `duration_seconds` (0.5–22) and optional `prompt_influence`.
+prompt plus `duration_seconds` (0.5–30), optional `prompt_influence`, and an explicit
+`model_id: "eleven_text_to_sound_v3"`.
 
 - **The Speaker** is one voice, used for all of his own lines. Pick it by ear once and pin the
   `voice_id` in the manifest; changing it later is a one-line edit plus regeneration.
@@ -205,27 +226,30 @@ recorded.
 
 **Per gambit — success and failure variants**
 
-Every gambit gets an effect for the act of playing it, plus a speech reaction on success. This
-is the bulk of the work: six gambits × two verdicts ≈ 12 effects plus ~8 lines.
+Every gambit requires **two distinct recorded sound effects**: one for `onSuccess` and one for
+`onFailure`. Both are entries in the effects registry with a name, category, intended purpose,
+and filename. A physical action may also have an optional `onUse` sound, such as each T-shirt
+launch. Speaker lines are separate speech clips. The first review set records only the Personal
+Anecdote pair; the rest below are candidate sounds.
 
-| Gambit              | Effect (play)                                    | Success speech                                       |
-| ------------------- | ------------------------------------------------ | ---------------------------------------------------- |
-| `personal-anecdote` | paper rustle, a single warm "hmm" from the crowd | "So there I was, forty feet up a ladder…"            |
-| `anecdote-callback` | a soft recognition chime                         | "Remember the ladder? Exactly. That's what this is." |
-| `rule-of-three`     | three rising thumps, one per beat                | "Simple. Honest. Unstoppable."                       |
-| `pious-statement`   | low organ swell                                  | "There are things we don't earn. We accept them."    |
-| `praise-jesus`      | a hard choir stab                                | "Praise Jesus! Amen!"                                |
-| `t-shirt-cannon`    | the cannon's pop and flight                      | "Catch it! Don't be shy!"                            |
+| Gambit              | Success effect                     | Failure effect                           |
+| ------------------- | ---------------------------------- | ---------------------------------------- |
+| `personal-anecdote` | sustained, building applause       | an awkward cough and chair creak         |
+| `anecdote-callback` | a warm recognition chime           | a short, descending missed-cue chime     |
+| `rule-of-three`     | a strong third beat and room cheer | a rhythm that stumbles and stops         |
+| `pious-statement`   | a low, resolving organ swell       | a sour, unresolved organ note            |
+| `praise-jesus`      | a full choir response              | a choir stab cut off in dissonance       |
+| `t-shirt-cannon`    | excited whoops after the volley    | a dull impact and startled room reaction |
 
-Failure variants should be **shorter and flatter**: a deflating tone, a cough, one word.
-"Right. Moving on." A failure cue that sounds funny is worth more than one that sounds sad.
+Failure variants should be shorter and flatter where that suits the gambit. The player should
+hear the verdict from the sound alone.
 
 **Moods and ambience** — see 4b. The line bank there covers every mood band, and clapping and
 snoring are the ambience beds.
 
 ### 4a. Milestones — the one new trait this needs
 
-Nothing emits proTHegress events today, and adding three ad-hoc timer checks would be exactly the
+Nothing emits progress events today, and adding three ad-hoc timer checks would be exactly the
 special-casing `principles.md` warns about. Instead, a small room trait in the same shape as
 `GameTimer`:
 
@@ -351,16 +375,19 @@ The engine already says behaviour belongs in traits. So:
   with an optional gain and pitch. Replaces the oscillator-only path for recorded sound; keeps
   `cues.ts` tone generation for anything still synthesised (the Rule of Three pitch ladder is
   lovely and cheap — keep it).
-- **`SoundCue` trait** — settings are a map from event name to clip ids, so any object can
-  sound like anything without new code:
+- **Gambit verdict effects** — the existing `onSuccess` and `onFailure` lists refer to the
+  corresponding registered audio effects. `GAMBIT_PLAYED` happens before the verdict is known,
+  so it cannot select the outcome sound.
+- **`SoundCue` trait** — a later step maps non-gambit events to clip ids, so rooms and audience
+  members can sound different through settings:
 
   ```ts
   room.add(SoundCue, {
-    cues: { "gambit-played": "gambit/{item}/success", "round-lost": "speaker/lost" },
+    cues: { "round-lost": "speaker/round-lost" },
   });
   ```
 
-  Templating on `{item}` and `{verdict}` is what keeps this from becoming six special cases.
+  The crowd needs a shared scheduler so forty `MOOD_CHANGED` events do not play forty clips.
 
 - **Autoplay**: browsers block audio until a gesture. The existing `Start Round` action is the
   natural unlock point — resume the `AudioContext` there and keep every cue silent before it.
@@ -377,14 +404,15 @@ The engine already says behaviour belongs in traits. So:
 
 ## What I would build first
 
-A thin vertical slice, not the whole cue sheet:
+A thin vertical slice, not the whole cue sheet. Issue #21 contains the first review set:
 
 1. `Clip` manifest plus `scripts/audio.ts` with `list`, `generate --only`, `verify`.
-2. Three clips: one Speaker line, one success effect, one failure effect.
-3. `src/audio/player.ts` with decode and cache; wire it to `GAMBIT_PLAYED` and the verdict.
-4. The mute toggle and caption.
-5. Cross-faded beds, for clapping and snoring.
-6. Only then expand the cue sheet, one gambit at a time.
+2. Six clips: one Speaker line, a success/failure effect pair, and three audience reactions.
+3. `src/audio/player.ts` with decode and cache; wire the effect pair to the existing gambit
+   verdict hooks and add a listening page with metadata.
+4. Review the recordings before expanding the cue sheet.
+5. Add a shared mixer, mute toggle, in-game captions, audience scheduling, and cross-faded beds
+   after the sample sounds are approved.
 
 That gets the pipeline proven end to end before anyone spends credits on forty clips they might
 not like.
@@ -401,6 +429,5 @@ not like.
 - **How rude can the crowd be?** "WTF?" versus "You what?" changes the age rating and the
   recording pass. Worth settling before the hostile lines are recorded.
 - **Cache busting.** Files under `public/` get no hashed names, so a replaced clip can serve
-  stale from a browser cache. Options: a `?v=<requestHash>` query string built from the
-  manifest, or an `audio.sw.js` cache-first service worker keyed on the hash. I would start with
-  the query string — it needs no new machinery.
+  stale from a browser cache. The sample player appends `?v=<fileHash>` from the generated lock
+  file. This changes even when a new take uses the same request.
