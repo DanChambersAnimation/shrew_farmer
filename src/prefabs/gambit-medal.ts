@@ -15,6 +15,7 @@ import {
   type Material,
 } from "three";
 import type { MedalDef } from "../gambits/effect.ts";
+import { createMedalCooldown } from "./gambit-medal-cooldown.ts";
 
 /** Small independent movements, in radians and screen pixels. */
 export function medalJiggle(seconds: number, phase: number) {
@@ -41,6 +42,7 @@ export function createGambitMedal(def: MedalDef) {
   const enamel = new MeshBasicMaterial({ color: 0xfff0bd, toneMapped: false });
   const accent = new MeshBasicMaterial({ color: 0xff7187, toneMapped: false });
   const ink = new MeshBasicMaterial({ color: 0x211529, toneMapped: false });
+  const beats: Mesh[][] = [];
   materials.push(metal, inset, enamel, accent, ink);
 
   const addShape = (
@@ -77,6 +79,7 @@ export function createGambitMedal(def: MedalDef) {
     const mesh = new Mesh(geometry, material);
     mesh.position.set(x, y, 0.17);
     group.add(mesh);
+    return mesh;
   };
   const addDot = (x: number, y: number, radius: number, material: Material = enamel) => {
     const geometry = new SphereGeometry(radius, 14, 10);
@@ -84,6 +87,7 @@ export function createGambitMedal(def: MedalDef) {
     const mesh = new Mesh(geometry, material);
     mesh.position.set(x, y, 0.17);
     group.add(mesh);
+    return mesh;
   };
 
   if (def.shape === "round") {
@@ -140,8 +144,7 @@ export function createGambitMedal(def: MedalDef) {
     case "three":
       for (const [index, height] of [0.15, 0.25, 0.36].entries()) {
         const x = (index - 1) * 0.24;
-        addBar(x, -0.28 + height / 2, 0.12, height, index === 2 ? accent : enamel);
-        addDot(x, -0.28 + height, 0.07, index === 2 ? accent : enamel);
+        beats.push([addBar(x, -0.28 + height / 2, 0.12, height), addDot(x, -0.28 + height, 0.07)]);
       }
       break;
     case "book":
@@ -198,9 +201,20 @@ export function createGambitMedal(def: MedalDef) {
       break;
   }
 
+  const cooldown = createMedalCooldown(def.shape);
+  group.add(cooldown.group);
+
   return {
     group,
+    setCooldown: (remaining: number, duration: number) => cooldown.set(remaining, duration),
+    /** Light one mark for each accepted beat of Rule of Three. */
+    setStage(uses: number) {
+      for (const [index, meshes] of beats.entries()) {
+        for (const mesh of meshes) mesh.material = index < uses ? accent : enamel;
+      }
+    },
     dispose() {
+      cooldown.dispose();
       for (const geometry of geometries) geometry.dispose();
       for (const material of materials) material.dispose();
     },

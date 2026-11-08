@@ -26,6 +26,8 @@ export interface RackHost {
 
 interface RackEntry {
   readonly button: HTMLButtonElement;
+  /** The icon face inside the button. Cooldown marks live here, not on the row slot. */
+  readonly icon: HTMLSpanElement;
   readonly item: ItemDef;
   readonly medal: ReturnType<typeof createGambitMedal>;
   readonly phase: number;
@@ -113,11 +115,17 @@ export class GambitRack {
     button.title = item.name;
     button.setAttribute("aria-label", item.name);
     button.addEventListener("click", () => this.play(id));
+    // The icon travels with its gambit; the button only reserves the slot.
+    const icon = document.createElement("span");
+    icon.className = "gambit-medal-icon";
+    icon.setAttribute("aria-hidden", "true");
+    button.appendChild(icon);
     this.root.appendChild(button);
     const medal = createGambitMedal(item.medal);
     this.scene.add(medal.group);
     this.medals.set(id, {
       button,
+      icon,
       item,
       medal,
       phase: phaseFor(id),
@@ -159,20 +167,16 @@ export class GambitRack {
       const playable = canPlay(host.room, id, atSeconds);
       button.disabled = !playable;
       const cooldown = !over && !spent ? gambitStatus(host.room, id, atSeconds)?.cooldown : null;
-      button.dataset.cooling = String(Boolean(cooldown));
+      // The countdown is part of the medal's own 3D group, so it travels with
+      // the icon when the row re-sorts rather than staying in its old slot.
       if (cooldown) {
+        medal.setCooldown(cooldown.remainingSeconds, cooldown.durationSeconds);
         const seconds = Math.ceil(cooldown.remainingSeconds);
         const label = `${item.name}, ready in ${seconds} ${seconds === 1 ? "second" : "seconds"}`;
-        button.dataset.cooldown = String(seconds);
-        button.style.setProperty(
-          "--cooldown-angle",
-          `${360 * (1 - cooldown.remainingSeconds / cooldown.durationSeconds)}deg`,
-        );
         button.title = label;
         button.setAttribute("aria-label", label);
       } else {
-        delete button.dataset.cooldown;
-        button.style.removeProperty("--cooldown-angle");
+        medal.setCooldown(0, 0);
         button.title = item.name;
         button.setAttribute("aria-label", item.name);
       }
