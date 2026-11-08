@@ -27,8 +27,8 @@ export class World {
   haze = 0;
   /** Day or night outside (see DayNight). Kept when the room changes. */
   outside: "day" | "night" = "day";
-  /** Glow around bright things, or null for none (see the Bloom trait). */
-  bloom: { strength: number; radius: number; threshold: number } | null = null;
+  /** How much bright things glow, or null for none (see the Bloom and Glow traits). */
+  bloom: { strength: number } | null = null;
   /** Brightness (0..1) of each named light group; groups not listed are at 1. */
   readonly lightLevels = new Map<string, number>();
   /** True while something outside the game (e.g. noclip) is steering the camera. */

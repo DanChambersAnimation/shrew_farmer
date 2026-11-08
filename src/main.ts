@@ -47,13 +47,12 @@ const world = new World();
 // Debug handle for the browser console in dev builds.
 if (import.meta.env.DEV) (window as unknown as { world: World }).world = world;
 
-const frame = new FrameRenderer(renderer, world);
+const frame = new FrameRenderer(renderer);
 // Debug handles for the browser console in dev builds (e.g. timing the renderer).
 if (import.meta.env.DEV) Object.assign(window, { frame, renderer });
 
 function resize(): void {
   renderer.setSize(window.innerWidth, window.innerHeight);
-  frame.setSize(window.innerWidth, window.innerHeight);
   world.camera.aspect = window.innerWidth / window.innerHeight;
   world.camera.updateProjectionMatrix();
 }

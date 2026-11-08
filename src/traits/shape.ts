@@ -1,6 +1,7 @@
 import {
   BoxGeometry,
   type BufferGeometry,
+  CircleGeometry,
   CylinderGeometry,
   Mesh,
   MeshStandardMaterial,
@@ -11,9 +12,9 @@ import { defineTrait } from "../core/trait.ts";
 import { makeTexture } from "../textures/index.ts";
 import type { Vec3 } from "./types.ts";
 
-export type ShapeKind = "box" | "cylinder" | "sphere" | "plane";
+export type ShapeKind = "box" | "cylinder" | "sphere" | "plane" | "disc";
 
-/** `size` is the bounding size [x, y, z]; planes use x and y. */
+/** `size` is the bounding size [x, y, z]; planes use x and y; discs use x as the diameter. */
 function makeGeometry(kind: ShapeKind, [x, y, z]: Vec3): BufferGeometry {
   switch (kind) {
     case "box":
@@ -24,6 +25,8 @@ function makeGeometry(kind: ShapeKind, [x, y, z]: Vec3): BufferGeometry {
       return new SphereGeometry(x / 2, 24, 16);
     case "plane":
       return new PlaneGeometry(x, y);
+    case "disc":
+      return new CircleGeometry(x / 2, 48);
   }
 }
 

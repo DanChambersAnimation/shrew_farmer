@@ -1,6 +1,7 @@
 import type { ObjectSpec } from "../core/spec.ts";
 import { trait } from "../core/trait.ts";
 import { GroupGlow } from "../traits/day-night.ts";
+import { Glow } from "../traits/glow.ts";
 import { Light } from "../traits/light.ts";
 import { Transform } from "../traits/transform.ts";
 import type { Vec3 } from "../traits/types.ts";
@@ -30,6 +31,8 @@ export function streetlight(position: Vec3, rotation: Vec3 = [0, 0, 0], height =
         traits: [
           trait(Transform, { position: [0.65, height - 0.2, 0] }),
           trait(GroupGlow, { group: "streetlight", intensity: 3 }),
+          // A halo around the lamp, seen through the windows at night.
+          trait(Glow, { size: [1.4, 1.4], color: 0xffa040, intensity: 0.9, group: "streetlight" }),
         ],
         children: [
           slab("lens", [0.36, 0.04, 0.16], [0, 0, 0], SODIUM, {

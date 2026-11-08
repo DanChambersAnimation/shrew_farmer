@@ -5,6 +5,7 @@ import { HALL } from "../locations/church-hall.ts";
 import { churchHallShow } from "../scenes/church-hall-show.ts";
 import { ColorCycle, Pulse, Sweep } from "../traits/light-animation.ts";
 import { Light } from "../traits/light.ts";
+import { Glow } from "../traits/glow.ts";
 import { Haze } from "../traits/haze.ts";
 import { Laser } from "../traits/laser.ts";
 import { LightingCues } from "../traits/lighting-cues.ts";
@@ -140,6 +141,8 @@ rooms.register({
             sweep: 10,
             period,
           }),
+          // A bright glow where the beams leave the unit.
+          trait(Glow, { size: [0.7, 0.7], color, intensity: 1, group: "lasers" }),
         ],
         children: [
           {

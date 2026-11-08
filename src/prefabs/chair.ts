@@ -12,15 +12,19 @@ const BACK_HEIGHT = 0.5;
 /** Overall chair height (floor to top of the back), in metres. */
 export const CHAIR_HEIGHT = SEAT_HEIGHT + BACK_HEIGHT;
 
-/** A plain cuboid chair facing +z; its sit point is at the back of the seat, just above it. */
-export function chair(position: Vec3 = [0, 0, 0]): ObjectSpec {
+/**
+ * A plain cuboid chair facing +z; its sit point is at the back of the seat,
+ * just above it. With `seat: false` it's just furniture (e.g. stacked away),
+ * so nobody gets seated on it.
+ */
+export function chair(position: Vec3 = [0, 0, 0], { seat = true } = {}): ObjectSpec {
   const leg = (x: number, z: number) =>
     slab("chair-leg", [0.04, SEAT_HEIGHT - 0.05, 0.04], [x, (SEAT_HEIGHT - 0.05) / 2, z], CHAIR);
   return {
     kind: "chair",
     traits: [
       trait(Transform, { position }),
-      trait(Seat, { sitPoint: [0, SEAT_HEIGHT + 0.01, -0.07] }),
+      ...(seat ? [trait(Seat, { sitPoint: [0, SEAT_HEIGHT + 0.01, -0.07] })] : []),
     ],
     children: [
       slab("chair-seat", [0.5, 0.05, 0.45], [0, SEAT_HEIGHT - 0.025, 0], CHAIR),
@@ -30,5 +34,19 @@ export function chair(position: Vec3 = [0, 0, 0]): ObjectSpec {
       leg(-0.22, 0.2),
       leg(0.22, 0.2),
     ],
+  };
+}
+
+/**
+ * A stack of `count` chairs, as stacking chairs nest: each one a little higher
+ * and slightly shifted. None are seats. Stands at `position`, facing +z.
+ */
+export function chairStack(position: Vec3, count = 6, rotation: Vec3 = [0, 0, 0]): ObjectSpec {
+  return {
+    kind: "chair-stack",
+    traits: [trait(Transform, { position, rotation })],
+    children: Array.from({ length: count }, (_, i) =>
+      chair([0, i * 0.075, i * 0.012], { seat: false }),
+    ),
   };
 }

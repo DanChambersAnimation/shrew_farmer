@@ -1,5 +1,6 @@
 import type { ObjectSpec } from "../core/spec.ts";
 import { trait } from "../core/trait.ts";
+import { Glow } from "../traits/glow.ts";
 import { Transform } from "../traits/transform.ts";
 import type { Vec3 } from "../traits/types.ts";
 import { slab } from "./blocks.ts";
@@ -48,7 +49,18 @@ export function windowFrame(
   }
   return {
     kind: "window",
-    traits: [trait(Transform, { position, rotation })],
+    traits: [
+      trait(Transform, { position, rotation }),
+      // Daylight glowing through the glass (off at night).
+      trait(Glow, {
+        shape: "rect",
+        size: [width * 1.25, height * 1.2],
+        color: 0xdcecff,
+        intensity: 0.45,
+        group: "daylight",
+        offset: [0, 0, 0.08],
+      }),
+    ],
     children: [
       // Clear glass, faintly tinted.
       slab("glass", [width, height, 0.02], [0, 0, 0], GLASS, {

@@ -1,11 +1,12 @@
 import type { ObjectSpec } from "../core/spec.ts";
 import { slab } from "../prefabs/blocks.ts";
-import { CHAIR_HEIGHT, chair } from "../prefabs/chair.ts";
+import { CHAIR_HEIGHT, chair, chairStack } from "../prefabs/chair.ts";
 import { fireDoors, fireExtinguisher } from "../prefabs/fire-exit.ts";
 import { noticeboard } from "../prefabs/noticeboard.ts";
 import { mopAndBucket, smilingVacuum } from "../prefabs/cleaning.ts";
 import { radiator } from "../prefabs/radiator.ts";
 import { streetlight } from "../prefabs/streetlight.ts";
+import { wallClock } from "../prefabs/wall-clock.ts";
 import { windowFrame } from "../prefabs/window.ts";
 import { trait } from "../core/trait.ts";
 import { Highlight } from "../traits/highlight.ts";
@@ -31,6 +32,8 @@ const PILLAR = 0xcfc6b6;
 const PILLAR_SPACING = 5;
 /** Side windows: real openings in the wall, centred in each bay between pillars. */
 const WINDOW = { width: 2.6, height: 3, centre: 3.2 } as const;
+/** Width of the double fire doors (two 0.9 m leaves and the gap). */
+const FIRE_DOORS_WIDTH = 1.82;
 /** Wall thickness. */
 const WALL_T = 0.2;
 /** Tint over the parquet texture (white = the wood as drawn). */
@@ -203,6 +206,17 @@ function backWall(): ObjectSpec {
     kind: "back-wall",
     children: [
       fireDoors([0, 0, z]),
+      // A coir doormat in front of the doors, the same width as them.
+      slab("doormat", [FIRE_DOORS_WIDTH, 0.02, 0.85], [0, 0.01, z + 0.5], 0xffffff, {
+        texture: "coir",
+        textureSize: 0.6,
+        roughness: 1,
+      }),
+      wallClock([0, 3.15, z + 0.01]),
+      // Stacked chairs to the right of the doors (past the extinguisher).
+      chairStack([2.3, 0, z + 0.4], 7),
+      chairStack([2.95, 0, z + 0.42], 5, [0, -6, 0]),
+      chairStack([3.6, 0, z + 0.4], 8, [0, 4, 0]),
       fireExtinguisher([1.45, 0.3, z]),
       noticeboard([-3, 1.55, z]),
       // Cleaning things tucked into the back right corner.
@@ -236,7 +250,8 @@ export function churchHall(): ObjectSpec {
       {
         kind: "sign",
         traits: [
-          trait(Transform, { position: [0, h * 0.6, -d / 2 + 0.01] }),
+          // High on the back wall, above the clock and fire doors.
+          trait(Transform, { position: [0, h * 0.75, -d / 2 + 0.01] }),
           trait(Sign, { text: "Church Hall", width: 4, height: 1 }),
           trait(Inspectable, {
             title: "Church hall sign",
