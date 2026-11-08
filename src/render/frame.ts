@@ -5,6 +5,9 @@ import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 import type { World } from "../core/world.ts";
 
+/** How much smaller than the screen the bloom is computed. */
+const BLOOM_DIVISOR = 2;
+
 /**
  * Draws the world each frame: straight to the screen, or through a bloom pass
  * when the room asks for it (world.bloom). Tone mapping stays as configured on
@@ -27,13 +30,19 @@ export class FrameRenderer {
   }
 
   setSize(width: number, height: number): void {
-    this.composer.setPixelRatio(this.renderer.getPixelRatio());
+    const ratio = this.renderer.getPixelRatio();
+    this.composer.setPixelRatio(ratio);
     this.composer.setSize(width, height);
+    // Bloom is a blur, so it can run far below screen resolution: half the
+    // width and height here, and the pass halves again internally. This is
+    // most of bloom's cost, and the difference barely shows.
+    this.bloomPass.setSize((width * ratio) / BLOOM_DIVISOR, (height * ratio) / BLOOM_DIVISOR);
   }
 
   render(world: World): void {
     const camera = world.viewCamera;
-    if (!world.bloom) {
+    // No bloom, or too faint to see: skip post-processing entirely.
+    if (!world.bloom || world.bloom.strength < 0.001) {
       this.renderer.render(world.scene, camera);
       return;
     }

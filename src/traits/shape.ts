@@ -46,6 +46,8 @@ export const Shape = defineTrait({
     textureSize: 1.2,
     /** Turn the texture on the surface, degrees (e.g. 45 for diagonal parquet). */
     textureRotation: 0,
+    /** Below 1 the surface is see-through (e.g. window glass). */
+    opacity: 1,
   },
   setup({ object, settings: s }) {
     const geometry = makeGeometry(s.shape, s.size);
@@ -66,6 +68,10 @@ export const Shape = defineTrait({
       metalness: s.metalness,
       emissive: s.emissive,
       emissiveIntensity: s.emissiveIntensity,
+      opacity: s.opacity,
+      transparent: s.opacity < 1,
+      // See-through surfaces don't hide what's behind them from the depth test.
+      depthWrite: s.opacity >= 1,
     });
     const mesh = new Mesh(geometry, material);
     mesh.castShadow = s.castShadow;
