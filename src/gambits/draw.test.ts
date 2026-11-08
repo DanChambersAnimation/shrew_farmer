@@ -4,12 +4,12 @@ import { World } from "../core/world.ts";
 import { items } from "../gambits/library.ts";
 import type { ItemDef } from "../gambits/effect.ts";
 import { Gambits, canPlay, playGambit } from "../traits/gambits.ts";
+import { GAMBIT_REPLACED, GambitSelection } from "../traits/gambit-selection.ts";
 import { GameTimer } from "../traits/game-timer.ts";
 import { RACK_SIZE, chooseHand, sampleHand } from "./draw.ts";
 
 import.meta.glob(["../rooms/*.ts", "!../rooms/*.test.ts"], { eager: true });
 import "../effects/library.ts";
-import { GambitSelection } from "../traits/gambit-selection.ts";
 
 const pool: ItemDef[] = items.names().map((id) => items.get(id));
 
@@ -77,6 +77,65 @@ describe("GambitSelection", () => {
   });
 });
 
+describe("replacing a burned gambit", () => {
+  const room = (hand: string[], refill = true) => {
+    const world = new World();
+    const root = world.createRoot("room");
+    root.add(GameTimer);
+    root.add(Gambits, { hand: [...hand], played: [], lastUsedAt: {}, finished: false });
+    root.add(GambitSelection, { hand, refill, random: false });
+    return root;
+  };
+
+  it("swaps a burned gambit for a fresh one from the pool", () => {
+    const root = room(["praise-jesus", "personal-anecdote"]);
+    const swaps: unknown[] = [];
+    root.on(GAMBIT_REPLACED, (payload) => swaps.push(payload));
+
+    playGambit(root, items.get("praise-jesus"), 0);
+    root.update(0);
+
+    const hand = root.settingsOf(Gambits)!.hand;
+    // The row keeps its size, drops the burned gambit, and gains a fresh one.
+    expect(hand).toHaveLength(2);
+    expect(hand).not.toContain("praise-jesus");
+    expect(hand).toContain("personal-anecdote");
+    // The burned gambit had already left the row, so this event is a top-up.
+    expect(swaps).toHaveLength(1);
+    expect((swaps[0] as { retired: string | null }).retired).toBeNull();
+    expect((swaps[0] as { replacement: string }).replacement).not.toBe("praise-jesus");
+  });
+
+  it("never offers a gambit that is already in the hand or already retired", () => {
+    const root = room(["praise-jesus", "personal-anecdote"]);
+    playGambit(root, items.get("praise-jesus"), 0);
+    root.update(0);
+    const hand = root.settingsOf(Gambits)!.hand;
+    expect(new Set(hand).size).toBe(hand.length);
+    expect(hand).not.toContain("praise-jesus");
+  });
+
+  it("keeps drawing until the pool runs dry, then the row shrinks", () => {
+    const root = room(["praise-jesus", "anecdote-callback", "t-shirt-cannon"]);
+    expect(root.settingsOf(Gambits)!.hand).toHaveLength(3);
+    for (const id of ["praise-jesus", "anecdote-callback", "t-shirt-cannon"]) {
+      playGambit(root, items.get(id), 0);
+      root.update(0);
+    }
+    const hand = root.settingsOf(Gambits)!.hand;
+    expect(new Set(hand).size).toBe(hand.length);
+    // Every finite item is either spent or replaced by an unused one.
+    for (const id of hand) expect(canPlay(root, id, 5)).toBe(true);
+  });
+
+  it("leaves the row alone when refill is off", () => {
+    const root = room(["praise-jesus"], false);
+    playGambit(root, items.get("praise-jesus"), 0);
+    root.update(0);
+    expect(root.settingsOf(Gambits)!.hand).toEqual([]);
+  });
+});
+
 describe("the rack in a room", () => {
   it("gives dev3 a hand of gambits that can be played", () => {
     const world = new World();
@@ -86,16 +145,28 @@ describe("the rack in a room", () => {
     for (const id of hand) expect(canPlay(room, id, 0)).toBe(true);
   });
 
-  it("spends a single-use gambit so it cannot be played twice", () => {
+  it("spends a limited-use gambit so it leaves the row", () => {
+    const world = new World();
+    const room = world.createRoot("room");
+    room.add(GameTimer);
+    room.add(Gambits, { hand: ["praise-jesus"], played: [], lastUsedAt: {}, finished: false });
+    expect(canPlay(room, "praise-jesus", 0)).toBe(true);
+    expect(playGambit(room, items.get("praise-jesus"), 0)).toBe(true);
+    expect(room.settingsOf(Gambits)!.hand).toEqual([]);
+    expect(canPlay(room, "praise-jesus", 5)).toBe(false);
+    expect(playGambit(room, items.get("praise-jesus"), 5)).toBe(false);
+  });
+
+  it("keeps a cooldown gambit in the row, but makes it wait", () => {
     const world = new World();
     const room = world.createRoot("room");
     room.add(GameTimer);
     room.add(Gambits, { hand: ["personal-anecdote"], played: [], lastUsedAt: {}, finished: false });
-    expect(canPlay(room, "personal-anecdote", 0)).toBe(true);
     expect(playGambit(room, items.get("personal-anecdote"), 0)).toBe(true);
-    expect(room.settingsOf(Gambits)!.hand).toEqual([]);
+    // Still in the row, just unavailable until its cooldown elapses.
+    expect(room.settingsOf(Gambits)!.hand).toEqual(["personal-anecdote"]);
     expect(canPlay(room, "personal-anecdote", 5)).toBe(false);
-    expect(playGambit(room, items.get("personal-anecdote"), 5)).toBe(false);
+    expect(canPlay(room, "personal-anecdote", 15)).toBe(true);
   });
 
   it("closes the hand when the round clock stops", () => {

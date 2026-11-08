@@ -34,3 +34,9 @@ export function itemPool(): ItemDef[] {
     .map((id) => items.get(id))
     .filter((item) => item.simulation.outcomes.length > 0);
 }
+
+/** Pool entries whose ids are not in `exclude`, so a draw never repeats a card. */
+export function excluding(exclude: readonly string[]): ItemDef[] {
+  const blocked = new Set(exclude);
+  return itemPool().filter((item) => !blocked.has(item.id));
+}

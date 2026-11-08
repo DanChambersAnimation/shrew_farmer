@@ -2,6 +2,7 @@ import type { AudiencePersonality, AudienceState } from "../characters/audience-
 import type { MemoryEntry } from "../characters/crowd.ts";
 import type { ObjectSpec } from "../core/spec.ts";
 import type { EffectRef, Verdict } from "../effects/registry.ts";
+import type { GambitTraitEntry } from "./traits.ts";
 
 /**
  * One possible thing an item does when used: a weighted outcome, aimed at part
@@ -64,15 +65,8 @@ export interface ItemDef {
   readonly name: string;
   /** The 3D medal shown in the overlay; its accessible label is `name`. */
   readonly medal: MedalDef;
-  /** How often this gambit can be invoked during a round. */
-  readonly usage: Readonly<{
-    /** Null means unlimited uses; a number is the round's total allowance. */
-    maxUses: number | null;
-    /** Only every Nth accepted use releases the simulation effect. */
-    usesPerEffect: number;
-    /** Minimum seconds between accepted uses, even when an effect has not fired yet. */
-    cooldownSeconds: number;
-  }>;
+  /** Registered traits that gate use, exhaust the item, or build up an effect. */
+  readonly gambitTraits: readonly GambitTraitEntry[];
   /** A spawnable scene object assembled from visual traits. */
   readonly visual: ObjectSpec;
   /** Weighted outcomes composed from effects on audience members. */

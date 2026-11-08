@@ -14,7 +14,7 @@ import { resolveItem, type CrowdMember } from "../gambits/resolve.ts";
 import { AudienceModel } from "../traits/audience-model.ts";
 import { Seat } from "../traits/seat.ts";
 import { GameTimer } from "../traits/game-timer.ts";
-import { GAMBIT_PLAYED, Gambits, canPlay, playGambit } from "../traits/gambits.ts";
+import { GAMBIT_PLAYED, Gambits, canPlay, gambitStatus, playGambit } from "../traits/gambits.ts";
 import { createGambitMedal, medalJiggle } from "../prefabs/gambit-medal.ts";
 import { createMaterialise } from "./materialise.ts";
 
@@ -26,6 +26,9 @@ export interface RackHost {
 
 interface RackEntry {
   readonly button: HTMLButtonElement;
+  /** The icon face inside the button. Cooldown marks live here, not on the row slot. */
+  readonly icon: HTMLSpanElement;
+  readonly item: ItemDef;
   readonly medal: ReturnType<typeof createGambitMedal>;
   readonly phase: number;
   dissolve: ReturnType<typeof createMaterialise> | null;
@@ -96,23 +99,53 @@ export class GambitRack {
       this.root.hidden = true;
       return;
     }
-    for (const id of hand) {
-      if (!items.has(id)) continue;
-      const item = items.get(id);
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "gambit-medal-button";
-      button.dataset.gambit = id;
-      button.title = item.name;
-      button.setAttribute("aria-label", item.name);
-
-      button.addEventListener("click", () => this.play(id));
-      this.root.appendChild(button);
-      const medal = createGambitMedal(item.medal);
-      this.scene.add(medal.group);
-      this.medals.set(id, { button, medal, phase: phaseFor(id), dissolve: null, placed: false });
-    }
+    for (const id of hand) this.addEntry(id);
     this.refresh();
+  }
+
+  /** Build a hit target and medal for one gambit and put it in the row. */
+  private addEntry(id: string): void {
+    if (!items.has(id) || this.medals.has(id)) return;
+    const item = items.get(id);
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "gambit-medal-button";
+    button.dataset.gambit = id;
+    button.dataset.shape = item.medal.shape;
+    button.title = item.name;
+    button.setAttribute("aria-label", item.name);
+    button.addEventListener("click", () => this.play(id));
+    // The icon travels with its gambit; the button only reserves the slot.
+    const icon = document.createElement("span");
+    icon.className = "gambit-medal-icon";
+    icon.setAttribute("aria-hidden", "true");
+    button.appendChild(icon);
+    this.root.appendChild(button);
+    const medal = createGambitMedal(item.medal);
+    this.scene.add(medal.group);
+    this.medals.set(id, {
+      button,
+      icon,
+      item,
+      medal,
+      phase: phaseFor(id),
+      dissolve: null,
+      placed: false,
+    });
+  }
+
+  /** Put the buttons in the hand's order, moving as few as possible. */
+  private orderRow(hand: readonly string[]): void {
+    let previous: HTMLElement | null = null;
+    for (const id of hand) {
+      const entry = this.medals.get(id);
+      if (!entry) continue;
+      const expected: Element | null = previous
+        ? previous.nextElementSibling
+        : this.root.firstElementChild;
+      if (expected !== entry.button) this.root.insertBefore(entry.button, expected);
+      previous = entry.button;
+    }
   }
 
   /** Update hit targets, jiggle, and disappearing medals once a frame. */
@@ -124,11 +157,29 @@ export class GambitRack {
     const atSeconds = clock?.elapsedSeconds ?? 0;
     const over = clock !== undefined && !clock.running;
     const hand = host.room.settingsOf(Gambits)?.hand ?? [];
+    // A fresh gambit may have replaced a burned one; add it and order the row
+    // the way the hand is ordered, so it takes the burned gambit's place.
+    for (const id of hand) this.addEntry(id);
+    this.orderRow(hand);
     for (const [id, entry] of this.medals) {
-      const { button, medal } = entry;
+      const { button, item, medal } = entry;
       const spent = !hand.includes(id);
       const playable = canPlay(host.room, id, atSeconds);
       button.disabled = !playable;
+      const cooldown = !over && !spent ? gambitStatus(host.room, id, atSeconds)?.cooldown : null;
+      // The countdown is part of the medal's own 3D group, so it travels with
+      // the icon when the row re-sorts rather than staying in its old slot.
+      if (cooldown) {
+        medal.setCooldown(cooldown.remainingSeconds, cooldown.durationSeconds);
+        const seconds = Math.ceil(cooldown.remainingSeconds);
+        const label = `${item.name}, ready in ${seconds} ${seconds === 1 ? "second" : "seconds"}`;
+        button.title = label;
+        button.setAttribute("aria-label", label);
+      } else {
+        medal.setCooldown(0, 0);
+        button.title = item.name;
+        button.setAttribute("aria-label", item.name);
+      }
       if (spent && !entry.dissolve) {
         entry.dissolve = createMaterialise(medal.group, {
           seconds: 0.9,

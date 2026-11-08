@@ -14,20 +14,20 @@ function roomWithHand(hand: string[] = [personalAnecdote.id, anecdoteCallback.id
 }
 
 describe("Gambits", () => {
-  it("takes a gambit out of the hand so it cannot be played twice", () => {
-    const { room } = roomWithHand();
+  it("takes an exhausted gambit out of the hand so it cannot be played twice", () => {
+    const { room } = roomWithHand([anecdoteCallback.id]);
     const played: unknown[] = [];
     room.on(GAMBIT_PLAYED, (payload) => played.push(payload));
 
-    expect(canPlay(room, personalAnecdote.id)).toBe(true);
-    expect(playGambit(room, personalAnecdote, 3)).toBe(true);
-    expect(played).toEqual([{ item: personalAnecdote, atSeconds: 3 }]);
+    expect(canPlay(room, anecdoteCallback.id)).toBe(true);
+    expect(playGambit(room, anecdoteCallback, 3)).toBe(true);
+    expect(played).toEqual([{ item: anecdoteCallback, atSeconds: 3 }]);
 
     const hand = room.settingsOf(Gambits)!;
-    expect(hand.hand).toEqual([anecdoteCallback.id]);
-    expect(hand.played).toEqual([personalAnecdote.id]);
-    expect(canPlay(room, personalAnecdote.id)).toBe(false);
-    expect(playGambit(room, personalAnecdote, 4)).toBe(false);
+    expect(hand.hand).toEqual([]);
+    expect(hand.played).toEqual([anecdoteCallback.id]);
+    expect(canPlay(room, anecdoteCallback.id)).toBe(false);
+    expect(playGambit(room, anecdoteCallback, 4)).toBe(false);
   });
 
   it("refuses a gambit that was never in the hand", () => {

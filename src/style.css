@@ -44,6 +44,10 @@ canvas {
   transition: transform 80ms ease;
 }
 
+.gambit-medal-button[data-shape="square"] {
+  border-radius: 10%;
+}
+
 .gambit-medal-button:hover:not(:disabled) {
   transform: translateY(-2px);
 }
@@ -57,7 +61,7 @@ canvas {
   outline-offset: 2px;
 }
 
-/* The medal remains while cooling, with a dark veil above the canvas. */
+/* A spent or round-finished medal dims, with no countdown of its own. */
 .gambit-medal-button:disabled::after {
   position: absolute;
   inset: 3px;
