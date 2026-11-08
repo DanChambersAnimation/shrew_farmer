@@ -8,7 +8,7 @@ What the Speaker uses to engage the audience. Every item has **upsides and downs
 
 **How an item is defined** (`src/gambits/effect.ts`): an item is a list of **weighted outcomes**. Each outcome has a **target** (the whole audience, the room, or a neighbourhood within a radius) and **effects**. An effect changes a person's approval and/or engagement, can decide whether it reaches them at all (e.g. too bored to notice), and can scale by context (personality, what they remember, the round time). Risky items are just extra outcomes with low weights.
 
-Each item attaches named traits from `src/gambits/traits.ts`. **Cooldown** gates repeat use and drives a clock-face sweep on the medal. **LimitedUse** removes the item after its final use; the medal burns away and a fresh gambit can materialise in its place. **BuildUp** releases the crowd effect after several accepted uses. The traits are independent, so an item can combine them.
+Each item attaches named traits from `src/gambits/traits.ts`. **Cooldown** gates repeat use and drives a clock-face sweep on the medal. **LimitedUse** exhausts the item after its final use. When combined with Cooldown, the exhausted medal stays in its slot until the countdown ends, then burns away. **BuildUp** releases the crowd effect after several accepted uses. The replacement trait tries to keep five gambits in the playable rack, drawing an unused item when a slot opens; the fixed preview rooms set their own rack sizes.
 
 ## Entry template
 

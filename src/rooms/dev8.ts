@@ -24,6 +24,7 @@ rooms.register({
         "t-shirt-cannon",
       ],
       random: false,
+      refill: false,
     });
     churchHallShow(room);
   },
