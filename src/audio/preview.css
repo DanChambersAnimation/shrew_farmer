@@ -90,6 +90,27 @@ audio {
   margin: 0.5rem 0;
 }
 
+.seat-listen {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.in-room {
+  border: 1px solid #efc982;
+  border-radius: 0.5rem;
+  background: #3d3440;
+  color: #f5ede0;
+  padding: 0.55rem 0.85rem;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.in-room:hover,
+.in-room:focus-visible {
+  background: #5a4454;
+}
+
 .caption {
   color: #cbd5e4;
   font-style: italic;

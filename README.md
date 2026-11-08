@@ -54,8 +54,12 @@ Open `http://localhost:5173/audio-preview.html` to search and listen to all 114 
 Speaker lines, both outcomes for every gambit, round markers and endings, four audience voices
 across eight moods, and crowd reactions and ambience. The files are committed under
 `public/audio/`, with their metadata and offline generation requests in `src/audio/clips.ts`.
-The gambit outcome sounds play in the game; the remaining cues are available for review while
-the shared crowd and round audio scheduling is built.
+Gambit outcomes, the round's opening and endings, milestone cues, and audience chatter play in
+dev3. The other situational recordings remain available for review.
+For crowd clips, the native player gives the raw recording; **Left seat** and **Right seat**
+play it through the game's distant audience filter and spatial panning. The game assigns each
+seated person a stable voice and plays their lines from their position. Speaker lines remain
+clear and close.
 
 ```sh
 vpx scripts/audio.ts list

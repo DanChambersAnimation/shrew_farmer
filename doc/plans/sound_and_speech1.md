@@ -12,9 +12,15 @@ lines, and crowd reaction, clapping, snoring and room sounds. Every gambit verdi
 references its recorded effect. `/audio-preview.html` lets the team search and review
 each take; `vpx scripts/audio.ts verify` checks the committed files and request hashes.
 
-The other clips are content candidates. The shared mixer, round milestone events,
-audience scheduler, cross-faded beds, captions and audio settings still need runtime
-work, tracked in [#23](https://github.com/DanChambersAnimation/shrew_farmer/issues/23).
+The playable room now triggers round milestones and outcomes and schedules sparse audience
+speech and applause/snoring beds. Each seated person has a stable voice: the scheduler selects
+that voice's mood lines and plays them at the person's mouth position through a low-pass,
+quieter room bus and a spatial panner. The audio listener follows the camera. The preview page
+offers raw, left-seat and right-seat listening for crowd clips.
+
+Situational gambit lines, on-screen captions, a mute and volume control, and more seamless
+cross-fading of the beds remain for [#23](https://github.com/DanChambersAnimation/shrew_farmer/issues/23)
+and later audio work.
 
 Related: [#15](https://github.com/DanChambersAnimation/shrew_farmer/issues/15) (game feedback),
 [#16](https://github.com/DanChambersAnimation/shrew_farmer/issues/16) (staged beats),

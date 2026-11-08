@@ -29,7 +29,8 @@ const roundMeterRemaining = document.querySelector<HTMLElement>("#round-meter-re
 const roundStart = document.querySelector<HTMLElement>("#round-start")!;
 const roundStartButton = document.querySelector<HTMLButtonElement>("#round-start-button")!;
 const gambitRackSlot = document.querySelector<HTMLElement>("#gambit-rack-slot")!;
-const gambitRack = new GambitRack(gambitRackSlot);
+const gambitSummary = document.querySelector<HTMLElement>("#gambit-summary")!;
+const gambitRack = new GambitRack(gambitRackSlot, gambitSummary);
 // The noclip panel builds its own markup so it never depends on index.html.
 const noclipHud = Object.assign(document.createElement("div"), { id: "noclip", hidden: true });
 noclipHud.innerHTML = "<strong>NOCLIP</strong> <code></code><small></small>";

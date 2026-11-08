@@ -16,6 +16,7 @@ import { Seat } from "../traits/seat.ts";
 import { TiltToCamera } from "../traits/tilt-to-camera.ts";
 import { Transform } from "../traits/transform.ts";
 import { AudienceModel, randomAudienceMotion } from "../traits/audience-model.ts";
+import { AudienceVoice, audienceVoiceFor } from "../traits/audience-voice.ts";
 import { MoodWatch } from "../traits/mood-watch.ts";
 import { faceFor, randomFaceRhythm } from "../characters/audience-face-model.ts";
 import type { Vec3 } from "../traits/types.ts";
@@ -66,6 +67,7 @@ export function createAudienceMember(
         face: randomFaceRhythm(seed ^ 0x27d4eb2f),
         faceSeed: seed ^ 0x165667b1,
       }),
+      trait(AudienceVoice, { voiceName: audienceVoiceFor(seed) }),
       // Announces mood changes (e.g. for speech bubbles).
       trait(MoodWatch),
     ],

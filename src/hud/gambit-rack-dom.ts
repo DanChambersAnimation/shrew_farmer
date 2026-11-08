@@ -71,7 +71,10 @@ export class GambitRack {
   private host: RackHost | null = null;
   private elapsed = 0;
 
-  constructor(container: HTMLElement) {
+  private readonly summary: HTMLElement | null;
+
+  constructor(container: HTMLElement, summary: HTMLElement | null = null) {
+    this.summary = summary;
     this.root = document.createElement("div");
     this.root.id = "gambit-rack";
     this.root.setAttribute("role", "toolbar");
@@ -95,6 +98,7 @@ export class GambitRack {
     this.medals.clear();
     this.root.replaceChildren();
     this.root.hidden = !host;
+    this.describe(null);
     if (!host) return;
 
     const hand = host.room.settingsOf(Gambits)?.hand ?? [];
@@ -118,6 +122,10 @@ export class GambitRack {
     button.title = item.name;
     button.setAttribute("aria-label", item.name);
     button.addEventListener("click", () => this.play(id));
+    button.addEventListener("pointerenter", () => this.describe(id));
+    button.addEventListener("focus", () => this.describe(id));
+    button.addEventListener("pointerleave", () => this.describe(null));
+    button.addEventListener("blur", () => this.describe(null));
     this.root.appendChild(button);
     const medal = createGambitMedal(item.medal);
     this.scene.add(medal.group);
@@ -132,6 +140,19 @@ export class GambitRack {
       dissolve: null,
       placed: false,
     });
+  }
+
+  /** Show one gambit's line under the row, or the standing hint for null. */
+  private describe(id: string | null): void {
+    if (!this.summary) return;
+    if (id === null || !items.has(id)) {
+      this.summary.replaceChildren("Hover a medal to see what it does.");
+      return;
+    }
+    const item = items.get(id);
+    const name = document.createElement("strong");
+    name.textContent = `${item.name}:`;
+    this.summary.replaceChildren(name, document.createTextNode(` ${item.summary}`));
   }
 
   /** Put the buttons in the hand's order, moving as few as possible. */
